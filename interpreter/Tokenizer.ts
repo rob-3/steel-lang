@@ -5,7 +5,7 @@ let startIndex = 0;
 let currentIndex = 0;
 let source: string;
 let line = 1;
-let commentNests = 0
+let commentNests = 0;
 
 function tokenize(src: string) {
     let tokens = [];
@@ -53,10 +53,15 @@ function eatLineComment(): void {
 
 function eatMultiLineComment(): void {
     commentNests += 1;
-    while (lookAhead() !== "*") {
-        eatChar();
+    while (!atEnd() && commentNests > 0) {
+        if (eatChar() === "/") {
+            if (lookBehind() === "*") {
+                commentNests -= 1;
+            } else if (match("*")) {
+                commentNests += 1;
+            }
+        }
     }
-    
 }
 
 function atEnd(): boolean {
@@ -68,9 +73,13 @@ function eatChar(): string {
     return source[currentIndex - 1];
 }
 
-function lookAhead(num: number = 1): string {
+function lookBehind(num: number = 0): string {
+    return source[currentIndex - num];
+}
+
+function lookAhead(num: number = 0): string {
     if (atEnd()) return "\0";
-    return source[currentIndex + num - 1];
+    return source[currentIndex + num];
 }
 
 function match(char: string): boolean {
