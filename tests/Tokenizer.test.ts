@@ -30,6 +30,7 @@ describe("isAlphaNumeric()", () => {
         expect(isAlphaNumeric("\0")).to.equal(false);
         expect(isAlphaNumeric("\"")).to.equal(false);
         expect(isAlphaNumeric("'")).to.equal(false);
+        expect(isAlpha("\n")).to.equal(false);
     });
 });
 
@@ -46,6 +47,7 @@ describe("isAlpha()", () => {
         expect(isAlpha("\0")).to.equal(false);
         expect(isAlpha("\"")).to.equal(false);
         expect(isAlpha("'")).to.equal(false);
+        expect(isAlpha("\n")).to.equal(false);
     });
 });
 
@@ -62,5 +64,12 @@ describe("isNumber()", () => {
         expect(isNumber("\0")).to.equal(false);
         expect(isNumber("\"")).to.equal(false);
         expect(isNumber("'")).to.equal(false);
+    });
+});
+
+describe("tokenize() line number handling", () => {
+    it("should provide correct line numbers", () => {
+        let result = tokenize("hi\n7.543\n92");
+        expect(result.map(t => t.line)).to.deep.equal([1, 1, 2, 2, 3]);
     });
 });

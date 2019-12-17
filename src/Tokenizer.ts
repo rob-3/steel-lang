@@ -18,6 +18,7 @@ export default function tokenize(src: string): Token[] {
         // reset start for next token
         startIndex = currentIndex;
     }
+    reset();
     return tokens;
 }
 
@@ -45,13 +46,16 @@ function scanToken(): void | Token {
         case "-": return match(">") ? makeToken(TokenType.SINGLE_ARROW) : makeToken(TokenType.MINUS);
         case "=": return match("=") ? makeToken(TokenType.EQUAL_EQUAL) : makeToken(TokenType.EQUAL);
         case " ": return;
-        case "\n": return makeToken(TokenType.STMT_TERM);
+        case "\n": 
+            let token = makeToken(TokenType.STMT_TERM);
+            line += 1;
+            return token;
         case "\"": return makeString();
         //case "\'": return stringInterpolation();
         default:
             if (isNumber(char)) {
                 return makeNumber();
-            } else if (isAlphaNumeric(char)) {
+            } else if (isAlpha(char)) {
                 return makeIdentifier();
             } else {
                 throw `Unrecognized character "${char}". Perhaps you intended to put this in a string?`;
@@ -63,7 +67,12 @@ function scanToken(): void | Token {
 
 // TODO disallow newlines in strings
 function makeString(): Token {
-    while (!atEnd() && eatChar() !== "\"") {}
+    while (!atEnd() && lookAhead() !== "\"") {
+        if(eatChar() === "\n") {
+            throw "No newlines permitted in string!";
+        }
+    }
+    eatChar();
     return makeToken(TokenType.STRING, source.slice(startIndex + 1, currentIndex - 1));
 }
 
@@ -81,9 +90,8 @@ function makeNumber(): Token {
 }
 
 function makeIdentifier(): Token {
-    let char: string = "a";
-    while (!atEnd() && isAlphaNumeric(char)) {
-        char = eatChar();
+    while (!atEnd() && isAlphaNumeric(lookAhead())) {
+        eatChar();
     }
     return makeToken(TokenType.IDENTIFER, source.slice(startIndex, currentIndex));
 }
@@ -98,6 +106,13 @@ function stringInterpolation(): Token {
 */
 
 // helpers
+function reset() {
+    startIndex = 0;
+    currentIndex = 0;
+    line = 1;
+    commentNests = 0;
+}
+
 function isAlphaNumeric(char: string): boolean {
     if (isAlpha(char) || isNumber(char) || char === "_") {
         return true;
