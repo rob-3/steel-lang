@@ -15,6 +15,8 @@ export default function tokenize(src: string): Token[] {
         if (maybeToken) {
             tokens.push(maybeToken);
         }
+        // reset start for next token
+        startIndex = currentIndex;
     }
     return tokens;
 }
@@ -42,7 +44,7 @@ function scanToken(): void | Token {
         case "+": return match("+") ? makeToken(TokenType.PLUS_PLUS) : makeToken(TokenType.PLUS);
         case "-": return match(">") ? makeToken(TokenType.SINGLE_ARROW) : makeToken(TokenType.MINUS);
         case "=": return match("=") ? makeToken(TokenType.EQUAL_EQUAL) : makeToken(TokenType.EQUAL);
-        case " ": break;
+        case " ": return;
         case "\n": return makeToken(TokenType.STMT_TERM);
         case "\"": return makeString();
         //case "\'": return stringInterpolation();
@@ -55,8 +57,6 @@ function scanToken(): void | Token {
                 throw `Unrecognized character "${char}". Perhaps you intended to put this in a string?`;
             }
     }
-    // reset start for next token
-    startIndex = currentIndex;
 }
 
 // literal makers
@@ -68,14 +68,13 @@ function makeString(): Token {
 }
 
 function makeNumber(): Token {
-    // optimized to avoid calls and cache results
-    let char: string = "0";
-    while (!atEnd() && isNumber(char)) {
-        char = eatChar();
+    while (!atEnd() && isNumber(lookAhead())) {
+        eatChar();
     }
-    if (char === ".") {
-        while (!atEnd() && isNumber(char)) {
-            char = eatChar();
+    if (lookAhead() === ".") {
+        eatChar();
+        while (!atEnd() && isNumber(lookAhead())) {
+            eatChar();
         }
     }
     return makeToken(TokenType.NUMBER, Number(source.slice(startIndex, currentIndex)));

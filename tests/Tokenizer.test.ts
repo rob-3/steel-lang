@@ -1,16 +1,21 @@
-//import tokenize from "../src/Tokenizer";
+import tokenize from "../src/Tokenizer";
+import Token from "../src/Token";
+import TokenType from "../src/TokenType";
 import { isAlphaNumeric, isAlpha, isNumber } from "../src/Tokenizer";
 import { expect } from "chai";
 
-/*
+// TODO fix line numbers
 describe("tokenize()", () => {
     it("should tokenize input", () => {
-        const output = tokenize("2 hello 6.04 my_identifier");
-        console.log(output)
-        expect(output).to.equal(0);
+        const output = tokenize('2 "hello" 6.04 my_identifier');
+        expect(output).to.deep.equal([
+            new Token(TokenType.NUMBER, "2", 2, 1),
+            new Token(TokenType.STRING, '"hello"', "hello", 1),
+            new Token(TokenType.NUMBER, "6.04", 6.04, 1),
+            new Token(TokenType.IDENTIFER, "my_identifier", "my_identifier", 1),
+        ]);
     });
 });
-*/
 
 describe("isAlphaNumeric()", () => {
     it("should check if a character is in [a-z0-9_]", () => {
