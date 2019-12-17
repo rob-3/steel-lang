@@ -56,7 +56,7 @@ function scanToken(): void | Token {
             if (isNumber(char)) {
                 return makeNumber();
             } else if (isAlpha(char)) {
-                return makeIdentifier();
+                return makeIdentifierOrKeyword();
             } else {
                 throw `Unrecognized character "${char}". Perhaps you intended to put this in a string?`;
             }
@@ -89,11 +89,15 @@ function makeNumber(): Token {
     return makeToken(TokenType.NUMBER, Number(source.slice(startIndex, currentIndex)));
 }
 
-function makeIdentifier(): Token {
+function makeIdentifierOrKeyword(): Token {
     while (!atEnd() && isAlphaNumeric(lookAhead())) {
         eatChar();
     }
-    return makeToken(TokenType.IDENTIFER, source.slice(startIndex, currentIndex));
+    let lexeme = source.slice(startIndex, currentIndex);
+    switch (lexeme) {
+        case "let": return makeToken(TokenType.LET);
+        default: return makeToken(TokenType.IDENTIFER);
+    }
 }
 
 /* TODO implement

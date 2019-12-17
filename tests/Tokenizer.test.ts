@@ -12,7 +12,7 @@ describe("tokenize()", () => {
             new Token(TokenType.NUMBER, "2", 2, 1),
             new Token(TokenType.STRING, '"hello"', "hello", 1),
             new Token(TokenType.NUMBER, "6.04", 6.04, 1),
-            new Token(TokenType.IDENTIFER, "my_identifier", "my_identifier", 1),
+            new Token(TokenType.IDENTIFER, "my_identifier", null, 1),
         ]);
     });
 });
@@ -71,5 +71,27 @@ describe("tokenize() line number handling", () => {
     it("should provide correct line numbers", () => {
         let result = tokenize("hi\n7.543\n92");
         expect(result.map(t => t.line)).to.deep.equal([1, 1, 2, 2, 3]);
+    });
+});
+
+describe("single line comment handling", () => {
+    it("should completely ignore everything after the comment", () => {
+        let result = tokenize(`let apple = 4.3 // apple = 0 *//**/??////
+            let pancakes = apple * 3 // rando-stuff
+        `);
+        expect(result).to.deep.equal([
+            new Token(TokenType.LET, "let", null, 1),
+            new Token(TokenType.IDENTIFER, "apple", null, 1),
+            new Token(TokenType.EQUAL, "=", null, 1),
+            new Token(TokenType.NUMBER, "4.3", 4.3, 1),
+            new Token(TokenType.STMT_TERM, "\n", null, 1),
+            new Token(TokenType.LET, "let", null, 2),
+            new Token(TokenType.IDENTIFER, "pancakes", null, 2),
+            new Token(TokenType.EQUAL, "=", null, 2),
+            new Token(TokenType.IDENTIFER, "apple", null, 2),
+            new Token(TokenType.STAR, "*", null, 2),
+            new Token(TokenType.NUMBER, "3", 3, 2),
+            new Token(TokenType.STMT_TERM, "\n", null, 2),
+        ])
     });
 });
