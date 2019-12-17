@@ -41,7 +41,7 @@ function scanToken(): void | Token {
             } else {
                 return makeToken(TokenType.SLASH);
             }
-            break;
+            return null;
         case "+": return match("+") ? makeToken(TokenType.PLUS_PLUS) : makeToken(TokenType.PLUS);
         case "-": return match(">") ? makeToken(TokenType.SINGLE_ARROW) : makeToken(TokenType.MINUS);
         case "=": return match("=") ? makeToken(TokenType.EQUAL_EQUAL) : makeToken(TokenType.EQUAL);
@@ -148,7 +148,7 @@ function eatMultiLineComment(): void {
     commentNests += 1;
     while (!atEnd() && commentNests > 0) {
         if (eatChar() === "/") {
-            if (lookBehind() === "*") {
+            if (lookBehind(2) === "*") {
                 commentNests -= 1;
             } else if (match("*")) {
                 commentNests += 1;
@@ -166,13 +166,13 @@ function eatChar(): string {
     return source[currentIndex - 1];
 }
 
-function lookBehind(num: number = 0): string {
+function lookBehind(num: number = 1): string {
     return source[currentIndex - num];
 }
 
-function lookAhead(num: number = 0): string {
+function lookAhead(num: number = 1): string {
     if (atEnd()) return "\0";
-    return source[currentIndex + num];
+    return source[currentIndex + num - 1];
 }
 
 function match(char: string): boolean {

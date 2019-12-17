@@ -95,3 +95,12 @@ describe("single line comment handling", () => {
         ])
     });
 });
+
+describe("multi line comment handling", () => {
+    it("should allow and ignore nested comments", () => {
+        let result = tokenize("/**//**\n let var = 32.432.32 *//* laskdjflaskdf 43*/apple");
+        expect(result).to.deep.equal([
+            new Token(TokenType.IDENTIFER, "apple", null, 1),
+        ]);
+    });
+});
