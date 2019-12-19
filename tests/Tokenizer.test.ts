@@ -104,3 +104,23 @@ describe("multi line comment handling", () => {
         ]);
     });
 });
+
+describe("tokenize() over multiple lines with variable declarations", () => {
+    it("should", () => {
+        let result = tokenize(
+            `let a = 23
+             var b = 46`
+        );
+        expect(result).to.deep.equal([
+            new Token(TokenType.LET, "let", null, 1),
+            new Token(TokenType.IDENTIFER, "a", null, 1),
+            new Token(TokenType.EQUAL, "=", null, 1),
+            new Token(TokenType.NUMBER, "23", 23, 1),
+            new Token(TokenType.STMT_TERM, "\n", null, 1),
+            new Token(TokenType.VAR, "var", null, 2),
+            new Token(TokenType.IDENTIFER, "b", null, 2),
+            new Token(TokenType.EQUAL, "=", null, 2),
+            new Token(TokenType.NUMBER, "46", 46, 2),
+        ]);
+    });
+});

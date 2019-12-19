@@ -96,6 +96,7 @@ function makeIdentifierOrKeyword(): Token {
     let lexeme = source.slice(startIndex, currentIndex);
     switch (lexeme) {
         case "let": return makeToken(TokenType.LET);
+        case "var": return makeToken(TokenType.VAR);
         default: return makeToken(TokenType.IDENTIFER);
     }
 }
