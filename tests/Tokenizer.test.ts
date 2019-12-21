@@ -25,7 +25,7 @@ describe("isAlphaNumeric()", () => {
         expect(isAlphaNumeric("Z")).to.equal(true);
         expect(isAlphaNumeric("0")).to.equal(true);
         expect(isAlphaNumeric("9")).to.equal(true);
-        expect(isAlphaNumeric("_")).to.equal(true);
+        expect(isAlphaNumeric("_")).to.equal(false);
         expect(isAlphaNumeric("-")).to.equal(false);
         expect(isAlphaNumeric("\0")).to.equal(false);
         expect(isAlphaNumeric("\"")).to.equal(false);

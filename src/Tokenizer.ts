@@ -90,7 +90,7 @@ function makeNumber(): Token {
 }
 
 function makeIdentifierOrKeyword(): Token {
-    while (!atEnd() && isAlphaNumeric(lookAhead())) {
+    while (!atEnd() && isLegalIdentifierChar(lookAhead())) {
         eatChar();
     }
     let lexeme = source.slice(startIndex, currentIndex);
@@ -119,11 +119,15 @@ function reset() {
 }
 
 function isAlphaNumeric(char: string): boolean {
-    if (isAlpha(char) || isNumber(char) || char === "_") {
+    if (isAlpha(char) || isNumber(char)) {
         return true;
     } else {
         return false;
     }
+}
+
+function isLegalIdentifierChar(char: string) {
+    return char === "_" || isAlphaNumeric(char);
 }
 
 function isAlpha(char: string): boolean {
@@ -185,4 +189,4 @@ function match(char: string): boolean {
     }
 }
 
-export { isAlphaNumeric, isAlpha, isNumber };
+export { isAlphaNumeric, isAlpha, isNumber, isLegalIdentifierChar };
