@@ -123,7 +123,7 @@ describe("multi line comment handling", () => {
 });
 
 describe("tokenize() over multiple lines with variable declarations", () => {
-    it("should", () => {
+    it("should use LET/VAR TokenType and STMT_TERM", () => {
         let result = tokenize(
             `let a = 23
              var b = 46`
