@@ -1,7 +1,7 @@
 import tokenize from "../src/Tokenizer";
 import Token from "../src/Token";
 import TokenType from "../src/TokenType";
-import { isAlphaNumeric, isAlpha, isNumber } from "../src/Tokenizer";
+import { isAlphaNumeric, isAlpha, isNumber, isLegalIdentifierChar } from "../src/Tokenizer";
 import { expect } from "chai";
 
 // TODO fix line numbers
@@ -17,8 +17,25 @@ describe("tokenize()", () => {
     });
 });
 
-describe("isAlphaNumeric()", () => {
+describe("isLegalIdentifierChar()", () => {
     it("should check if a character is in [a-z0-9_]", () => {
+        expect(isLegalIdentifierChar("a")).to.equal(true);
+        expect(isLegalIdentifierChar("z")).to.equal(true);
+        expect(isLegalIdentifierChar("A")).to.equal(true);
+        expect(isLegalIdentifierChar("Z")).to.equal(true);
+        expect(isLegalIdentifierChar("0")).to.equal(true);
+        expect(isLegalIdentifierChar("9")).to.equal(true);
+        expect(isLegalIdentifierChar("_")).to.equal(true);
+        expect(isLegalIdentifierChar("-")).to.equal(false);
+        expect(isLegalIdentifierChar("\0")).to.equal(false);
+        expect(isLegalIdentifierChar("\"")).to.equal(false);
+        expect(isLegalIdentifierChar("'")).to.equal(false);
+        expect(isLegalIdentifierChar("\n")).to.equal(false);
+    });
+});
+
+describe("isAlphaNumeric()", () => {
+    it("should check if a character is in [a-z0-9]", () => {
         expect(isAlphaNumeric("a")).to.equal(true);
         expect(isAlphaNumeric("z")).to.equal(true);
         expect(isAlphaNumeric("A")).to.equal(true);
@@ -30,7 +47,7 @@ describe("isAlphaNumeric()", () => {
         expect(isAlphaNumeric("\0")).to.equal(false);
         expect(isAlphaNumeric("\"")).to.equal(false);
         expect(isAlphaNumeric("'")).to.equal(false);
-        expect(isAlpha("\n")).to.equal(false);
+        expect(isAlphaNumeric("\n")).to.equal(false);
     });
 });
 
