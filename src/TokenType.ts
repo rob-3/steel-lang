@@ -14,6 +14,8 @@ enum TokenType {
 
     // keywords
     LET, VAR, //IF, FUNCTION, TRUE, FALSE, AND, OR, NOT, WHILE, FOR, IN
+
+    EOF,
 }
 
 export default TokenType;

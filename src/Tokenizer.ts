@@ -18,6 +18,7 @@ export default function tokenize(src: string): Token[] {
         // reset start for next token
         startIndex = currentIndex;
     }
+    tokens.push(new Token(TokenType.EOF, "", null, line));
     reset();
     return tokens;
 }

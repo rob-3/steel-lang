@@ -13,18 +13,20 @@ describe("tokenize()", () => {
             new Token(TokenType.STRING, '"hello"', "hello", 1),
             new Token(TokenType.NUMBER, "6.04", 6.04, 1),
             new Token(TokenType.IDENTIFER, "my_identifier", null, 1),
+            new Token(TokenType.EOF, "", null, 1)
         ]);
     });
 
     it("should provide correct line numbers", () => {
         let result = tokenize("hi\n7.543\n92");
-        expect(result.map(t => t.line)).to.deep.equal([1, 1, 2, 2, 3]);
+        expect(result.map(t => t.line)).to.deep.equal([1, 1, 2, 2, 3, 3]);
     });
 
     it("should ignore single line comments", () => {
-        let result = tokenize(`let apple = 4.3 // apple = 0 *//**/??////
+        let result = tokenize(
+            `let apple = 4.3 // apple = 0 *//**/??////
             let pancakes = apple * 3 // rando-stuff
-        `);
+            `);
         expect(result).to.deep.equal([
             new Token(TokenType.LET, "let", null, 1),
             new Token(TokenType.IDENTIFER, "apple", null, 1),
@@ -38,13 +40,15 @@ describe("tokenize()", () => {
             new Token(TokenType.STAR, "*", null, 2),
             new Token(TokenType.NUMBER, "3", 3, 2),
             new Token(TokenType.STMT_TERM, "\n", null, 2),
-        ])
+            new Token(TokenType.EOF, "", null, 3)
+        ]);
     });
 
     it("should ignore nested multi-line comments", () => {
         let result = tokenize("/**//**\n let var = 32.432.32 *//* laskdjflaskdf 43*/apple");
         expect(result).to.deep.equal([
             new Token(TokenType.IDENTIFER, "apple", null, 1),
+            new Token(TokenType.EOF, "", null, 1)
         ]);
     });
 
@@ -63,6 +67,14 @@ describe("tokenize()", () => {
             new Token(TokenType.IDENTIFER, "b", null, 2),
             new Token(TokenType.EQUAL, "=", null, 2),
             new Token(TokenType.NUMBER, "46", 46, 2),
+            new Token(TokenType.EOF, "", null, 2)
+        ]);
+    });
+
+    it("should end with an EOF token no matter what", () => {
+        let result = tokenize("");
+        expect(result).to.deep.equal([
+            new Token(TokenType.EOF, "", null, 1)
         ]);
     });
 });
