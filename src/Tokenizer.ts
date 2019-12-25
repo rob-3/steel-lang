@@ -100,6 +100,7 @@ function makeIdentifierOrKeyword(): Token {
         case "var": return makeToken(TokenType.VAR);
         case "true": return makeToken(TokenType.TRUE, true);
         case "false": return makeToken(TokenType.FALSE, false);
+        case "fun": return makeToken(TokenType.FUN);
         default: return makeToken(TokenType.IDENTIFER);
     }
 }

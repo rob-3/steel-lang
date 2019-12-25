@@ -86,6 +86,14 @@ describe("tokenize()", () => {
             new Token(TokenType.EOF, "", null, 1),
         ])
     });
+
+    it("should tokenize the fun keyword", () => {
+        let result = tokenize("fun");
+        expect(result).to.deep.equal([
+            new Token(TokenType.FUN, "fun", null, 1),
+            new Token(TokenType.EOF, "", null, 1),
+        ]);
+    });
 });
 
 describe("isLegalIdentifierChar()", () => {
