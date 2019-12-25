@@ -77,6 +77,15 @@ describe("tokenize()", () => {
             new Token(TokenType.EOF, "", null, 1)
         ]);
     });
+
+    it("should tokenize true and false", () => {
+        let result = tokenize("true false");
+        expect(result).to.deep.equal([
+            new Token(TokenType.TRUE, "true", true, 1),
+            new Token(TokenType.FALSE, "false", false, 1),
+            new Token(TokenType.EOF, "", null, 1),
+        ])
+    });
 });
 
 describe("isLegalIdentifierChar()", () => {

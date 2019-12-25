@@ -98,6 +98,8 @@ function makeIdentifierOrKeyword(): Token {
     switch (lexeme) {
         case "let": return makeToken(TokenType.LET);
         case "var": return makeToken(TokenType.VAR);
+        case "true": return makeToken(TokenType.TRUE, true);
+        case "false": return makeToken(TokenType.FALSE, false);
         default: return makeToken(TokenType.IDENTIFER);
     }
 }

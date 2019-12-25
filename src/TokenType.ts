@@ -13,7 +13,7 @@ enum TokenType {
     STMT_TERM,
 
     // keywords
-    LET, VAR, //IF, FUNCTION, TRUE, FALSE, AND, OR, NOT, WHILE, FOR, IN
+    LET, VAR, TRUE, FALSE, //IF, FUNCTION, AND, OR, NOT, WHILE, FOR, IN
 
     EOF,
 }
