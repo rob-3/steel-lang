@@ -155,7 +155,7 @@ function makeToken(type: TokenType, literal: any = null): Token {
 }
 
 function eatLineComment(): void {
-    while (lookAhead() !== "\n") {
+    while (lookAhead() !== "\n" && !atEnd()) {
         eatChar();
     }
 }

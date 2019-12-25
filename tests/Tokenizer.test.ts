@@ -129,6 +129,15 @@ describe("tokenize()", () => {
             new Token(TokenType.EOF, "", null, 1),
         ]);
     });
+
+    it("should not loop if there is a comment and no newline before EOF",
+       function() {
+        this.timeout(1000);
+        tokenize(
+            `let a = 3
+            let b = 5.34 //`
+        );
+    });
 });
 
 describe("isLegalIdentifierChar()", () => {
