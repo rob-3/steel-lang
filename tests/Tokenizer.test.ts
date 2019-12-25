@@ -119,6 +119,16 @@ describe("tokenize()", () => {
             new Token(TokenType.EOF, "", null, 1),
         ]);
     });
+
+    it("should tokenize the and, or, and not keywords", () => {
+        let result = tokenize("and or not");
+        expect(result).to.deep.equal([
+            new Token(TokenType.AND, "and", null, 1),
+            new Token(TokenType.OR, "or", null, 1),
+            new Token(TokenType.NOT, "not", null, 1),
+            new Token(TokenType.EOF, "", null, 1),
+        ]);
+    });
 });
 
 describe("isLegalIdentifierChar()", () => {

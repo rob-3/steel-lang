@@ -105,6 +105,9 @@ function makeIdentifierOrKeyword(): Token {
         case "else": return makeToken(TokenType.ELSE);
         case "for": return makeToken(TokenType.FOR);
         case "while": return makeToken(TokenType.WHILE);
+        case "and": return makeToken(TokenType.AND);
+        case "or": return makeToken(TokenType.OR);
+        case "not": return makeToken(TokenType.NOT);
         default: return makeToken(TokenType.IDENTIFER);
     }
 }
