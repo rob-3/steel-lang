@@ -94,6 +94,31 @@ describe("tokenize()", () => {
             new Token(TokenType.EOF, "", null, 1),
         ]);
     });
+
+    it("should tokenize the for keyword", () => {
+        let result = tokenize("for");
+        expect(result).to.deep.equal([
+            new Token(TokenType.FOR, "for", null, 1),
+            new Token(TokenType.EOF, "", null, 1),
+        ]);
+    });
+
+    it("should tokenize the while keyword", () => {
+        let result = tokenize("while");
+        expect(result).to.deep.equal([
+            new Token(TokenType.WHILE, "while", null, 1),
+            new Token(TokenType.EOF, "", null, 1),
+        ]);
+    });
+
+    it("should tokenize the if and else keywords", () => {
+        let result = tokenize("if else");
+        expect(result).to.deep.equal([
+            new Token(TokenType.IF, "if", null, 1),
+            new Token(TokenType.ELSE, "else", null, 1),
+            new Token(TokenType.EOF, "", null, 1),
+        ]);
+    });
 });
 
 describe("isLegalIdentifierChar()", () => {
