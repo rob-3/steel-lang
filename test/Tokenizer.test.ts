@@ -138,6 +138,12 @@ describe("tokenize()", () => {
             let b = 5.34 //`
         );
     });
+
+    it("should throw if there is an unterminated string literal", () => {
+        let source = '"23';
+        console.log(JSON.stringify(tokenize(source)));
+        expect(tokenize(source)).to.throw("Unterminated string literal");
+    });
 });
 
 describe("isLegalIdentifierChar()", () => {
