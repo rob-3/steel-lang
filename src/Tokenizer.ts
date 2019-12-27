@@ -66,11 +66,10 @@ function scanToken(): void | Token {
 
 // literal makers
 
-// TODO disallow newlines in strings
 function makeString(): Token {
     while (!atEnd() && lookAhead() !== "\"") {
         if(eatChar() === "\n") {
-            throw "No newlines permitted in string!";
+            throw "Unterminated string literal.";
         }
     }
     eatChar();

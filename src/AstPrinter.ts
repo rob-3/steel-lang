@@ -8,7 +8,7 @@ export default function stringify(expr: Expr): string {
         return `(${expr.operator.lexeme}${stringify(expr.right)})`
     }
     if (expr instanceof Expr.Primary) {
-        return `${expr.literal}`;
+        return `${JSON.stringify(expr.literal)}`;
     }
     throw "Unhandled expr: " + JSON.stringify(expr);
 }

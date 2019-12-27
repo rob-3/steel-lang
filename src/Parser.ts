@@ -1,15 +1,16 @@
 import Token from "./Token";
 import TokenType from "./TokenType";
 import Expr from "./Expr";
+import Stmt from "./Stmt";
 
 let tokens: Token[];
 let current = 0;
 
-export default function parse(tokenList: Token[]): Expr[] {
+export default function parse(tokenList: Token[]): Stmt[] {
     tokens = tokenList;
     let ast = [];
     while (!atEnd()) {
-        ast.push(makeExpr());
+        ast.push(makeStmt());
     }
     reset();
     return ast;
@@ -45,10 +46,18 @@ function lookAhead(): Token {
     return tokens[current];
 }
 
-function makeExpr(): Expr {
-    let expr = makeEquality();
+function makeStmt(): Stmt {
+    return makeExprStmt();
+}
+
+function makeExprStmt(): Stmt {
+    let expr = makeExpr();
     consume(TokenType.STMT_TERM, "Expected a newline!");
     return expr;
+}
+
+function makeExpr(): Expr {
+    return makeEquality();
 }
 
 function makeEquality(): Expr {
@@ -57,7 +66,11 @@ function makeEquality(): Expr {
 
 function makeComparision(): Expr {
     return makeBinaryExpr([TokenType.GREATER, TokenType.GREATER_EQUAL,
-                          TokenType.LESS, TokenType.LESS_EQUAL], makeAddition);
+                          TokenType.LESS, TokenType.LESS_EQUAL], makeConcat);
+}
+
+function makeConcat(): Expr {
+    return makeBinaryExpr([TokenType.PLUS_PLUS], makeAddition);
 }
 
 function makeAddition(): Expr {
