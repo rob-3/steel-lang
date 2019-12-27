@@ -29,7 +29,11 @@ function startRepl() {
     rl.setPrompt("> ");
     rl.prompt();
     rl.on("line", input => {
-        run(input);
+        try {
+            run(input + "\n");
+        } catch (err) {
+            console.log(err);
+        }
         rl.prompt();
     }).on("close", () => {
         console.log("Closing REPL...");
