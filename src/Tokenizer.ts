@@ -9,17 +9,20 @@ let commentNests = 0;
 
 export default function tokenize(src: string): Token[] {
     let tokens = [];
-    source = src;
-    while (!atEnd()) {
-        let maybeToken = scanToken();
-        if (maybeToken) {
-            tokens.push(maybeToken);
+    try {
+        source = src;
+        while (!atEnd()) {
+            let maybeToken = scanToken();
+            if (maybeToken) {
+                tokens.push(maybeToken);
+            }
+            // reset start for next token
+            startIndex = currentIndex;
         }
-        // reset start for next token
-        startIndex = currentIndex;
+        tokens.push(new Token(TokenType.EOF, "", null, line));
+    } finally {
+        reset();
     }
-    tokens.push(new Token(TokenType.EOF, "", null, line));
-    reset();
     return tokens;
 }
 
@@ -67,10 +70,13 @@ function scanToken(): void | Token {
 // literal makers
 
 function makeString(): Token {
-    while (!atEnd() && lookAhead() !== "\"") {
-        if(eatChar() === "\n") {
+    let cache = lookAhead()
+    while (cache !== "\"") {
+        if(cache === "\n" || atEnd()) {
             throw "Unterminated string literal.";
         }
+        eatChar();
+        cache = lookAhead();
     }
     eatChar();
     return makeToken(TokenType.STRING, source.slice(startIndex + 1, currentIndex - 1));

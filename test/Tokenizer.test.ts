@@ -141,8 +141,12 @@ describe("tokenize()", () => {
 
     it("should throw if there is an unterminated string literal", () => {
         let source = '"23';
-        console.log(JSON.stringify(tokenize(source)));
-        expect(tokenize(source)).to.throw("Unterminated string literal");
+        expect(() => tokenize(source)).to.throw("Unterminated string literal.");
+    });
+
+    it("should throw if there is an unexpected character", () => {
+        let source = '\\';
+        expect(() => tokenize(source)).to.throw("Unrecognized character \"\\\"");
     });
 });
 
