@@ -9,10 +9,13 @@ let current = 0;
 export default function parse(tokenList: Token[]): Stmt[] {
     tokens = tokenList;
     let ast = [];
-    while (!atEnd()) {
-        ast.push(makeStmt());
+    try {
+        while (!atEnd()) {
+            ast.push(makeStmt());
+        }
+    } finally {
+        reset();
     }
-    reset();
     return ast;
 }
 
