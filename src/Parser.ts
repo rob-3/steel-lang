@@ -5,26 +5,32 @@ import Expr from "./Expr";
 let tokens: Token[];
 let current = 0;
 
-export function parse(tokenList: Token[]): Expr[] {
+export default function parse(tokenList: Token[]): Expr[] {
     tokens = tokenList;
     let ast = [];
     while (!atEnd()) {
         ast.push(makeExpr());
     }
+    reset();
     return ast;
 }
 
-function consume(tt: TokenType, err: string): Token {
+function consume(tt: TokenType, err: string): void {
     if (matchType(tt)) {
-        current += 1;
-        return tokens[current];
+        return;
     } else {
         throw err;
     }
 }
 
 function matchType(...types: TokenType[]): boolean {
-    return types.reduce((acc, cur) => acc || (tokens[current].type === cur), false);
+    if (atEnd()) return false;
+    if (types.includes(lookAhead().type)) {
+        eatToken();
+        return true;
+    } else {
+        return false;
+    }
 }
 
 function atEnd(): boolean {
@@ -40,7 +46,9 @@ function lookAhead(): Token {
 }
 
 function makeExpr(): Expr {
-    return makeEquality();
+    let expr = makeEquality();
+    consume(TokenType.STMT_TERM, "Expected a newline!");
+    return expr;
 }
 
 function makeEquality(): Expr {
@@ -95,4 +103,8 @@ function makeBinaryExpr(matches: TokenType[], higherPrecedenceOperation: () => E
         expr = new Expr.Binary(expr, operator, right);
     }
     return expr;
+}
+
+function reset() {
+    current = 0;
 }
