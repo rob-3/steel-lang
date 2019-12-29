@@ -148,6 +148,15 @@ describe("tokenize()", () => {
         let source = '\\';
         expect(() => tokenize(source)).to.throw("Unrecognized character \"\\\"");
     });
+
+    it("should tokenize a unary not", () => {
+        let result = tokenize("not true");
+        expect(result).to.deep.equal([
+            new Token(TokenType.NOT, "not", null, 1),
+            new Token(TokenType.TRUE, "true", true, 1),
+            new Token(TokenType.EOF, "", null, 1),
+        ]);
+    });
 });
 
 describe("isLegalIdentifierChar()", () => {

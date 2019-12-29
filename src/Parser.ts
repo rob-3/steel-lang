@@ -19,21 +19,30 @@ export default function parse(tokenList: Token[]): Stmt[] {
     return ast;
 }
 
-function consume(tt: TokenType, err: string): void {
-    if (matchType(tt)) {
+function expectAndEat(tt: TokenType[], err: string): void {
+    if (matchType(...tt)) {
         return;
     } else {
-        throw err;
+        throw Error(err);
     }
 }
 
 function matchType(...types: TokenType[]): boolean {
-    if (atEnd()) return false;
-    if (types.includes(lookAhead().type)) {
-        eatToken();
-        return true;
+    if (atEnd()) {
+        if (types.includes(TokenType.EOF)) {
+            // we don't eat the EOF so that the top level loop won't try to
+            // lookAhead past the end of the source array
+            return true;
+        } else {
+            return false;
+        }
     } else {
-        return false;
+        if (types.includes(lookAhead().type)) {
+            eatToken();
+            return true;
+        } else {
+            return false;
+        }
     }
 }
 
@@ -55,7 +64,7 @@ function makeStmt(): Stmt {
 
 function makeExprStmt(): Stmt {
     let expr = makeExpr();
-    consume(TokenType.STMT_TERM, "Expected a newline!");
+    expectAndEat([TokenType.STMT_TERM, TokenType.EOF], "Expected a newline!");
     return expr;
 }
 
@@ -85,7 +94,7 @@ function makeMultiplication(): Expr {
 }
 
 function makeUnary(): Expr {
-    if (matchType(TokenType.MINUS)) {
+    if (matchType(TokenType.MINUS, TokenType.NOT)) {
         let operator = lookBehind();
         let right = makeUnary();
         return new Expr.Unary(operator, right);
