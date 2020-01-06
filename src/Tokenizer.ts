@@ -113,6 +113,7 @@ function makeIdentifierOrKeyword(): Token {
         case "and": return makeToken(TokenType.AND);
         case "or": return makeToken(TokenType.OR);
         case "not": return makeToken(TokenType.NOT);
+        case "in": return makeToken(TokenType.IN);
         default: return makeToken(TokenType.IDENTIFER);
     }
 }

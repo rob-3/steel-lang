@@ -19,14 +19,6 @@ export default function parse(tokenList: Token[]): Stmt[] {
     return ast;
 }
 
-function expectAndEat(tt: TokenType[], err: string): void {
-    if (matchType(...tt)) {
-        return;
-    } else {
-        throw Error(err);
-    }
-}
-
 function matchType(...types: TokenType[]): boolean {
     if (atEnd()) {
         if (types.includes(TokenType.EOF)) {
@@ -64,12 +56,40 @@ function makeStmt(): Stmt {
 
 function makeExprStmt(): Stmt {
     let expr = makeExpr();
-    expectAndEat([TokenType.STMT_TERM, TokenType.EOF], "Expected a newline!");
-    return expr;
+    if (matchType(TokenType.STMT_TERM, TokenType.EOF)) {
+        return expr;
+    } else {
+        throw Error("Expected a newline!");
+    }
 }
 
 function makeExpr(): Expr {
+    if (matchType(TokenType.LET)) return finishVariableDeclaration(true);
+    if (matchType(TokenType.VAR)) return finishVariableDeclaration(false);
+    if (matchType(TokenType.IDENTIFER)) return finishAssignment(lookBehind().lexeme);
     return makeEquality();
+}
+
+function finishVariableDeclaration(immutable: boolean): Stmt {
+    if (!matchType(TokenType.IDENTIFER)) {
+        if (matchType(TokenType.STRING)) throw Error(`Expected identifier; got a string literal.`);
+        throw Error(`Expected identifier; got "${lookAhead().lexeme}".`);
+    }
+    let identifier = lookBehind();
+    if (!matchType(TokenType.EQUAL)) {
+        throw Error(`Expected "="; got "${lookAhead().lexeme}".`);
+    }
+    let right = makeExpr();
+    return new Stmt.VariableDeclaration(identifier.lexeme, immutable, right);
+}
+
+function finishAssignment(identifier: string): Stmt {
+    // TODO check if identifier has already been declared
+    if (!matchType(TokenType.EQUAL)) {
+        throw Error(`Expected "=", got ${lookAhead().lexeme}.`);
+    }
+    let right = makeExpr();
+    return new Stmt.VariableAssignment(identifier, right);
 }
 
 function makeEquality(): Expr {
