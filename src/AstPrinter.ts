@@ -10,5 +10,8 @@ export default function stringify(expr: Expr): string {
     if (expr instanceof Expr.Primary) {
         return `${JSON.stringify(expr.literal)}`;
     }
+    if (expr instanceof Expr.Grouping) {
+        return `(${stringify(expr.expr)})`;
+    }
     throw "Unhandled expr: " + JSON.stringify(expr);
 }
