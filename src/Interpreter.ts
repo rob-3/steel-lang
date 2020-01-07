@@ -21,6 +21,8 @@ export function cfxEval(expr: Expr): any {
             case TokenType.MINUS: return opposite(expr.right);
             case TokenType.NOT: return not(expr.right);
         }
+    } else if (expr instanceof Expr.Grouping) {
+        return cfxEval(expr.expr);
     }
 }
 

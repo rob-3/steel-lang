@@ -27,4 +27,11 @@ export default class Expr {
             this.right = right;
         }
     }
+
+    static Grouping = class {
+        expr: Expr
+        constructor(expr: Expr) {
+            this.expr = expr;
+        }
+    }
 }

@@ -127,7 +127,16 @@ function makePrimary(): Expr {
     if (matchType(TokenType.FALSE)) return new Expr.Primary(false);
     if (matchType(TokenType.NUMBER, TokenType.STRING)) return new Expr.Primary(lookBehind().literal);
 
-    // TODO: paren and grouping handing
+    if (matchType(TokenType.OPEN_PAREN)) return finishGrouping();
+
+    // should be impossible to get here
+    throw Error(`Expected a primary; got "${lookAhead().lexeme}" `);
+}
+
+function finishGrouping(): Expr {
+    let expr = makeExpr();
+    if (matchType(TokenType.CLOSE_PAREN)) return new Expr.Grouping(expr);
+    else throw Error(`Expected ")", got "${lookAhead().lexeme}"`);
 }
 
 function lookBehind(): Token {
