@@ -31,7 +31,7 @@ function startRepl() {
     rl.prompt();
     rl.on("line", input => {
         try {
-            run(input + "\n");
+            run(input);
         } catch (err) {
             console.log(err);
         }
