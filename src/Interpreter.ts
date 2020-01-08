@@ -1,6 +1,9 @@
 import Expr from "./Expr";
 import TokenType from "./TokenType";
 
+/*
+ * eval() for conflux. Pass in any expression and get the evalutated result.
+ */
 export function cfxEval(expr: Expr): any {
     if (expr instanceof Expr.Primary) {
         return expr.literal;
@@ -26,6 +29,10 @@ export function cfxEval(expr: Expr): any {
     }
 }
 
+/*
+ * Returns the opposite of the expression. Throws if expr does not evaluate to a
+ * number.
+ */
 function opposite(right: Expr): number {
     let rightVal = cfxEval(right);
     if (assertNumber(rightVal)) return -rightVal;
