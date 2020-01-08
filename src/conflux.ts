@@ -44,7 +44,9 @@ function startRepl() {
 
 function run(source: string): void {
     let tokens = tokenize(source);
-    let ast = parse(tokens)[0];
-    let val = cfxEval(ast);
-    console.log(val);
+    let ast = parse(tokens);
+    if (ast.length > 0) {
+        let val = cfxEval(ast);
+        console.log(val);
+    }
 }
