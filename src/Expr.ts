@@ -1,37 +1,50 @@
 import Token from "./Token";
 
-export default class Expr {
-    static Binary = class {
-        left: Expr;
-        operator: Token;
-        right: Expr;
-        constructor(left: Expr, operator: Token, right: Expr) {
-            this.left = left;
-            this.operator = operator;
-            this.right = right;
-        }
-    }
+export class Expr {
+}
 
-    static Primary = class {
-        literal: any;
-        constructor(literal: any) {
-            this.literal = literal;
-        }
+export class BinaryExpr extends Expr {
+    left: Expr;
+    operator: Token;
+    right: Expr;
+    constructor(left: Expr, operator: Token, right: Expr) {
+        super();
+        this.left = left;
+        this.operator = operator;
+        this.right = right;
     }
+}
 
-    static Unary = class {
-        operator: Token;
-        right: Expr;
-        constructor(operator: Token, right: Expr) {
-            this.operator = operator;
-            this.right = right;
-        }
+export class PrimaryExpr extends Expr {
+    literal: any;
+    constructor(literal: any) {
+        super();
+        this.literal = literal;
     }
+}
 
-    static Grouping = class {
-        expr: Expr
-        constructor(expr: Expr) {
-            this.expr = expr;
-        }
+export class UnaryExpr extends Expr {
+    operator: Token;
+    right: Expr;
+    constructor(operator: Token, right: Expr) {
+        super();
+        this.operator = operator;
+        this.right = right;
+    }
+}
+
+export class GroupingExpr extends Expr {
+    expr: Expr
+    constructor(expr: Expr) {
+        super();
+        this.expr = expr;
+    }
+}
+
+export class VariableExpr extends Expr {
+    identifier: Token;
+    constructor(identifier: Token) {
+        super();
+        this.identifier = identifier;
     }
 }

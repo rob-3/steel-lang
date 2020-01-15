@@ -1,7 +1,10 @@
 import Token from "./Token";
 import TokenType from "./TokenType";
-import Expr from "./Expr";
-import Stmt from "./Stmt";
+import { 
+    Expr, GroupingExpr, BinaryExpr, 
+    PrimaryExpr, UnaryExpr, VariableExpr 
+} from "./Expr";
+import { Stmt, PrintStmt, VariableDeclarationStmt, VariableAssignmentStmt } from "./Stmt";
 
 let tokens: Token[];
 let current = 0;
@@ -51,7 +54,24 @@ function lookAhead(): Token {
 }
 
 function makeStmt(): Stmt {
+    if (matchType(TokenType.LET)) return finishVariableDeclaration(true);
+    if (matchType(TokenType.VAR)) return finishVariableDeclaration(false);
+    if (matchType(TokenType.IDENTIFER)) {
+        // TODO support for dot notation here
+        if (matchType(TokenType.EQUAL)) {
+            return finishAssignment(lookBehind(2).lexeme);
+        } else {
+            return new VariableExpr(lookBehind());
+        }
+    }
+    if (matchType(TokenType.PRINT)) return finishPrintStmt();
     return makeExprStmt();
+}
+
+function finishPrintStmt(): Stmt {
+    if (matchType(TokenType.STRING, TokenType.NUMBER)) return new PrintStmt(lookBehind().literal);
+    if (matchType(TokenType.IDENTIFER)) return new PrintStmt(lookBehind());
+    else throw Error("Can't print");
 }
 
 function makeExprStmt(): Stmt {
@@ -64,13 +84,11 @@ function makeExprStmt(): Stmt {
 }
 
 function makeExpr(): Expr {
-    if (matchType(TokenType.LET)) return finishVariableDeclaration(true);
-    if (matchType(TokenType.VAR)) return finishVariableDeclaration(false);
-    if (matchType(TokenType.IDENTIFER)) return finishAssignment(lookBehind().lexeme);
     return makeEquality();
 }
 
 function finishVariableDeclaration(immutable: boolean): Stmt {
+    // TODO check if variable has already been declared
     if (!matchType(TokenType.IDENTIFER)) {
         if (matchType(TokenType.STRING)) throw Error(`Expected identifier; got a string literal.`);
         throw Error(`Expected identifier; got "${lookAhead().lexeme}".`);
@@ -80,16 +98,23 @@ function finishVariableDeclaration(immutable: boolean): Stmt {
         throw Error(`Expected "="; got "${lookAhead().lexeme}".`);
     }
     let right = makeExpr();
-    return new Stmt.VariableDeclaration(identifier.lexeme, immutable, right);
+
+    if (matchType(TokenType.STMT_TERM, TokenType.EOF)) {
+        return new VariableDeclarationStmt(identifier.lexeme, immutable, right);
+    } else {
+        throw Error("Expected a newline!");
+    }
 }
 
 function finishAssignment(identifier: string): Stmt {
     // TODO check if identifier has already been declared
+    /*
     if (!matchType(TokenType.EQUAL)) {
         throw Error(`Expected "=", got ${lookAhead().lexeme}.`);
     }
+    */
     let right = makeExpr();
-    return new Stmt.VariableAssignment(identifier, right);
+    return new VariableAssignmentStmt(identifier, right);
 }
 
 function makeEquality(): Expr {
@@ -117,15 +142,16 @@ function makeUnary(): Expr {
     if (matchType(TokenType.MINUS, TokenType.NOT)) {
         let operator = lookBehind();
         let right = makeUnary();
-        return new Expr.Unary(operator, right);
+        return new UnaryExpr(operator, right);
     }
     return makePrimary();
 }
 
 function makePrimary(): Expr {
-    if (matchType(TokenType.TRUE)) return new Expr.Primary(true);
-    if (matchType(TokenType.FALSE)) return new Expr.Primary(false);
-    if (matchType(TokenType.NUMBER, TokenType.STRING)) return new Expr.Primary(lookBehind().literal);
+    if (matchType(TokenType.TRUE)) return new PrimaryExpr(true);
+    if (matchType(TokenType.FALSE)) return new PrimaryExpr(false);
+    if (matchType(TokenType.NUMBER, TokenType.STRING)) return new PrimaryExpr(lookBehind().literal);
+    if (matchType(TokenType.IDENTIFER)) return new VariableExpr(lookBehind());
 
     if (matchType(TokenType.OPEN_PAREN)) return finishGrouping();
 
@@ -135,12 +161,12 @@ function makePrimary(): Expr {
 
 function finishGrouping(): Expr {
     let expr = makeExpr();
-    if (matchType(TokenType.CLOSE_PAREN)) return new Expr.Grouping(expr);
+    if (matchType(TokenType.CLOSE_PAREN)) return new GroupingExpr(expr);
     else throw Error(`Expected ")", got "${lookAhead().lexeme}"`);
 }
 
-function lookBehind(): Token {
-    return tokens[current - 1];
+function lookBehind(distance: number = 1): Token {
+    return tokens[current - distance];
 }
 
 function eatToken(): Token {
@@ -154,7 +180,7 @@ function makeBinaryExpr(matches: TokenType[], higherPrecedenceOperation: () => E
     while (matchType(...matches)) {
         let operator = lookBehind();
         let right = higherPrecedenceOperation();
-        expr = new Expr.Binary(expr, operator, right);
+        expr = new BinaryExpr(expr, operator, right);
     }
     return expr;
 }

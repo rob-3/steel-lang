@@ -6,8 +6,7 @@ const rl = require("readline").createInterface({
 
 import tokenize from "./Tokenizer";
 import parse from "./Parser";
-import stringify from "./AstPrinter";
-import { cfxEval } from "./Interpreter";
+import { cfxEval, exec } from "./Interpreter";
 
 if (process.argv.length > 3) {
     console.log("Usage: node conflux [filename]");
@@ -20,7 +19,7 @@ if (process.argv.length > 3) {
             console.log("There was a problem reading the file.");
             process.exitCode = 1;
         } else {
-            run(contents);
+            run(contents, false);
             rl.close();
         }
     });
@@ -31,7 +30,7 @@ function startRepl() {
     rl.prompt();
     rl.on("line", input => {
         try {
-            run(input);
+            run(input, true);
         } catch (err) {
             console.log(err);
         }
@@ -42,11 +41,11 @@ function startRepl() {
     });
 }
 
-function run(source: string): void {
+function run(source: string, repl: boolean): void {
     let tokens = tokenize(source);
     let ast = parse(tokens);
-    if (ast.length > 0) {
-        let val = cfxEval(ast);
-        console.log(val);
+    for (let stmt of ast) {
+        exec(stmt);
     }
+    if (repl) console.log(cfxEval(ast[0]));
 }

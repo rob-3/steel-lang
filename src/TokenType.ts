@@ -16,6 +16,8 @@ enum TokenType {
     LET, VAR, IF, ELSE, TRUE, FALSE, FUN, WHILE, FOR, IN, AND, OR, NOT,
 
     EOF,
+
+    PRINT,
 }
 
 export default TokenType;
