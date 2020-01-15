@@ -56,7 +56,7 @@ function lookAhead(): Token {
 function makeStmt(): Stmt {
     if (matchType(TokenType.LET)) return finishVariableDeclaration(true);
     if (matchType(TokenType.VAR)) return finishVariableDeclaration(false);
-    if (matchType(TokenType.IDENTIFER)) {
+    if (matchType(TokenType.IDENTIFIER)) {
         // TODO support for dot notation here
         if (matchType(TokenType.EQUAL)) {
             return finishAssignment(lookBehind(2).lexeme);
@@ -70,7 +70,7 @@ function makeStmt(): Stmt {
 
 function finishPrintStmt(): Stmt {
     if (matchType(TokenType.STRING, TokenType.NUMBER)) return new PrintStmt(lookBehind().literal);
-    if (matchType(TokenType.IDENTIFER)) return new PrintStmt(lookBehind());
+    if (matchType(TokenType.IDENTIFIER)) return new PrintStmt(lookBehind());
     else throw Error("Can't print");
 }
 
@@ -89,7 +89,7 @@ function makeExpr(): Expr {
 
 function finishVariableDeclaration(immutable: boolean): Stmt {
     // TODO check if variable has already been declared
-    if (!matchType(TokenType.IDENTIFER)) {
+    if (!matchType(TokenType.IDENTIFIER)) {
         if (matchType(TokenType.STRING)) throw Error(`Expected identifier; got a string literal.`);
         throw Error(`Expected identifier; got "${lookAhead().lexeme}".`);
     }
@@ -151,7 +151,7 @@ function makePrimary(): Expr {
     if (matchType(TokenType.TRUE)) return new PrimaryExpr(true);
     if (matchType(TokenType.FALSE)) return new PrimaryExpr(false);
     if (matchType(TokenType.NUMBER, TokenType.STRING)) return new PrimaryExpr(lookBehind().literal);
-    if (matchType(TokenType.IDENTIFER)) return new VariableExpr(lookBehind());
+    if (matchType(TokenType.IDENTIFIER)) return new VariableExpr(lookBehind());
 
     if (matchType(TokenType.OPEN_PAREN)) return finishGrouping();
 

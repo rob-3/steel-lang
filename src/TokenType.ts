@@ -7,7 +7,7 @@ enum TokenType {
     EQUAL_EQUAL, GREATER_EQUAL, LESS_EQUAL, PLUS_PLUS, SINGLE_ARROW,
 
     // literals
-    STRING, NUMBER, IDENTIFER,
+    STRING, NUMBER, IDENTIFIER,
 
     // terminator
     STMT_TERM,

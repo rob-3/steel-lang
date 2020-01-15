@@ -12,7 +12,7 @@ describe("tokenize()", () => {
             new Token(TokenType.NUMBER, "2", 2, 1),
             new Token(TokenType.STRING, '"hello"', "hello", 1),
             new Token(TokenType.NUMBER, "6.04", 6.04, 1),
-            new Token(TokenType.IDENTIFER, "my_identifier", null, 1),
+            new Token(TokenType.IDENTIFIER, "my_identifier", null, 1),
             new Token(TokenType.EOF, "", null, 1)
         ]);
     });
@@ -29,14 +29,14 @@ describe("tokenize()", () => {
             `);
         expect(result).to.deep.equal([
             new Token(TokenType.LET, "let", null, 1),
-            new Token(TokenType.IDENTIFER, "apple", null, 1),
+            new Token(TokenType.IDENTIFIER, "apple", null, 1),
             new Token(TokenType.EQUAL, "=", null, 1),
             new Token(TokenType.NUMBER, "4.3", 4.3, 1),
             new Token(TokenType.STMT_TERM, "\n", null, 1),
             new Token(TokenType.LET, "let", null, 2),
-            new Token(TokenType.IDENTIFER, "pancakes", null, 2),
+            new Token(TokenType.IDENTIFIER, "pancakes", null, 2),
             new Token(TokenType.EQUAL, "=", null, 2),
-            new Token(TokenType.IDENTIFER, "apple", null, 2),
+            new Token(TokenType.IDENTIFIER, "apple", null, 2),
             new Token(TokenType.STAR, "*", null, 2),
             new Token(TokenType.NUMBER, "3", 3, 2),
             new Token(TokenType.STMT_TERM, "\n", null, 2),
@@ -47,7 +47,7 @@ describe("tokenize()", () => {
     it("should ignore nested multi-line comments", () => {
         let result = tokenize("/**//**\n let var = 32.432.32 *//* laskdjflaskdf 43*/apple");
         expect(result).to.deep.equal([
-            new Token(TokenType.IDENTIFER, "apple", null, 1),
+            new Token(TokenType.IDENTIFIER, "apple", null, 1),
             new Token(TokenType.EOF, "", null, 1)
         ]);
     });
@@ -59,12 +59,12 @@ describe("tokenize()", () => {
         );
         expect(result).to.deep.equal([
             new Token(TokenType.LET, "let", null, 1),
-            new Token(TokenType.IDENTIFER, "a", null, 1),
+            new Token(TokenType.IDENTIFIER, "a", null, 1),
             new Token(TokenType.EQUAL, "=", null, 1),
             new Token(TokenType.NUMBER, "23", 23, 1),
             new Token(TokenType.STMT_TERM, "\n", null, 1),
             new Token(TokenType.VAR, "var", null, 2),
-            new Token(TokenType.IDENTIFER, "b", null, 2),
+            new Token(TokenType.IDENTIFIER, "b", null, 2),
             new Token(TokenType.EQUAL, "=", null, 2),
             new Token(TokenType.NUMBER, "46", 46, 2),
             new Token(TokenType.EOF, "", null, 2)
