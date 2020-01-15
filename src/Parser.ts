@@ -56,16 +56,20 @@ function lookAhead(): Token {
 function makeStmt(): Stmt {
     if (matchType(TokenType.LET)) return finishVariableDeclaration(true);
     if (matchType(TokenType.VAR)) return finishVariableDeclaration(false);
+    if (matchType(TokenType.PRINT)) return finishPrintStmt();
     if (matchType(TokenType.IDENTIFIER)) {
         // TODO support for dot notation here
         if (matchType(TokenType.EQUAL)) {
             return finishAssignment(lookBehind(2).lexeme);
         } else {
-            return new VariableExpr(lookBehind());
+            backTrack();
         }
     }
-    if (matchType(TokenType.PRINT)) return finishPrintStmt();
     return makeExprStmt();
+}
+
+function backTrack(): void {
+    current -= 1;
 }
 
 function finishPrintStmt(): Stmt {
