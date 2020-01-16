@@ -1,21 +1,22 @@
 {
-  "name": "interpreter",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "test": "mocha -r ts-node/register --watch --watch-extensions ts"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "devDependencies": {
-    "@types/chai": "^4.2.7",
-    "@types/mocha": "^5.2.7",
-    "@types/node": "^13.1.7",
-    "chai": "^4.2.0",
-    "mocha": "^6.2.2",
-    "ts-node": "^8.6.2",
-    "typescript": "^3.7.4"
-  }
+	"name": "interpreter",
+	"version": "1.0.0",
+	"main": "index.js",
+	"scripts": {
+		"start": "ts-node src/conflux.ts",
+		"test": "mocha -r ts-node/register --watch --watch-extensions ts"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"description": "",
+	"devDependencies": {
+		"@types/chai": "^4.2.7",
+		"@types/mocha": "^5.2.7",
+		"@types/node": "^13.1.7",
+		"chai": "^4.2.0",
+		"mocha": "^6.2.2",
+		"ts-node": "^8.6.2",
+		"typescript": "^3.7.4"
+	}
 }
