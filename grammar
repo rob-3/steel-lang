@@ -1,9 +1,0 @@
-expression -> literal | unary | binary | grouping | block | assignment
-literal -> NUMBER | STRING | "true" | "false";
-grouping -> "(" expression ")";
-unary -> ( "-" | "not" ) expression;
-binary -> expression operator expression;
-operator -> "==" | "<" | "<=" | ">" | ">=" | "+" | "-" | "*" | "/" | "is" | "->" | "++";
-block -> "{" expression* "}";
-parameters -> (IDENTIFIER ",")*
-assignment -> ( "let" | "var" ) IDENTIFIER "=" 
