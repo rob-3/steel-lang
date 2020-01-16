@@ -18,7 +18,7 @@ export function exec(stmt: Stmt): void {
     } else if (stmt instanceof VariableAssignmentStmt) {
         assign(stmt.identifier, stmt.right);
     } else if (stmt instanceof Expr) {
-        cfxEval(stmt);
+        return cfxEval(stmt);
     }
 }
 

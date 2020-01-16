@@ -6,7 +6,7 @@ const rl = require("readline").createInterface({
 
 import tokenize from "./Tokenizer";
 import parse from "./Parser";
-import { cfxEval, exec } from "./Interpreter";
+import { exec } from "./Interpreter";
 
 if (process.argv.length > 3) {
     console.log("Usage: node conflux [filename]");
@@ -45,7 +45,9 @@ function run(source: string, repl: boolean): void {
     let tokens = tokenize(source);
     let ast = parse(tokens);
     for (let stmt of ast) {
-        exec(stmt);
+        let val = exec(stmt);
+        if (repl && val !== undefined) {
+            console.log(val)
+        }
     }
-    if (repl) console.log(cfxEval(ast[0]));
 }
