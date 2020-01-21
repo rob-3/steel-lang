@@ -81,7 +81,7 @@ function makeExprStmt(): Stmt {
     if (matchType(TokenType.STMT_TERM, TokenType.EOF)) {
         return expr;
     } else {
-        throw Error("Expected a newline!");
+        throw Error(`Expected a newline; got "${lookAhead().lexeme}"`);
     }
 }
 
