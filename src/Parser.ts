@@ -73,9 +73,7 @@ function backTrack(): void {
 }
 
 function finishPrintStmt(): Stmt {
-    if (matchType(TokenType.STRING, TokenType.NUMBER)) return new PrintStmt(new PrimaryExpr(lookBehind().literal));
-    if (matchType(TokenType.IDENTIFIER)) return new PrintStmt(new VariableExpr(lookBehind()));
-    else throw Error("Can't print");
+    return new PrintStmt(makeExpr());
 }
 
 function makeExprStmt(): Stmt {
