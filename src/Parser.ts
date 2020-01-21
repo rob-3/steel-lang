@@ -73,16 +73,21 @@ function backTrack(): void {
 }
 
 function finishPrintStmt(): Stmt {
-    return new PrintStmt(makeExpr());
+    let stmt = new PrintStmt(makeExpr());
+    endStmt();
+    return stmt;
+}
+
+function endStmt() {
+    if (!matchType(TokenType.STMT_TERM, TokenType.EOF)) {
+        throw Error(`Expected a newline; got "${lookAhead().lexeme}"`);
+    }
 }
 
 function makeExprStmt(): Stmt {
     let expr = makeExpr();
-    if (matchType(TokenType.STMT_TERM, TokenType.EOF)) {
-        return expr;
-    } else {
-        throw Error(`Expected a newline; got "${lookAhead().lexeme}"`);
-    }
+    endStmt();
+    return expr;
 }
 
 function makeExpr(): Expr {
