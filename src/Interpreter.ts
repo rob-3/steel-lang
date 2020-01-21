@@ -3,8 +3,7 @@ import { Stmt, VariableDeclarationStmt, PrintStmt, VariableAssignmentStmt } from
 import TokenType from "./TokenType";
 import Token from "./Token";
 
-let immutableGlobals = new Map();
-let mutableGlobals = new Map();
+let variables = new Map();
 
 export function exec(stmt: Stmt): void {
     if (stmt instanceof PrintStmt) {
@@ -19,31 +18,30 @@ export function exec(stmt: Stmt): void {
 }
 
 function lookup(identifierToken: Token): any {
-    let val = immutableGlobals.get(identifierToken.lexeme);
+    let val = variables.get(identifierToken.lexeme);
     if (val === undefined) {
-        val = mutableGlobals.get(identifierToken.lexeme);
-        if (val === undefined) {
-            throw Error(`Variable "${identifierToken.lexeme}" is not defined.`);
-        }
+        throw Error(`Variable "${identifierToken.lexeme}" is not defined.`);
+    } else {
+        return val[0];
     }
-    return val;
 }
 
 function define(key: string, value: Expr, immutable: boolean): void {
-    if (immutable) {
-        immutableGlobals.set(key, cfxEval(value));
-    } else {
-        mutableGlobals.set(key, cfxEval(value));
-    }
+    if (!variables.has(key) || !variables.get(key)[1]) variables.set(key, [cfxEval(value), immutable]);
+    else throw Error(`Cannot redefine immutable variable "${key}".`);
 }
 
 function assign(key: string, value: Expr): void {
-    if (mutableGlobals.has(key)) {
-        mutableGlobals.set(key, cfxEval(value));
-    } else if (immutableGlobals.has(key)) {
-        throw Error(`Cannot assign to immutable variable "${key}".`);
-    } else {
+    let variable = variables.get(key);
+    if (variable === undefined) {
         throw Error(`Cannot assign to undefined variable "${key}".`);
+    } else {
+        let immutable = variable[1];
+        if (!immutable) {
+            variables.set(key, [cfxEval(value), false]);
+        } else {
+            throw Error(`Cannot assign to immutable variable "${key}".`);
+        }
     }
 }
 
