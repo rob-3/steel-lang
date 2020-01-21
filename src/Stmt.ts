@@ -1,5 +1,4 @@
 import { Expr } from "./Expr";
-import Token from "./Token";
 
 export class Stmt {
 }
@@ -28,8 +27,8 @@ export class VariableAssignmentStmt extends Stmt {
 
 // TODO: library function
 export class PrintStmt extends Stmt {
-    thingToPrint: Token;
-    constructor(thingToPrint: Token) {
+    thingToPrint: Expr;
+    constructor(thingToPrint: Expr) {
         super();
         this.thingToPrint = thingToPrint;
     }

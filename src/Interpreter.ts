@@ -8,11 +8,7 @@ let mutableGlobals = new Map();
 
 export function exec(stmt: Stmt): void {
     if (stmt instanceof PrintStmt) {
-        if (stmt.thingToPrint instanceof VariableExpr) {
-            console.log(lookup(stmt.thingToPrint))
-        } else {
-            console.log(stmt.thingToPrint);
-        }
+        console.log(cfxEval(stmt.thingToPrint));
     } else if (stmt instanceof VariableDeclarationStmt) {
         define(stmt.identifier, stmt.right, stmt.immutable)
     } else if (stmt instanceof VariableAssignmentStmt) {
