@@ -13,10 +13,10 @@
 	"devDependencies": {
 		"@types/chai": "^4.2.7",
 		"@types/mocha": "^5.2.7",
-		"@types/node": "^13.1.7",
+		"@types/node": "^13.1.8",
 		"chai": "^4.2.0",
 		"mocha": "^6.2.2",
 		"ts-node": "^8.6.2",
-		"typescript": "^3.7.4"
+		"typescript": "^3.7.5"
 	}
 }
