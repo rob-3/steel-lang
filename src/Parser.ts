@@ -4,7 +4,10 @@ import {
     Expr, GroupingExpr, BinaryExpr, 
     PrimaryExpr, UnaryExpr, VariableExpr 
 } from "./Expr";
-import { Stmt, PrintStmt, VariableDeclarationStmt, VariableAssignmentStmt } from "./Stmt";
+import { 
+    Stmt, PrintStmt, VariableDeclarationStmt, 
+    VariableAssignmentStmt, IfStmt, BlockStmt
+} from "./Stmt";
 
 let tokens: Token[];
 let current = 0;
@@ -53,10 +56,11 @@ function lookAhead(): Token {
     return tokens[current];
 }
 
-function makeStmt(): Stmt {
+function makeStmt(): Stmt | void {
     if (matchType(TokenType.LET)) return finishVariableDeclaration(true);
     if (matchType(TokenType.VAR)) return finishVariableDeclaration(false);
     if (matchType(TokenType.PRINT)) return finishPrintStmt();
+    if (matchType(TokenType.IF)) return finishIfStmt();
     if (matchType(TokenType.IDENTIFIER)) {
         // TODO support for dot notation here
         if (matchType(TokenType.EQUAL)) {
@@ -65,6 +69,8 @@ function makeStmt(): Stmt {
             backTrack();
         }
     }
+    if (matchType(TokenType.OPEN_BRACE)) return finishBlockStmt();
+    if (matchType(TokenType.STMT_TERM)) return null;
     return makeExprStmt();
 }
 
@@ -72,21 +78,52 @@ function backTrack(): void {
     current -= 1;
 }
 
-function finishPrintStmt(): Stmt {
-    let stmt = new PrintStmt(makeExpr());
-    endStmt();
-    return stmt;
+function finishBlockStmt(): Stmt {
+    let stmts: Stmt[] = [];
+    while (!matchType(TokenType.CLOSE_BRACE)) {
+        let maybeStmt = makeStmt();
+        if (maybeStmt) stmts.push(maybeStmt);
+        if (atEnd()) {
+            throw Error("Encountered EOF before end of block statement.");
+        }
+    }
+    return new BlockStmt(stmts);
 }
 
-function endStmt() {
-    if (!matchType(TokenType.STMT_TERM, TokenType.EOF)) {
-        throw Error(`Expected a newline; got "${lookAhead().lexeme}"`);
+function finishIfStmt(): Stmt {
+    if (!matchType(TokenType.OPEN_PAREN)) {
+        throw Error(`Expected "("; got "${lookAhead().lexeme}"`);
     }
+    let condition = makeExpr();
+    if (!matchType(TokenType.CLOSE_PAREN)) {
+        throw Error(`Expected ")"; got "${lookAhead().lexeme}"`);
+    }
+    let maybeBody = makeStmt();
+    if (!maybeBody) {
+        throw Error(`After if expected statement, but got ${lookAhead().lexeme}`);
+    }
+    let elseBody: Stmt = null;
+    if (matchType(TokenType.ELSE)) {
+        let maybeElseBody = makeStmt();
+        if (maybeElseBody) {
+            elseBody = maybeElseBody;
+        } else {
+            throw Error(`After else expected statement, but got ${lookAhead().lexeme}`);
+        }
+    }
+    return new IfStmt(condition, maybeBody, elseBody);
+}
+
+function finishPrintStmt(): Stmt {
+    let stmt = new PrintStmt(makeExpr());
+    return stmt;
 }
 
 function makeExprStmt(): Stmt {
     let expr = makeExpr();
-    endStmt();
+    if (!matchType(TokenType.STMT_TERM, TokenType.EOF)) {
+        throw Error(`Expected a newline; got "${lookAhead().lexeme}"`);
+    }
     return expr;
 }
 

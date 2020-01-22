@@ -33,3 +33,23 @@ export class PrintStmt extends Stmt {
         this.thingToPrint = thingToPrint;
     }
 }
+
+export class IfStmt extends Stmt {
+    condition: Expr;
+    body: Stmt;
+    elseBody: Stmt;
+    constructor(condition: Expr, body: Stmt, elseBody: Stmt) {
+        super();
+        this.condition = condition;
+        this.body = body;
+        this.elseBody = elseBody;
+    }
+}
+
+export class BlockStmt extends Stmt {
+    stmts: Stmt[];
+    constructor(stmts: Stmt[]) {
+        super();
+        this.stmts = stmts;
+    }
+}

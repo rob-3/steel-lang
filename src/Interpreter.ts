@@ -1,17 +1,35 @@
-import { Expr, VariableExpr, BinaryExpr, PrimaryExpr, UnaryExpr, GroupingExpr } from "./Expr";
-import { Stmt, VariableDeclarationStmt, PrintStmt, VariableAssignmentStmt } from "./Stmt";
+import { 
+    Expr, VariableExpr, BinaryExpr, 
+    PrimaryExpr, UnaryExpr, GroupingExpr 
+} from "./Expr";
+import { 
+    Stmt, VariableDeclarationStmt, PrintStmt, 
+    VariableAssignmentStmt, IfStmt, BlockStmt
+} from "./Stmt";
 import TokenType from "./TokenType";
 import Token from "./Token";
 
 let variables = new Map();
 
-export function exec(stmt: Stmt): void {
+export function exec(stmt: Stmt, printfn): void {
     if (stmt instanceof PrintStmt) {
-        console.log(cfxEval(stmt.thingToPrint));
+        printfn(cfxEval(stmt.thingToPrint));
     } else if (stmt instanceof VariableDeclarationStmt) {
         define(stmt.identifier, stmt.right, stmt.immutable)
     } else if (stmt instanceof VariableAssignmentStmt) {
         assign(stmt.identifier, stmt.right);
+    } else if (stmt instanceof IfStmt) {
+        let shouldBeBool = cfxEval(stmt.condition);
+        if (typeof shouldBeBool !== "boolean") {
+            throw Error("Statement doesn't evaluate to a boolean.");
+        }
+        if (shouldBeBool) {
+            exec(stmt.body, printfn);
+        } else if (stmt.elseBody !== null) {
+            exec(stmt.elseBody, printfn);
+        }
+    } else if (stmt instanceof BlockStmt) {
+        stmt.stmts.map(stmt => exec(stmt, printfn));
     } else if (stmt instanceof Expr) {
         return cfxEval(stmt);
     }

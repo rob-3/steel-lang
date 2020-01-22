@@ -54,6 +54,8 @@ function scanToken(): void | Token {
             let token = makeToken(TokenType.STMT_TERM);
             line += 1;
             return token;
+        case ";":
+            return makeToken(TokenType.STMT_TERM);
         case "\"": return makeString();
         //case "\'": return stringInterpolation();
         default:
