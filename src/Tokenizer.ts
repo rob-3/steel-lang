@@ -49,6 +49,7 @@ function scanToken(): void | Token {
         case "+": return match("+") ? makeToken(TokenType.PLUS_PLUS) : makeToken(TokenType.PLUS);
         case "-": return match(">") ? makeToken(TokenType.SINGLE_ARROW) : makeToken(TokenType.MINUS);
         case "=": return match("=") ? makeToken(TokenType.EQUAL_EQUAL) : makeToken(TokenType.EQUAL);
+        case "\t":
         case " ": return;
         case "\n": 
             let token = makeToken(TokenType.STMT_TERM);
