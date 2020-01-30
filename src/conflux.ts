@@ -45,7 +45,7 @@ function run(source: string, repl: boolean): void {
     let tokens = tokenize(source);
     let ast = parse(tokens);
     for (let stmt of ast) {
-        let val = exec(stmt);
+        let val = exec(stmt, console.log);
         if (repl && val !== undefined) {
             console.log(val)
         }
