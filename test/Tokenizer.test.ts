@@ -177,7 +177,7 @@ describe("isLegalIdentifierChar()", () => {
         expect(isLegalIdentifierChar("_")).to.equal(true);
     });
 
-    it("should return false if a character is [-\0\"\'\n]", () => {
+    it("should return false if a character is [-\\0\"\'\\n]", () => {
        expect(isLegalIdentifierChar("\0")).to.equal(false);
        expect(isLegalIdentifierChar("\"")).to.equal(false);
        expect(isLegalIdentifierChar("'")).to.equal(false);
@@ -198,7 +198,7 @@ describe("isAlphaNumeric()", () => {
         expect(isAlphaNumeric("9")).to.equal(true);
     });
 
-    it("should return false if a character is [_-\0\"\'\n]", () => {
+    it("should return false if a character is [_-\\0\"\'\\n]", () => {
         expect(isAlphaNumeric("_")).to.equal(false);
         expect(isAlphaNumeric("-")).to.equal(false);
         expect(isAlphaNumeric("\0")).to.equal(false);
@@ -216,7 +216,7 @@ describe("isAlpha()", () => {
         expect(isAlpha("Z")).to.equal(true);
     });
 
-    it("should return false if a character is [_-\0\"\'\n]", () => {
+    it("should return false if a character is [_-\\0\"\'\\n]", () => {
         expect(isAlpha("0")).to.equal(false);
         expect(isAlpha("9")).to.equal(false);
         expect(isAlpha("_")).to.equal(false);
