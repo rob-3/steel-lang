@@ -31,6 +31,48 @@ describe("cfxEval()", () => {
         let result = evalLn(src);
         expect(result).to.equal("happy day");
     });
+
+    it("should evaluate boolean literals", () => {
+        let src = "true";
+        let result = evalLn(src);
+        expect(result).to.equal(true);
+    });
+
+    it("should do addition correctly", () => {
+        let src = "2 + 2";
+        let result = evalLn(src);
+        expect(result).to.equal(4);
+    });
+
+    it("should do subtraction correctly", () => {
+        let src = "2 - 2";
+        let result = evalLn(src);
+        expect(result).to.equal(0);
+    });
+
+    it("should do multiplication correctly", () => {
+        let src = "2 * 5";
+        let result = evalLn(src);
+        expect(result).to.equal(10);
+    });
+
+    it("should do division correctly", () => {
+        let src = "2 / 2";
+        let result = evalLn(src);
+        expect(result).to.equal(1);
+    });
+
+    it("should do floating point division correctly", () => {
+        let src = "5 / 2";
+        let result = evalLn(src);
+        expect(result).to.equal(2.5);
+    });
+
+    it("should follow order of operations", () => {
+        let src = "5 / 5 + 3 * 2";
+        let result = evalLn(src);
+        expect(result).to.equal(7);
+    });
 });
 
 describe("exec()", () => {
