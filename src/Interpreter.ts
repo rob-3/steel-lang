@@ -78,6 +78,11 @@ export function cfxEval(expr: Expr): any {
             case TokenType.SLASH: return slash(expr.left, expr.right);
             case TokenType.AND: return and(expr.left, expr.right);
             case TokenType.OR: return or(expr.left, expr.right);
+            case TokenType.GREATER_EQUAL: return greaterEqual(expr.left, expr.right);
+            case TokenType.GREATER: return greater(expr.left, expr.right);
+            case TokenType.LESS_EQUAL: return lessEqual(expr.left, expr.right);
+            case TokenType.LESS: return less(expr.left, expr.right);
+            case TokenType.EQUAL_EQUAL: return equal(expr.left, expr.right);
             default:
                 throw Error(`FIXME: Unhandled operator type "${expr.operator}"`);
         }
@@ -179,5 +184,33 @@ function assertBool(...literals: any[]): boolean {
 function not(right: Expr): boolean {
     let rightVal = cfxEval(right);
     if (assertBool(rightVal)) return !rightVal;
-    else throw Error('Operand of "not" should be booleans.');
+    else throw Error('Operands of "not" should be booleans.');
+}
+
+function greaterEqual(left: Expr, right: Expr): boolean {
+    return comparision(left, right, (l, r) => l >= r, ">=");
+}
+
+function greater(left: Expr, right: Expr): boolean {
+    return comparision(left, right, (l, r) => l > r, ">");
+}
+
+function lessEqual(left: Expr, right: Expr): boolean {
+    return comparision(left, right, (l, r) => l <= r, "<=");
+}
+
+function less(left: Expr, right: Expr): boolean {
+    return comparision(left, right, (l, r) => l < r, "<");
+}
+
+function equal(left: Expr, right: Expr): boolean {
+    return comparision(left, right, (l, r) => l === r, "==");
+}
+
+function comparision(left: Expr, right: Expr, operator, err: string): boolean {
+    let leftVal = cfxEval(left);
+    let rightVal = cfxEval(right);
+    if (assertNumber(leftVal, rightVal)) {
+        return operator(leftVal, rightVal);
+    } else throw Error(`Operands of ${err} should be numbers.`);
 }

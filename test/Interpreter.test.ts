@@ -17,61 +17,88 @@ function run(source: string, spy): void {
 }
 
 describe("cfxEval()", () => {
-    it("should evaluate number literals", () => {
-        let src0 = "2";
-        let result0 = evalLn(src0);
-        expect(result0).to.equal(2);
-        let src1 = "-2";
-        let result1 = evalLn(src1);
-        expect(result1).to.equal(-2);
+    describe("literals", () => {
+        it("should evaluate number literals", () => {
+            expect(evalLn("2")).to.equal(2);
+            expect(evalLn("-2")).to.equal(-2);
+        });
+
+        it("should evaluate string literals", () => {
+            let src = `"happy day"`;
+            let result = evalLn(src);
+            expect(result).to.equal("happy day");
+        });
+
+        it("should evaluate boolean literals", () => {
+            let src = "true";
+            let result = evalLn(src);
+            expect(result).to.equal(true);
+        });
     });
 
-    it("should evaluate string literals", () => {
-        let src = `"happy day"`;
-        let result = evalLn(src);
-        expect(result).to.equal("happy day");
+    describe("math", () => {
+        it("should do addition correctly", () => {
+            let src = "2 + 2";
+            let result = evalLn(src);
+            expect(result).to.equal(4);
+        });
+
+        it("should do subtraction correctly", () => {
+            let src = "2 - 2";
+            let result = evalLn(src);
+            expect(result).to.equal(0);
+        });
+
+        it("should do multiplication correctly", () => {
+            let src = "2 * 5";
+            let result = evalLn(src);
+            expect(result).to.equal(10);
+        });
+
+        it("should do division correctly", () => {
+            let src = "2 / 2";
+            let result = evalLn(src);
+            expect(result).to.equal(1);
+        });
+
+        it("should do floating point division correctly", () => {
+            let src = "5 / 2";
+            let result = evalLn(src);
+            expect(result).to.equal(2.5);
+        });
+
+        it("should follow order of operations", () => {
+            let src = "5 / 5 + 3 * 2";
+            let result = evalLn(src);
+            expect(result).to.equal(7);
+        });
     });
 
-    it("should evaluate boolean literals", () => {
-        let src = "true";
-        let result = evalLn(src);
-        expect(result).to.equal(true);
-    });
+    describe("comparisions", () => {
+        it("should handle equality checks", () => {
+            expect(evalLn("2 == 2")).to.equal(true);
+            expect(evalLn("2 == 3")).to.equal(false);
+        });
 
-    it("should do addition correctly", () => {
-        let src = "2 + 2";
-        let result = evalLn(src);
-        expect(result).to.equal(4);
-    });
+        it("should handle greater equal", () => {
+            expect(evalLn("2 >= 2")).to.equal(true);
+            expect(evalLn("1 >= 2")).to.equal(false);
+        });
 
-    it("should do subtraction correctly", () => {
-        let src = "2 - 2";
-        let result = evalLn(src);
-        expect(result).to.equal(0);
-    });
+        it("should handle less equal", () => {
+            expect(evalLn("2 <= 2")).to.equal(true);
+            expect(evalLn("4 <= 3")).to.equal(false);
+        });
 
-    it("should do multiplication correctly", () => {
-        let src = "2 * 5";
-        let result = evalLn(src);
-        expect(result).to.equal(10);
-    });
+        it("should handle greater than", () => {
+            expect(evalLn("2 > 1")).to.equal(true);
+            expect(evalLn("1 > 2")).to.equal(false);
+        });
 
-    it("should do division correctly", () => {
-        let src = "2 / 2";
-        let result = evalLn(src);
-        expect(result).to.equal(1);
-    });
-
-    it("should do floating point division correctly", () => {
-        let src = "5 / 2";
-        let result = evalLn(src);
-        expect(result).to.equal(2.5);
-    });
-
-    it("should follow order of operations", () => {
-        let src = "5 / 5 + 3 * 2";
-        let result = evalLn(src);
-        expect(result).to.equal(7);
+        it("should handle less than", () => {
+            expect(evalLn("2 < 3")).to.equal(true);
+            expect(evalLn("4 < 3")).to.equal(false);
+        });
     });
 });
 
