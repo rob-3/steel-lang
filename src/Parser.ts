@@ -200,7 +200,7 @@ function makePrimary(): Expr {
     if (matchType(TokenType.OPEN_PAREN)) return finishGrouping();
 
     // should be impossible to get here
-    throw Error(`Expected a primary; got "${lookAhead().lexeme}" `);
+    throw Error(`Expected a primary; got "${lookAhead().lexeme}"`);
 }
 
 function finishGrouping(): Expr {
