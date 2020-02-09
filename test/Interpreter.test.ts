@@ -100,6 +100,31 @@ describe("cfxEval()", () => {
             expect(evalLn("4 < 3")).to.equal(false);
         });
     });
+
+    describe("booleans", () => {
+        it("should evaluate logical AND correctly", () => {
+            expect(evalLn("true and true")).to.equal(true);
+            expect(evalLn("true and false")).to.equal(false);
+            expect(evalLn("false and true")).to.equal(false);
+            expect(evalLn("false and false")).to.equal(false);
+        });
+
+        it("should evaluate logical OR correctly", () => {
+            expect(evalLn("true or true")).to.equal(true);
+            expect(evalLn("true or false")).to.equal(true);
+            expect(evalLn("false or true")).to.equal(true);
+            expect(evalLn("false or false")).to.equal(false);
+        });
+
+        it("should evaluate logical NOT correctly", () => {
+            expect(evalLn("not true")).to.equal(false);
+            expect(evalLn("not false")).to.equal(true);
+        });
+
+        it("should handle logical NOT at a lower precedence than AND and OR", () => {
+            expect(evalLn("not true and false")).to.equal(false);
+        });
+    });
 });
 
 describe("exec()", () => {

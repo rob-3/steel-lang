@@ -179,7 +179,11 @@ function makeAddition(): Expr {
 }
 
 function makeMultiplication(): Expr {
-    return makeBinaryExpr([TokenType.STAR, TokenType.SLASH], makeUnary);
+    return makeBinaryExpr([TokenType.STAR, TokenType.SLASH], makeBinaryLogical);
+}
+
+function makeBinaryLogical(): Expr {
+    return makeBinaryExpr([TokenType.AND, TokenType.OR], makeUnary);
 }
 
 function makeUnary(): Expr {

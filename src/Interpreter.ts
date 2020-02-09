@@ -121,7 +121,7 @@ function minus(left: Expr, right: Expr): number {
     let rightVal = cfxEval(right);
     if (assertNumber(leftVal, rightVal)) {
         return leftVal - rightVal;
-    } else throw Error('Operands of "+" must be numbers.');
+    } else throw Error('Operands of "-" must be numbers.');
 }
 
 function plusPlus(left: Expr, right: Expr): string {
@@ -154,7 +154,7 @@ function and(left: Expr, right: Expr): boolean {
     let rightVal = cfxEval(right);
     if (assertBool(leftVal, rightVal)) {
         return leftVal && rightVal;
-    } else throw Error('Operands of "&&" must be booleans.');
+    } else throw Error('Operands of "and" must be booleans.');
     
 }
 
@@ -163,7 +163,7 @@ function or(left: Expr, right: Expr): boolean {
     let rightVal = cfxEval(right);
     if (assertBool(leftVal, rightVal)) {
         return leftVal || rightVal;
-    } else throw Error('Operands of "||" must be booleans.');
+    } else throw Error('Operands of "or" must be booleans.');
     
 }
 
