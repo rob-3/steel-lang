@@ -174,4 +174,25 @@ describe("exec()", () => {
             expect(spy).not.to.have.been.called.with(5);
         });
     });
+
+    describe("while loops", () => {
+        let src = `
+        var a = 0
+        while (a < 10) {
+            print a
+            a = a + 1
+        }
+        `
+        /*
+        it("should not throw on definition", () => {
+            expect(() => exec(src, () => {})).to.not.throw();
+        });
+        */
+
+        it("should loop until the condition is met", () => {
+            let spy = chai.spy();
+            exec(src, spy);
+            expect(spy).to.have.been.called.exactly(10);
+        });
+    });
 });

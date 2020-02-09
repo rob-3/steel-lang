@@ -6,7 +6,8 @@ import {
 } from "./Expr";
 import { 
     Stmt, PrintStmt, VariableDeclarationStmt, 
-    VariableAssignmentStmt, IfStmt, BlockStmt
+    VariableAssignmentStmt, IfStmt, BlockStmt,
+    WhileStmt
 } from "./Stmt";
 
 let tokens: Token[];
@@ -61,6 +62,7 @@ function makeStmt(): Stmt | void {
     if (matchType(TokenType.VAR)) return finishVariableDeclaration(false);
     if (matchType(TokenType.PRINT)) return finishPrintStmt();
     if (matchType(TokenType.IF)) return finishIfStmt();
+    if (matchType(TokenType.WHILE)) return finishWhileStmt();
     if (matchType(TokenType.IDENTIFIER)) {
         // TODO support for dot notation here
         if (matchType(TokenType.EQUAL)) {
@@ -72,6 +74,21 @@ function makeStmt(): Stmt | void {
     if (matchType(TokenType.OPEN_BRACE)) return finishBlockStmt();
     if (matchType(TokenType.STMT_TERM)) return null;
     return makeExprStmt();
+}
+
+function finishWhileStmt(): Stmt {
+    if (!matchType(TokenType.OPEN_PAREN)) {
+        throw Error(`Expected "("; got "${lookAhead().lexeme}"`);
+    }
+    let condition = makeExpr();
+    if (!matchType(TokenType.CLOSE_PAREN)) {
+        throw Error(`Expected ")"; got "${lookAhead().lexeme}"`);
+    }
+    let body = makeStmt();
+    if (!body) {
+        throw Error(`After while expected statement, but got ${lookAhead().lexeme}`);
+    }
+    return new WhileStmt(condition, body);
 }
 
 function backTrack(): void {

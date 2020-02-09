@@ -4,7 +4,8 @@ import {
 } from "./Expr";
 import { 
     Stmt, VariableDeclarationStmt, PrintStmt, 
-    VariableAssignmentStmt, IfStmt, BlockStmt
+    VariableAssignmentStmt, IfStmt, BlockStmt,
+    WhileStmt
 } from "./Stmt";
 import TokenType from "./TokenType";
 import Token from "./Token";
@@ -20,8 +21,8 @@ export function exec(stmt: Stmt, printfn): void {
         assign(stmt.identifier, stmt.right);
     } else if (stmt instanceof IfStmt) {
         let shouldBeBool = cfxEval(stmt.condition);
-        if (typeof shouldBeBool !== "boolean") {
-            throw Error("Statement doesn't evaluate to a boolean.");
+        if (!assertBool(shouldBeBool)) {
+            throw Error("Condition doesn't evaluate to a boolean.");
         }
         if (shouldBeBool) {
             exec(stmt.body, printfn);
@@ -30,6 +31,12 @@ export function exec(stmt: Stmt, printfn): void {
         }
     } else if (stmt instanceof BlockStmt) {
         stmt.stmts.map(stmt => exec(stmt, printfn));
+    } else if (stmt instanceof WhileStmt) {
+        let conditionValue = cfxEval(stmt.condition);
+        while (assertBool(conditionValue) && conditionValue) {
+            exec(stmt.body, printfn);
+            conditionValue = cfxEval(stmt.condition);
+        }
     } else if (stmt instanceof Expr) {
         return cfxEval(stmt);
     }
