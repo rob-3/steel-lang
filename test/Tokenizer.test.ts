@@ -157,6 +157,13 @@ describe("tokenize()", () => {
             new Token(TokenType.EOF, "", null, 1),
         ]);
     });
+    
+    it("should tokenize commas", () => {
+        expect(tokenize(",")).to.deep.equal([
+            new Token(TokenType.COMMA, ",", null, 1),
+            new Token(TokenType.EOF, "", null, 1),
+        ]);
+    });
 });
 
 describe("isLegalIdentifierChar()", () => {
@@ -177,11 +184,13 @@ describe("isLegalIdentifierChar()", () => {
         expect(isLegalIdentifierChar("_")).to.equal(true);
     });
 
-    it("should return false if a character is [-\\0\"\'\\n]", () => {
+    it("should return false if a character is [-\\0\"\'\\n()]", () => {
        expect(isLegalIdentifierChar("\0")).to.equal(false);
        expect(isLegalIdentifierChar("\"")).to.equal(false);
        expect(isLegalIdentifierChar("'")).to.equal(false);
        expect(isLegalIdentifierChar("\n")).to.equal(false);
+       expect(isLegalIdentifierChar("(")).to.equal(false);
+       expect(isLegalIdentifierChar(")")).to.equal(false);
     });
 });
 

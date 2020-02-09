@@ -51,6 +51,7 @@ function scanToken(): void | Token {
         case "=": return match("=") ? makeToken(TokenType.EQUAL_EQUAL) : makeToken(TokenType.EQUAL);
         case ">": return match("=") ? makeToken(TokenType.GREATER_EQUAL) : makeToken(TokenType.GREATER);
         case "<": return match("=") ? makeToken(TokenType.LESS_EQUAL) : makeToken(TokenType.LESS);
+        case ",": return makeToken(TokenType.COMMA);
         case "\t":
         case " ": return;
         case "\n": 
@@ -67,7 +68,7 @@ function scanToken(): void | Token {
             } else if (isAlpha(char)) {
                 return makeIdentifierOrKeyword();
             } else {
-                throw `Unrecognized character "${char}". Perhaps you intended to put this in a string?`;
+                throw Error(`Unrecognized character "${char}". Perhaps you intended to put this in a string?`);
             }
     }
 }
@@ -78,7 +79,7 @@ function makeString(): Token {
     let cache = lookAhead()
     while (cache !== "\"") {
         if(cache === "\n" || atEnd()) {
-            throw "Unterminated string literal.";
+            throw Error("Unterminated string literal.");
         }
         eatChar();
         cache = lookAhead();

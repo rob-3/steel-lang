@@ -6,7 +6,8 @@ const rl = require("readline").createInterface({
 
 import tokenize from "./Tokenizer";
 import parse from "./Parser";
-import { exec } from "./Interpreter";
+import { stmtExec, setPrintFn } from "./Interpreter";
+import Scope from "./Scope";
 
 if (process.argv.length > 3) {
     console.log("Usage: node conflux [filename]");
@@ -42,10 +43,12 @@ function startRepl() {
 }
 
 function run(source: string, repl: boolean): void {
+    setPrintFn(console.log);
     let tokens = tokenize(source);
     let ast = parse(tokens);
+    let scope = new Scope();
     for (let stmt of ast) {
-        let val = exec(stmt, console.log);
+        let val = stmtExec(stmt, scope);
         if (repl && val !== undefined) {
             console.log(val)
         }

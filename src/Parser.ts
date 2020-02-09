@@ -2,7 +2,8 @@ import Token from "./Token";
 import TokenType from "./TokenType";
 import { 
     Expr, GroupingExpr, BinaryExpr, 
-    PrimaryExpr, UnaryExpr, VariableExpr 
+    PrimaryExpr, UnaryExpr, VariableExpr,
+    FunctionExpr, CallExpr
 } from "./Expr";
 import { 
     Stmt, PrintStmt, VariableDeclarationStmt, 
@@ -18,7 +19,10 @@ export default function parse(tokenList: Token[]): Stmt[] {
     let ast = [];
     try {
         while (!atEnd()) {
-            ast.push(makeStmt());
+            let maybeStmt = makeStmt();
+            if (maybeStmt) {
+                ast.push(maybeStmt);
+            }
         }
     } finally {
         reset();
@@ -63,6 +67,7 @@ function makeStmt(): Stmt | void {
     if (matchType(TokenType.PRINT)) return finishPrintStmt();
     if (matchType(TokenType.IF)) return finishIfStmt();
     if (matchType(TokenType.WHILE)) return finishWhileStmt();
+    if (matchType(TokenType.FUN)) return finishFunctionDeclaration();
     if (matchType(TokenType.IDENTIFIER)) {
         // TODO support for dot notation here
         if (matchType(TokenType.EQUAL)) {
@@ -95,7 +100,46 @@ function backTrack(): void {
     current -= 1;
 }
 
-function finishBlockStmt(): Stmt {
+function finishFunctionDeclaration(): Stmt {
+    if (!matchType(TokenType.IDENTIFIER)) {
+        throw Error(`Expected an identifier; got "${lookAhead().lexeme}"`);
+    }
+    let fnName = lookBehind().lexeme;
+    if (!matchType(TokenType.OPEN_PAREN)) {
+        throw Error(`Expected "("; got "${lookAhead().lexeme}"`);
+    }
+    let argsObj = finishFunctDecArgs();
+    matchType(TokenType.OPEN_BRACE);
+    let body = finishBlockStmt();
+    // TODO: bad
+    let fnExp = new FunctionExpr(argsObj, body);
+    return new VariableDeclarationStmt(fnName, true, fnExp);
+}
+
+function finishFunctDecArgs(): string[] {
+    let args: string[] = [];
+    while (matchType(TokenType.IDENTIFIER)) {
+        args.push(lookBehind().lexeme);
+        matchType(TokenType.COMMA);
+        //FIXME checks are needed
+    }
+    if (!matchType(TokenType.CLOSE_PAREN)) {
+        throw Error(`Expected ")"; got "${lookAhead().lexeme}"`);
+    }
+    return args;
+}
+
+function finishCallArgs(): Expr[] {
+    let callArgs: Expr[] = [];
+    while (!matchType(TokenType.CLOSE_PAREN)) {
+        callArgs.push(makeExpr());
+        matchType(TokenType.COMMA);
+        // FIXME consume function needed
+    }
+    return callArgs;
+}
+
+function finishBlockStmt(): BlockStmt {
     let stmts: Stmt[] = [];
     while (!matchType(TokenType.CLOSE_BRACE)) {
         let maybeStmt = makeStmt();
@@ -216,7 +260,14 @@ function makePrimary(): Expr {
     if (matchType(TokenType.TRUE)) return new PrimaryExpr(true);
     if (matchType(TokenType.FALSE)) return new PrimaryExpr(false);
     if (matchType(TokenType.NUMBER, TokenType.STRING)) return new PrimaryExpr(lookBehind().literal);
-    if (matchType(TokenType.IDENTIFIER)) return new VariableExpr(lookBehind());
+    if (matchType(TokenType.IDENTIFIER)) {
+        let identifier = lookBehind().lexeme;
+        if(matchType(TokenType.OPEN_PAREN)) {
+            let args: Expr[] = finishCallArgs();
+            return new CallExpr(identifier, args);
+        }
+        return new VariableExpr(identifier);
+    }
 
     if (matchType(TokenType.OPEN_PAREN)) return finishGrouping();
 

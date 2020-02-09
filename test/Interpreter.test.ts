@@ -1,37 +1,36 @@
-import tokenize from "../src/Tokenizer";
-import parse from "../src/Parser";
-import { cfxEval, exec as stmtExec } from "../src/Interpreter";
+import { setPrintFn, cfxEval as _cfxEval, cfxExec as _cfxExec } from "../src/Interpreter";
+import Scope from "../src/Scope";
 import chai = require("chai");
 import spies = require("chai-spies");
 chai.use(spies);
 const expect = chai.expect;
-const exec = (src, spy) => parse(tokenize(src)).forEach(stmt => stmtExec(stmt, spy));
-const evalLn = (src: string) => cfxEval(parse(tokenize(src))[0]);
 
-function run(source: string, spy): void {
-    let tokens = tokenize(source);
-    let ast = parse(tokens);
-    for (let stmt of ast) {
-        stmtExec(stmt, spy);
-    }
-}
+const cfxEval = (src: string, scope: Scope = new Scope()) => {
+    return _cfxEval(src, scope);
+};
 
-describe("cfxEval()", () => {
+const cfxExec = (src: string, printfn = null) => {
+    if (printfn) setPrintFn(printfn);
+    return _cfxExec(src);
+};
+
+
+describe("exprEval()", () => {
     describe("literals", () => {
         it("should evaluate number literals", () => {
-            expect(evalLn("2")).to.equal(2);
-            expect(evalLn("-2")).to.equal(-2);
+            expect(cfxEval("2")).to.equal(2);
+            expect(cfxEval("-2")).to.equal(-2);
         });
 
         it("should evaluate string literals", () => {
             let src = `"happy day"`;
-            let result = evalLn(src);
+            let result = cfxEval(src);
             expect(result).to.equal("happy day");
         });
 
         it("should evaluate boolean literals", () => {
             let src = "true";
-            let result = evalLn(src);
+            let result = cfxEval(src);
             expect(result).to.equal(true);
         });
     });
@@ -39,90 +38,89 @@ describe("cfxEval()", () => {
     describe("math", () => {
         it("should do addition correctly", () => {
             let src = "2 + 2";
-            let result = evalLn(src);
+            let result = cfxEval(src);
             expect(result).to.equal(4);
         });
 
         it("should do subtraction correctly", () => {
             let src = "2 - 2";
-            let result = evalLn(src);
+            let result = cfxEval(src);
             expect(result).to.equal(0);
         });
 
         it("should do multiplication correctly", () => {
             let src = "2 * 5";
-            let result = evalLn(src);
+            let result = cfxEval(src);
             expect(result).to.equal(10);
         });
-
-        it("should do division correctly", () => {
+it("should do division correctly", () => {
             let src = "2 / 2";
-            let result = evalLn(src);
+            let result = cfxEval(src);
             expect(result).to.equal(1);
         });
 
         it("should do floating point division correctly", () => {
             let src = "5 / 2";
-            let result = evalLn(src);
+            let result = cfxEval(src);
             expect(result).to.equal(2.5);
         });
 
         it("should follow order of operations", () => {
             let src = "5 / 5 + 3 * 2";
-            let result = evalLn(src);
+            let result = cfxEval(src);
             expect(result).to.equal(7);
         });
     });
 
     describe("comparisions", () => {
         it("should handle equality checks", () => {
-            expect(evalLn("2 == 2")).to.equal(true);
-            expect(evalLn("2 == 3")).to.equal(false);
+            expect(cfxEval("2 == 2")).to.equal(true);
+            expect(cfxEval("2 == 3")).to.equal(false);
         });
 
         it("should handle greater equal", () => {
-            expect(evalLn("2 >= 2")).to.equal(true);
-            expect(evalLn("1 >= 2")).to.equal(false);
+            expect(cfxEval("2 >= 2")).to.equal(true);
+            expect(cfxEval("1 >= 2")).to.equal(false);
         });
 
         it("should handle less equal", () => {
-            expect(evalLn("2 <= 2")).to.equal(true);
-            expect(evalLn("4 <= 3")).to.equal(false);
+            expect(cfxEval("2 <= 2")).to.equal(true);
+            expect(cfxEval("4 <= 3")).to.equal(false);
         });
 
         it("should handle greater than", () => {
-            expect(evalLn("2 > 1")).to.equal(true);
-            expect(evalLn("1 > 2")).to.equal(false);
+            expect(cfxEval("2 > 1")).to.equal(true);
+            expect(cfxEval("1 > 2")).to.equal(false);
         });
 
         it("should handle less than", () => {
-            expect(evalLn("2 < 3")).to.equal(true);
-            expect(evalLn("4 < 3")).to.equal(false);
+            expect(cfxEval("2 < 3")).to.equal(true);
+            expect(cfxEval("4 < 3")).to.equal(false);
         });
     });
 
     describe("booleans", () => {
         it("should evaluate logical AND correctly", () => {
-            expect(evalLn("true and true")).to.equal(true);
-            expect(evalLn("true and false")).to.equal(false);
-            expect(evalLn("false and true")).to.equal(false);
-            expect(evalLn("false and false")).to.equal(false);
+            expect(cfxEval("true and true")).to.equal(true);
+            expect(cfxEval("true and false")).to.equal(false);
+            expect(cfxEval("false and true")).to.equal(false);
+            expect(cfxEval("false and false")).to.equal(false);
         });
 
         it("should evaluate logical OR correctly", () => {
-            expect(evalLn("true or true")).to.equal(true);
-            expect(evalLn("true or false")).to.equal(true);
-            expect(evalLn("false or true")).to.equal(true);
-            expect(evalLn("false or false")).to.equal(false);
+            expect(cfxEval("true or true")).to.equal(true);
+            expect(cfxEval("true or false")).to.equal(true);
+            expect(cfxEval("false or true")).to.equal(true);
+            expect(cfxEval("false or false")).to.equal(false);
         });
 
         it("should evaluate logical NOT correctly", () => {
-            expect(evalLn("not true")).to.equal(false);
-            expect(evalLn("not false")).to.equal(true);
+            expect(cfxEval("not true")).to.equal(false);
+            expect(cfxEval("not false")).to.equal(true);
         });
 
         it("should handle logical NOT at a lower precedence than AND and OR", () => {
-            expect(evalLn("not true and false")).to.equal(false);
+            expect(cfxEval("not true and false")).to.equal(false);
         });
     });
 });
@@ -132,7 +130,7 @@ describe("exec()", () => {
         it("should execute an if stmt with true condition", () => {
             let src = "if (true) {\nprint 5\n}";
             let spy = chai.spy();
-            run(src, spy);
+            cfxExec(src, spy);
             expect(spy).to.have.been.called.with(5);
         });
 
@@ -143,7 +141,7 @@ describe("exec()", () => {
             }
             `;
             let spy = chai.spy();
-            exec(src, spy);
+            cfxExec(src, spy);
             expect(spy).not.to.have.been.called();
         });
 
@@ -156,7 +154,7 @@ describe("exec()", () => {
             }
             `;
             let spy = chai.spy();
-            exec(src, spy);
+            cfxExec(src, spy);
             expect(spy).to.have.been.called.once;
             expect(spy).to.have.been.called.with(6);
         });
@@ -170,7 +168,7 @@ describe("exec()", () => {
             }
             `;
             let spy = chai.spy();
-            exec(src, spy);
+            cfxExec(src, spy);
             expect(spy).not.to.have.been.called.with(5);
         });
     });
@@ -183,16 +181,75 @@ describe("exec()", () => {
             a = a + 1
         }
         `
-        /*
-        it("should not throw on definition", () => {
-            expect(() => exec(src, () => {})).to.not.throw();
-        });
-        */
-
         it("should loop until the condition is met", () => {
             let spy = chai.spy();
-            exec(src, spy);
+            cfxExec(src, spy);
             expect(spy).to.have.been.called.exactly(10);
+        });
+    });
+
+    describe("variables", () => {
+        it("should be able to access a variable", () => {
+            let src = "var a = 14";
+            let scope = cfxExec(src);
+            expect(cfxEval("a", scope)).to.equal(14);
+        });
+
+        it("should be able to assign to a variable", () => {
+            let scope = cfxExec("var a = 14\na = 15");
+            expect(cfxEval("a", scope)).to.equal(15);
+        });
+    });
+
+    describe("functions", () => {
+        describe("argless functions", () => {
+            let src = `
+            fun a() {
+                print 5
+            }
+            `
+            it("should not throw on function definition", () => {
+                expect(() => cfxExec(src, () => {})).to.not.throw();
+            });
+
+            it("should not run the definition of a function", () => {
+                let spy = chai.spy();
+                cfxExec(src, spy);
+                expect(spy).not.to.have.been.called();
+            });
+
+            it("should be callable", () => {
+                let src2 = src + "a()";
+                let spy = chai.spy();
+                cfxExec(src2, spy);
+                expect(spy).to.have.been.called.once;
+                expect(spy).to.have.been.called.with(5);
+            });
+        });
+
+        describe("functions with arguments", () => {
+           let src = `
+           fun a(a, b) {
+                print a + b
+           }
+           `;
+            it("should not throw on function definition", () => {
+                expect(() => cfxExec(src, () => {})).to.not.throw();
+            });
+
+            it("should not run the definition of a function", () => {
+                let spy = chai.spy();
+                cfxExec(src, spy);
+                expect(spy).not.to.have.been.called();
+            });
+
+            it("should be callable", () => {
+                let src2 = src + "a(5, 6)";
+                let spy = chai.spy();
+                cfxExec(src2, spy);
+                expect(spy).to.have.been.called.once;
+                expect(spy).to.have.been.called.with(11);
+            });
         });
     });
 });
