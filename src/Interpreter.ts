@@ -12,30 +12,57 @@ import TokenType from "./TokenType";
 import Scope from "./Scope";
 import tokenize from "./Tokenizer";
 import parse from "./Parser";
+import { State } from "./lib/Monads";
+export type Scoped<T> = State<T, Scope>
+import { map, spread } from "./lib/utils";
+import { CfxFunction, Value } from "./InterpreterHelpers";
 
-let printfn = console.log;
+let printfn = thing => {
+    console.log(thing)
+    // FIXME: magic debugging number
+    return 42;
+};
 
 export function setPrintFn(fn) {
-    printfn = fn;
+    printfn = thing => {
+        fn(thing);
+        // FIXME: magic debugging number
+        return 65;
+    }
 }
 
-export function cfxExec(src: string): Scope {
+export function cfxExec(src: string): Scoped<Value> {
     let stmts: Stmt[] = parse(tokenize(src));
-    return stmts.reduce<Scope>((currentScope: Scope, stmt: Stmt) => {
-        return stmtExec(stmt, currentScope);
-    }, new Scope());
+    let scope = new Scope();
+    let result: Scoped<Value>;
+    for (let stmt of stmts) {
+        result = stmtExec(stmt, scope);
+        scope = result.state;
+    }
+    return result;
+    /*
+    let state: Scoped<Stmt[]> = State.of(stmts, new Scope());
+    return state.map((stmts, scope) => map((stmt) => stmtExec(stmt, scope))(stmts)).map(results => results[results.length - 1]);
+    */
 }
 
-export function stmtExec(stmt: Stmt, scope: Scope): Scope {
+export function stmtExec(stmt: Stmt, scope: Scope): Scoped<Value> {
     if (stmt instanceof PrintStmt) {
-        printfn(exprEval(stmt.thingToPrint, scope));
-        return scope;
+        let monad = State.of(stmt, scope).flatMap((stmt: PrintStmt, scope) => exprEval(stmt.thingToPrint, scope))
+        monad.map(printfn)
+        return monad;
     } else if (stmt instanceof VariableDeclarationStmt) {
-        return define(scope, stmt.identifier, stmt.right, stmt.immutable);
+        return exprEval(stmt.right, scope).flatMap(
+            (rightVal, scope) => define(stmt.identifier, rightVal, stmt.immutable, scope)
+        );
     } else if (stmt instanceof VariableAssignmentStmt) {
-        return assign(scope, stmt.identifier, stmt.right);
+        return exprEval(stmt.right, scope).flatMap(
+            (rightVal, scope) => assign(stmt.identifier, rightVal, scope)
+        );
     } else if (stmt instanceof IfStmt) {
-        let shouldBeBool = exprEval(stmt.condition, scope);
+        let result = exprEval(stmt.condition, scope);
+        let shouldBeBool = result.value;
+        scope = result.state;
         if (!assertBool(shouldBeBool)) {
             throw Error("Condition doesn't evaluate to a boolean.");
         }
@@ -43,28 +70,40 @@ export function stmtExec(stmt: Stmt, scope: Scope): Scope {
             return stmtExec(stmt.body, scope);
         } else if (stmt.elseBody !== null) {
             return stmtExec(stmt.elseBody, scope);
+        } else {
+            // TODO: hack we need to address
+            return State.of(null, scope);
         }
     } else if (stmt instanceof BlockStmt) {
-        return stmt.stmts.reduce<Scope>((currentScope: Scope, stmt: Stmt) => {
-            return stmtExec(stmt, currentScope)
-        },
-                                        scope);
+        let result: Scoped<Value>;
+        for (let myStmt of stmt.stmts) {
+            result = stmtExec(myStmt, scope);
+            scope = result.state;
+        }
+        return result;
+        /*
+        // this line is probably broken and unreadable anyways; replace it
+        return State.of(stmt.stmts, scope)
+            .map((stmts, scope) => 
+                map((stmt: Stmt) => 
+                    stmtExec(stmt, scope))(stmts))
+                        .flatMap((results, scope) => results[results.length - 1])
+         */
     } else if (stmt instanceof WhileStmt) {
         let conditionValue = exprEval(stmt.condition, scope);
         while (assertBool(conditionValue) && conditionValue) {
-            scope = stmtExec(stmt.body, scope);
+            scope = stmtExec(stmt.body, scope).state;
             conditionValue = exprEval(stmt.condition, scope);
         }
-        return scope;
+        return State.of(null, scope);
     } else if (stmt instanceof Expr) {
-        exprEval(stmt, scope);
-        return scope;
+        return State.of(stmt, scope).flatMap(exprEval);
     } else {
         throw Error("Unhandled stmt");
     }
 }
 
-function lookup(scope: Scope, identifier: string): any {
+function lookup(identifier: string, scope: Scope): Value {
     let val = scope.get(identifier);
     if (val === null) {
         throw Error(`Variable "${identifier}" is not defined.`);
@@ -73,149 +112,169 @@ function lookup(scope: Scope, identifier: string): any {
     }
 }
 
-function define(scope: Scope, key: string, value: Expr, immutable: boolean): Scope {
-    // TODO this is where the problem is
+function define(key: string, evaluatedExpr: Value, immutable: boolean, scope: Scope):
+    Scoped<Value> {
     if (!scope.has(key) || !scope.get(key)[1]) {
-        scope.set(key, [exprEval(value, scope), immutable]);
+        scope.set(key, [evaluatedExpr, immutable]);
+        return State.of(evaluatedExpr, scope);
     } else {
         throw Error(`Cannot redefine immutable variable "${key}".`);
     }
-    return scope;
 }
 
-function assign(scope: Scope, key: string, value: Expr): Scope {
+function assign(key: string, evaluatedExpr: Value, scope: Scope): Scoped<Value> {
     let variable = scope.get(key);
     if (variable === null) {
         throw Error(`Cannot assign to undefined variable "${key}".`);
     } else {
         let immutable = variable[1];
         if (!immutable) {
-            scope.set(key, [exprEval(value, scope), false]);
+            scope.set(key, [evaluatedExpr, false]);
+            return State.of(evaluatedExpr, scope);
         } else {
             throw Error(`Cannot assign to immutable variable "${key}".`);
         }
     }
-    return scope;
 }
 
 /*
  * String-based eval() for conflux.
  */
-export function cfxEval(src: string, scope: Scope): any {
-    return exprEval(parse(tokenize(src))[0], scope);
+export function cfxEval(src: string, scope: Scope): Value {
+    return exprEval(parse(tokenize(src))[0], scope).value;
 }
 
 /*
  * Ast-based eval() for conflux. Pass in any expression and get the evalutated result.
  */
-export function exprEval(expr: Expr, scope: Scope): any {
+export function exprEval(expr: Expr | Stmt, scope: Scope): Scoped<Value> {
     if (expr instanceof PrimaryExpr) {
-        return expr.literal;
+        return State.of(expr.literal, scope);
     } else if (expr instanceof BinaryExpr) {
+        // TODO: refactor in functional style
+        let leftMonad = exprEval(expr.left, scope);
+        let rightMonad = exprEval(expr.right, leftMonad.state);
+        let monad = State.of([leftMonad.value, rightMonad.value], rightMonad.state);
         switch (expr.operator.type) {
-            case TokenType.PLUS: return plus(expr.left, expr.right, scope);
-            case TokenType.MINUS: return minus(expr.left, expr.right, scope);
-            case TokenType.PLUS_PLUS: return plusPlus(expr.left, expr.right, scope);
-            case TokenType.STAR: return star(expr.left, expr.right, scope);
-            case TokenType.SLASH: return slash(expr.left, expr.right, scope);
-            case TokenType.AND: return and(expr.left, expr.right, scope);
-            case TokenType.OR: return or(expr.left, expr.right, scope);
-            case TokenType.GREATER_EQUAL: return greaterEqual(expr.left, expr.right, scope);
-            case TokenType.GREATER: return greater(expr.left, expr.right, scope);
-            case TokenType.LESS_EQUAL: return lessEqual(expr.left, expr.right, scope);
-            case TokenType.LESS: return less(expr.left, expr.right, scope);
-            case TokenType.EQUAL_EQUAL: return equal(expr.left, expr.right, scope);
+            case TokenType.PLUS:
+                return monad.map(spread(plus));
+            case TokenType.MINUS:
+                return monad.map(spread(minus));
+            case TokenType.PLUS_PLUS: 
+                return monad.map(spread(plusPlus));
+            case TokenType.STAR:
+                return monad.map(spread(star));
+            case TokenType.SLASH:
+                return monad.map(spread(slash));
+            case TokenType.AND:
+                return monad.map(spread(and));
+            case TokenType.OR:
+                return monad.map(spread(or));
+            case TokenType.GREATER_EQUAL:
+                return monad.map(spread(greaterEqual));
+            case TokenType.GREATER:
+                return monad.map(spread(greater));
+            case TokenType.LESS_EQUAL:
+                return monad.map(spread(lessEqual));
+            case TokenType.LESS:
+                return monad.map(spread(less));
+            case TokenType.EQUAL_EQUAL:
+                return monad.map(spread(equal));
             default:
                 throw Error(`FIXME: Unhandled operator type "${expr.operator}"`);
         }
     } else if (expr instanceof UnaryExpr) {
+        let monad = State.of(expr.right, scope)
+            .flatMap(exprEval)
         switch (expr.operator.type) {
-            case TokenType.MINUS: return opposite(expr.right, scope);
-            case TokenType.NOT: return not(expr.right, scope);
+            case TokenType.MINUS:
+                return monad.map(opposite);
+            case TokenType.NOT: 
+                return monad.map(not);
         }
     } else if (expr instanceof GroupingExpr) {
         return exprEval(expr.expr, scope);
     } else if (expr instanceof VariableExpr) {
-        return lookup(scope, expr.identifier);
+        return State.of(lookup(expr.identifier, scope), scope);
     } else if (expr instanceof CallExpr) {
-        return call(lookup(scope, expr.identifier), expr.args, scope);
+        let fn: any = lookup(expr.identifier, scope);
+        if (fn instanceof CfxFunction) {
+            return call(fn, expr.args, scope);
+        } else {
+            throw Error(`Can't call ${expr.identifier} because it is not a function.`);
+        }
     } else if (expr instanceof FunctionExpr) {
-        return expr;
+        return State.of(new CfxFunction(expr), scope);
+    } else if (expr instanceof BlockStmt) {
+        return stmtExec(expr, scope);
     } else {
         throw Error("Unrecognized error");
     }
 }
 
-function call(fn: FunctionExpr, args: Expr[], scope: Scope) {
-    return fn.call(args, scope);
+function call(fn: CfxFunction, args: Expr[], scope: Scope): Scoped<any> {
+    let argValues: Value[] = [];
+    for (let arg of args) {
+        let { state: newScope, value } = exprEval(arg, scope);
+        scope = newScope;
+        argValues.push(value);
+    }
+    return fn.call(argValues, scope);
 }
 
 /*
  * Returns the opposite of the expression. Throws if expr does not evaluate to a
  * number.
  */
-function opposite(right: Expr, scope: Scope): number {
-    let rightVal = exprEval(right, scope);
-    if (assertNumber(rightVal)) return -rightVal;
+function opposite(right: Value): number {
+    if (assertNumber(right)) return -<number>right;
     else throw Error('"-" can only be used on a number');
 }
 
-function plus(left: Expr, right: Expr, scope: Scope): number {
-    let leftVal = exprEval(left, scope);
-    let rightVal = exprEval(right, scope);
-    if (assertNumber(leftVal, rightVal)) {
-        return leftVal + rightVal;
+function plus(left: Value, right: Value): number {
+    if (assertNumber(left, right)) {
+        return <number>left + <number>right;
     } else throw Error('Operands of "+" must be numbers.');
 }
 
-function minus(left: Expr, right: Expr, scope: Scope): number {
-    let leftVal = exprEval(left, scope);
-    let rightVal = exprEval(right, scope);
-    if (assertNumber(leftVal, rightVal)) {
-        return leftVal - rightVal;
+function minus(left: Value, right: Value): number {
+    if (assertNumber(left, right)) {
+        return <number>left - <number>right;
     } else throw Error('Operands of "-" must be numbers.');
 }
 
-function plusPlus(left: Expr, right: Expr, scope: Scope): string {
-    let leftVal = exprEval(left, scope);
-    let rightVal = exprEval(right, scope);
-    if (typeof leftVal === "string" &&
-        typeof rightVal === "string") {
-        return leftVal.concat(rightVal);
+function plusPlus(left: Value, right: Value): string {
+    if (typeof left === "string" &&
+        typeof right === "string") {
+        return left.concat(right);
     } else throw Error('Operands of "++" must be strings.');
 }
 
-function star(left: Expr, right: Expr, scope: Scope): number {
-    let leftVal = exprEval(left, scope);
-    let rightVal = exprEval(right, scope);
-    if (assertNumber(leftVal, rightVal)) {
-        return leftVal * rightVal;
+function star(left: Value, right: Value): number {
+    if (assertNumber(left, right)) {
+        return <number>left * <number>right;
     } else throw Error('Operands of "*" must be numbers.');
 }
 
-function slash(left: Expr, right: Expr, scope: Scope): number {
-    let leftVal = exprEval(left, scope);
-    let rightVal = exprEval(right, scope);
-    if (assertNumber(leftVal, rightVal)) {
-        return leftVal / rightVal;
+function slash(left: Value, right: Value): number {
+    if (assertNumber(left, right)) {
+        return <number>left / <number>right;
     } else throw Error('Operands of "/" must be numbers.');
 }
 
-function and(left: Expr, right: Expr, scope: Scope): boolean {
-    let leftVal = exprEval(left, scope);
-    let rightVal = exprEval(right, scope);
-    if (assertBool(leftVal, rightVal)) {
-        return leftVal && rightVal;
+function and(left: Value, right: Value): boolean {
+    if (assertBool(left, right)) {
+        return <boolean>left && <boolean>right;
     } else throw Error('Operands of "and" must be booleans.');
     
 }
 
-function or(left: Expr, right: Expr, scope: Scope): boolean {
-    let leftVal = exprEval(left, scope);
-    let rightVal = exprEval(right, scope);
-    if (assertBool(leftVal, rightVal)) {
-        return leftVal || rightVal;
-    } else throw Error('Operands of "or" must be booleans.');
+function or(left: Value, right: Value): boolean {
+    if (assertBool(left, right)) {
+        return <boolean>left || <boolean>right;
+    } else {
+        throw Error('Operands of "or" must be booleans.');
+    }
     
 }
 
@@ -233,36 +292,33 @@ function assertBool(...literals: any[]): boolean {
     return true;
 }
 
-function not(right: Expr, scope: Scope): boolean {
-    let rightVal = exprEval(right, scope);
-    if (assertBool(rightVal)) return !rightVal;
+function not(right: Value): boolean {
+    if (assertBool(right)) return !right;
     else throw Error('Operands of "not" should be booleans.');
 }
 
-function greaterEqual(left: Expr, right: Expr, scope: Scope): boolean {
-    return comparision(left, right, scope, (l, r) => l >= r, ">=");
+function greaterEqual(left: Value, right: Value): boolean {
+    return comparision(left, right, (l, r) => l >= r, ">=");
 }
 
-function greater(left: Expr, right: Expr, scope: Scope): boolean {
-    return comparision(left, right, scope, (l, r) => l > r, ">");
+function greater(left: Value, right: Value): boolean {
+    return comparision(left, right, (l, r) => l > r, ">");
 }
 
-function lessEqual(left: Expr, right: Expr, scope: Scope): boolean {
-    return comparision(left, right, scope, (l, r) => l <= r, "<=");
+function lessEqual(left: Value, right: Value): boolean {
+    return comparision(left, right, (l, r) => l <= r, "<=");
 }
 
-function less(left: Expr, right: Expr, scope: Scope): boolean {
-    return comparision(left, right, scope, (l, r) => l < r, "<");
+function less(left: Value, right: Value): boolean {
+    return comparision(left, right, (l, r) => l < r, "<");
 }
 
-function equal(left: Expr, right: Expr, scope: Scope): boolean {
-    return comparision(left, right, scope, (l, r) => l === r, "==");
+function equal(left: Value, right: Value): boolean {
+    return comparision(left, right, (l, r) => l === r, "==");
 }
 
-function comparision(left: Expr, right: Expr, scope: Scope, operator, err: string): boolean {
-    let leftVal = exprEval(left, scope);
-    let rightVal = exprEval(right, scope);
-    if (assertNumber(leftVal, rightVal)) {
-        return operator(leftVal, rightVal);
+function comparision(left: Value, right: Value, operator: (left, right) => boolean, err: string): boolean {
+    if (assertNumber(left, right)) {
+        return operator(left, right);
     } else throw Error(`Operands of ${err} should be numbers.`);
 }

@@ -189,7 +189,7 @@ function makeExprStmt(): Stmt {
 }
 
 function makeExpr(): Expr {
-    return makeEquality();
+    return makeBinaryLogical();
 }
 
 function finishVariableDeclaration(immutable: boolean): Stmt {
@@ -222,6 +222,10 @@ function finishAssignment(identifier: string): Stmt {
     return new VariableAssignmentStmt(identifier, right);
 }
 
+function makeBinaryLogical(): Expr {
+    return makeBinaryExpr([TokenType.AND, TokenType.OR], makeEquality);
+}
+
 function makeEquality(): Expr {
     return makeBinaryExpr([TokenType.EQUAL_EQUAL], makeComparision);
 }
@@ -240,11 +244,7 @@ function makeAddition(): Expr {
 }
 
 function makeMultiplication(): Expr {
-    return makeBinaryExpr([TokenType.STAR, TokenType.SLASH], makeBinaryLogical);
-}
-
-function makeBinaryLogical(): Expr {
-    return makeBinaryExpr([TokenType.AND, TokenType.OR], makeUnary);
+    return makeBinaryExpr([TokenType.STAR, TokenType.SLASH], makeUnary);
 }
 
 function makeUnary(): Expr {
@@ -253,7 +253,27 @@ function makeUnary(): Expr {
         let right = makeUnary();
         return new UnaryExpr(operator, right);
     }
+    return makeCall();
+}
+
+function makeCall(): Expr {
+    if (matchType(TokenType.IDENTIFIER)) {
+        let identifier = lookBehind().lexeme;
+        while (true) {
+            if (matchType(TokenType.OPEN_PAREN)) {
+                return finishCall();
+            } else {
+                return new VariableExpr(identifier);
+            }
+        }
+    }
     return makePrimary();
+}
+
+function finishCall() {
+    let identifier = lookBehind(2).lexeme;
+    let args: Expr[] = finishCallArgs();
+    return new CallExpr(identifier, args);
 }
 
 function makePrimary(): Expr {
@@ -262,10 +282,6 @@ function makePrimary(): Expr {
     if (matchType(TokenType.NUMBER, TokenType.STRING)) return new PrimaryExpr(lookBehind().literal);
     if (matchType(TokenType.IDENTIFIER)) {
         let identifier = lookBehind().lexeme;
-        if(matchType(TokenType.OPEN_PAREN)) {
-            let args: Expr[] = finishCallArgs();
-            return new CallExpr(identifier, args);
-        }
         return new VariableExpr(identifier);
     }
 

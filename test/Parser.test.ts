@@ -2,7 +2,7 @@ import tokenize from "../src/Tokenizer";
 import parse from "../src/Parser";
 import TokenType from "../src/TokenType";
 import Token from "../src/Token";
-import { PrimaryExpr, UnaryExpr } from "../src/Expr";
+import { PrimaryExpr, UnaryExpr, BinaryExpr } from "../src/Expr";
 import { expect } from "chai";
 
 describe("parse()", () => {
@@ -70,5 +70,25 @@ describe("parse()", () => {
 
         let src16 = "let not = 34";
         expect(() => parse(tokenize(src16))).to.throw('Expected identifier; got "not"');
+    });
+
+    it("should parse `or` precedence correctly", () => {
+        let src = "4 == 5 or 6 == 7";
+        //console.log(parse(tokenize(src)))
+        expect(parse(tokenize(src))).to.eql([
+            new BinaryExpr(
+                new BinaryExpr(
+                    new PrimaryExpr(4),
+                    new Token(TokenType.EQUAL_EQUAL, "==", null, 1),
+                    new PrimaryExpr(5)
+                ),
+                new Token(TokenType.OR, "or", null, 1),
+                new BinaryExpr(
+                    new PrimaryExpr(6),
+                    new Token(TokenType.EQUAL_EQUAL, "==", null, 1),
+                    new PrimaryExpr(7)
+                )
+            )
+        ]);
     });
 });

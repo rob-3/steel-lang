@@ -1,7 +1,5 @@
 import Token from "./Token";
 import { BlockStmt } from "./Stmt";
-import Scope from "./Scope";
-import { stmtExec, exprEval } from "./Interpreter";
 
 export class Expr {
 }
@@ -59,15 +57,6 @@ export class FunctionExpr extends Expr {
         super();
         this.args = args;
         this.body = body;
-    }
-
-    call(callArgs: Expr[], scope: Scope) {
-        let functionScope = new Scope(scope);
-        for (let i = 0; i < this.args.length; i++) {
-            // FIXME typecheck args
-            functionScope.set(this.args[i], [exprEval(callArgs[i], scope), false]);
-        }
-        stmtExec(this.body, functionScope);
     }
 }
 

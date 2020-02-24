@@ -8,10 +8,9 @@ import tokenize from "./Tokenizer";
 import parse from "./Parser";
 import { stmtExec, setPrintFn } from "./Interpreter";
 import Scope from "./Scope";
+import { Expr } from "./Expr";
 
-if (process.argv.length > 3) {
-    console.log("Usage: node conflux [filename]");
-} else if (process.argv.length === 2) {
+if (process.argv.length === 2) {
     startRepl();
 } else {
     let filename = process.argv[2];
@@ -20,18 +19,19 @@ if (process.argv.length > 3) {
             console.log("There was a problem reading the file.");
             process.exitCode = 1;
         } else {
-            run(contents, false);
+            run(contents, false, new Scope());
             rl.close();
         }
     });
 }
 
 function startRepl() {
+    let scope = new Scope();
     rl.setPrompt("> ");
     rl.prompt();
     rl.on("line", input => {
         try {
-            run(input, true);
+            scope = run(input, true, scope);
         } catch (err) {
             console.log(err);
         }
@@ -42,15 +42,17 @@ function startRepl() {
     });
 }
 
-function run(source: string, repl: boolean): void {
+function run(source: string, repl: boolean, scope: Scope): Scope {
     setPrintFn(console.log);
     let tokens = tokenize(source);
-    let ast = parse(tokens);
-    let scope = new Scope();
+    let ast: any = parse(tokens);
+    //console.dir(ast[0].right.body.stmts[0].condition.left)
     for (let stmt of ast) {
-        let val = stmtExec(stmt, scope);
-        if (repl && val !== undefined) {
+        let { value: val, state: newScope } = stmtExec(stmt, scope);
+        scope = newScope;
+        if (stmt instanceof Expr && repl && val !== undefined) {
             console.log(val)
         }
     }
+    return scope;
 }
