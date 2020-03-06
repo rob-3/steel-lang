@@ -263,6 +263,19 @@ describe("exec()", () => {
                 expect(spy).to.have.been.called.once;
                 expect(spy).to.have.been.called.with(11);
             });
+
+            it("should have the correct scope", () => {
+                let src = `
+                {
+                    fun sum(a, b) {
+                        a + b
+                    }
+
+                    sum(4, 7)
+                }
+                `;
+                expect(cfxEval(src)).to.equal(11);
+            });
         });
     });
 });

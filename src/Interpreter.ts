@@ -46,63 +46,6 @@ export function cfxExec(src: string): Scoped<Value> {
     */
 }
 
-export function stmtExec(stmt: Stmt, scope: Scope): Scoped<Value> {
-    if (stmt instanceof PrintStmt) {
-        let monad = State.of(stmt, scope).flatMap((stmt: PrintStmt, scope) => exprEval(stmt.thingToPrint, scope))
-        monad.map(printfn)
-        return monad;
-    } else if (stmt instanceof VariableDeclarationStmt) {
-        return exprEval(stmt.right, scope).flatMap(
-            (rightVal, scope) => define(stmt.identifier, rightVal, stmt.immutable, scope)
-        );
-    } else if (stmt instanceof VariableAssignmentStmt) {
-        return exprEval(stmt.right, scope).flatMap(
-            (rightVal, scope) => assign(stmt.identifier, rightVal, scope)
-        );
-    } else if (stmt instanceof IfStmt) {
-        let result = exprEval(stmt.condition, scope);
-        let shouldBeBool = result.value;
-        scope = result.state;
-        if (!assertBool(shouldBeBool)) {
-            throw Error("Condition doesn't evaluate to a boolean.");
-        }
-        if (shouldBeBool) {
-            return stmtExec(stmt.body, scope);
-        } else if (stmt.elseBody !== null) {
-            return stmtExec(stmt.elseBody, scope);
-        } else {
-            // TODO: hack we need to address
-            return State.of(null, scope);
-        }
-    } else if (stmt instanceof BlockStmt) {
-        let result: Scoped<Value>;
-        for (let myStmt of stmt.stmts) {
-            result = stmtExec(myStmt, scope);
-            scope = result.state;
-        }
-        return result;
-        /*
-        // this line is probably broken and unreadable anyways; replace it
-        return State.of(stmt.stmts, scope)
-            .map((stmts, scope) => 
-                map((stmt: Stmt) => 
-                    stmtExec(stmt, scope))(stmts))
-                        .flatMap((results, scope) => results[results.length - 1])
-         */
-    } else if (stmt instanceof WhileStmt) {
-        let conditionValue = exprEval(stmt.condition, scope);
-        while (assertBool(conditionValue) && conditionValue) {
-            scope = stmtExec(stmt.body, scope).state;
-            conditionValue = exprEval(stmt.condition, scope);
-        }
-        return State.of(null, scope);
-    } else if (stmt instanceof Expr) {
-        return State.of(stmt, scope).flatMap(exprEval);
-    } else {
-        throw Error("Unhandled stmt");
-    }
-}
-
 function lookup(identifier: string, scope: Scope): Value {
     let val = scope.get(identifier);
     if (val === null) {
@@ -142,6 +85,11 @@ function assign(key: string, evaluatedExpr: Value, scope: Scope): Scoped<Value> 
  */
 export function cfxEval(src: string, scope: Scope): Value {
     return exprEval(parse(tokenize(src))[0], scope).value;
+}
+
+
+export function stmtExec(stmt: Stmt, scope: Scope): Scoped<Value> {
+    return exprEval(stmt, scope);
 }
 
 /*
@@ -205,10 +153,51 @@ export function exprEval(expr: Expr | Stmt, scope: Scope): Scoped<Value> {
         }
     } else if (expr instanceof FunctionExpr) {
         return State.of(new CfxFunction(expr), scope);
+    } else if (expr instanceof PrintStmt) {
+        let monad = State.of(expr, scope).flatMap((expr: PrintStmt, scope) => exprEval(expr.thingToPrint, scope))
+        monad.map(printfn)
+        return monad;
+    } else if (expr instanceof VariableDeclarationStmt) {
+        return exprEval(expr.right, scope).flatMap(
+            (rightVal, scope) => define(expr.identifier, rightVal, expr.immutable, scope)
+        );
+    } else if (expr instanceof VariableAssignmentStmt) {
+        return exprEval(expr.right, scope).flatMap(
+            (rightVal, scope) => assign(expr.identifier, rightVal, scope)
+        );
+    } else if (expr instanceof IfStmt) {
+        let result = exprEval(expr.condition, scope);
+        let shouldBeBool = result.value;
+        scope = result.state;
+        if (!assertBool(shouldBeBool)) {
+            throw Error("Condition doesn't evaluate to a boolean.");
+        }
+        if (shouldBeBool) {
+            return exprEval(expr.body, scope);
+        } else if (expr.elseBody !== null) {
+            return exprEval(expr.elseBody, scope);
+        } else {
+            // TODO: hack we need to address
+            return State.of(null, scope);
+        }
     } else if (expr instanceof BlockStmt) {
-        return stmtExec(expr, scope);
+        let result: Scoped<Value>;
+        for (let myStmt of expr.stmts) {
+            result = exprEval(myStmt, scope);
+            scope = result.state;
+        }
+        return result;
+    } else if (expr instanceof WhileStmt) {
+        let conditionValue = exprEval(expr.condition, scope);
+        while (assertBool(conditionValue) && conditionValue) {
+            scope = exprEval(expr.body, scope).state;
+            conditionValue = exprEval(expr.condition, scope);
+        }
+        return State.of(null, scope);
+    } else if (expr instanceof Expr) {
+        return State.of(expr, scope).flatMap(exprEval);
     } else {
-        throw Error("Unrecognized error");
+        throw Error("Unhandled stmt or expr.");
     }
 }
 
