@@ -78,7 +78,7 @@ function makeStmt(): Stmt | void {
     }
     if (matchType(TokenType.OPEN_BRACE)) return finishBlockStmt();
     if (matchType(TokenType.STMT_TERM)) return null;
-    return makeExprStmt();
+    return makeExpr();
 }
 
 function finishWhileStmt(): Stmt {
@@ -178,14 +178,6 @@ function finishIfStmt(): Stmt {
 function finishPrintStmt(): Stmt {
     let stmt = new PrintStmt(makeExpr());
     return stmt;
-}
-
-function makeExprStmt(): Stmt {
-    let expr = makeExpr();
-    if (!matchType(TokenType.STMT_TERM, TokenType.EOF)) {
-        throw Error(`Expected a newline; got "${lookAhead().lexeme}"`);
-    }
-    return expr;
 }
 
 function makeExpr(): Expr {

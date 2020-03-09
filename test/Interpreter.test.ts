@@ -311,6 +311,17 @@ describe("exec()", () => {
                 `
                 expect(cfxEval(src)).to.equal(5);
             });
+
+            it("shouldn't care about whitespace in a function", () => {
+                let src = `
+                {
+                    fun a() { 5 }
+
+                    a()
+                }
+                `;
+                expect(cfxEval(src)).to.equal(5);
+            });
         });
     });
 });
