@@ -353,6 +353,19 @@ describe("exec()", () => {
                `
                expect(cfxEval(src)).to.equal(30);
             });
+
+            it("should allow anonymous functions to be passed inline", () => {
+                let src = `
+                {
+                    let math = fun(a, b, c) {
+                        a(b) * c
+                    }
+
+                    math(fun(a) { a + 3 }, 2, 3)
+                }
+                `
+                expect(cfxEval(src)).to.equal(15);
+            });
         });
     });
 });
