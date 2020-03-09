@@ -14,7 +14,7 @@ import tokenize from "./Tokenizer";
 import parse from "./Parser";
 import { State } from "./lib/Monads";
 export type Scoped<T> = State<T, Scope>
-import { map, spread } from "./lib/utils";
+import { spread } from "./lib/utils";
 import { CfxFunction, Value } from "./InterpreterHelpers";
 
 let printfn = thing => {
