@@ -277,10 +277,23 @@ function makePrimary(): Expr {
         return new VariableExpr(identifier);
     }
 
+    if(matchType(TokenType.FUN)) return finishLambda();
+
     if (matchType(TokenType.OPEN_PAREN)) return finishGrouping();
 
     // should be impossible to get here
     throw Error(`Expected a primary; got "${lookAhead().lexeme}"`);
+}
+
+function finishLambda(): FunctionExpr {
+    if (!matchType(TokenType.OPEN_PAREN)) {
+        throw Error(`Expected "("; got "${lookAhead().lexeme}"`);
+    }
+    let argsObj: string[] = finishFunctDecArgs();
+    matchType(TokenType.OPEN_BRACE);
+    let body = finishBlockStmt();
+    // TODO: add checks and nice error messages
+    return new FunctionExpr(argsObj, body);
 }
 
 function finishGrouping(): Expr {

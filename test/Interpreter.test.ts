@@ -339,5 +339,20 @@ describe("exec()", () => {
                 expect(cfxEval(src)).to.equal(9)
             });
         });
+
+        describe("lambdas", () => {
+            it("should permit anonymous function style declaration", () => {
+               let src = `
+               {
+                    let a = fun(a, b) {
+                        a * b
+                    }
+
+                    a(5, 6)
+               }
+               `
+               expect(cfxEval(src)).to.equal(30);
+            });
+        });
     });
 });
