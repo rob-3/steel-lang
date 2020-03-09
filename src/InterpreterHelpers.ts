@@ -1,6 +1,7 @@
 import { Scoped, stmtExec } from "./Interpreter";
 import { FunctionExpr } from "./Expr";
 import Scope from "./Scope";
+import { State } from "./lib/Monads";
 
 export class CfxFunction {
     funExpr: FunctionExpr;
@@ -12,9 +13,11 @@ export class CfxFunction {
         let functionScope = new Scope(scope);
         for (let i = 0; i < this.funExpr.args.length; i++) {
             // FIXME typecheck args
-            functionScope.set(this.funExpr.args[i], [callArgs[i], false]);
+            functionScope.setLocal(this.funExpr.args[i], [callArgs[i], false]);
         }
-        return stmtExec(this.funExpr.body, functionScope);
+        // TODO: real problem here
+        let { value, state } = stmtExec(this.funExpr.body, functionScope);
+        return State.of(value, state.parentScope);
     }
 }
 

@@ -276,6 +276,41 @@ describe("exec()", () => {
                 `;
                 expect(cfxEval(src)).to.equal(11);
             });
+
+            it("should allow recursion", () => {
+                let src = `
+                {
+                    fun fac(a) {
+                        if (a == 0) {
+                            1
+                        } else {
+                            a * fac(a-1)
+                        }
+                    }
+
+                    fac(4)
+                }
+                `;
+                expect(cfxEval(src)).to.equal(24);
+            });
+
+            it("should be able to implement fib", () => {
+                let src = `
+                {
+                    fun fib(a) {
+                        if (a == 0 or a == 1) {
+                            1
+                        } else {
+                            print a
+                            fib(a-1) + fib(a-2)
+                        }
+                    }
+
+                    fib(4)
+                }
+                `
+                expect(cfxEval(src)).to.equal(5);
+            });
         });
     });
 });

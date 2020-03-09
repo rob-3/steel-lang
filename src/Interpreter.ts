@@ -58,7 +58,7 @@ function lookup(identifier: string, scope: Scope): Value {
 function define(key: string, evaluatedExpr: Value, immutable: boolean, scope: Scope):
     Scoped<Value> {
     if (!scope.has(key) || !scope.get(key)[1]) {
-        scope.set(key, [evaluatedExpr, immutable]);
+        scope.setLocal(key, [evaluatedExpr, immutable]);
         return State.of(evaluatedExpr, scope);
     } else {
         throw Error(`Cannot redefine immutable variable "${key}".`);
@@ -72,7 +72,7 @@ function assign(key: string, evaluatedExpr: Value, scope: Scope): Scoped<Value> 
     } else {
         let immutable = variable[1];
         if (!immutable) {
-            scope.set(key, [evaluatedExpr, false]);
+            scope.assign(key, [evaluatedExpr, false]);
             return State.of(evaluatedExpr, scope);
         } else {
             throw Error(`Cannot assign to immutable variable "${key}".`);
