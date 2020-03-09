@@ -238,6 +238,17 @@ describe("exec()", () => {
                 expect(spy).to.have.been.called.once;
                 expect(spy).to.have.been.called.with(5);
             });
+
+            it("shouldn't care about whitespace in a function", () => {
+                let src = `
+                {
+                    fun a() { 5 }
+
+                    a()
+                }
+                `;
+                expect(cfxEval(src)).to.equal(5);
+            });
         });
 
         describe("functions with arguments", () => {
@@ -309,17 +320,6 @@ describe("exec()", () => {
                     fib(4)
                 }
                 `
-                expect(cfxEval(src)).to.equal(5);
-            });
-
-            it("shouldn't care about whitespace in a function", () => {
-                let src = `
-                {
-                    fun a() { 5 }
-
-                    a()
-                }
-                `;
                 expect(cfxEval(src)).to.equal(5);
             });
         });
