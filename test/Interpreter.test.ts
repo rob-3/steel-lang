@@ -312,7 +312,6 @@ describe("exec()", () => {
                         if (a == 0 or a == 1) {
                             1
                         } else {
-                            print a
                             fib(a-1) + fib(a-2)
                         }
                     }
