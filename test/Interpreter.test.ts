@@ -322,6 +322,23 @@ describe("exec()", () => {
                 `
                 expect(cfxEval(src)).to.equal(5);
             });
+
+            it("should be able to be passed into another function", () => {
+                let src = `
+                {
+                    fun a(a, b) {
+                        a + b
+                    }
+
+                    fun b(a, b, c) {
+                        a(b, c)
+                    }
+
+                    b(a, 4, 5)
+                }
+                `
+                expect(cfxEval(src)).to.equal(9)
+            });
         });
     });
 });
