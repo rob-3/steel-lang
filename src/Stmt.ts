@@ -1,6 +1,6 @@
 import { Expr } from "./Expr";
 
-export class Stmt {
+export class Stmt extends Expr {
 }
 
 export class VariableDeclarationStmt extends Stmt {

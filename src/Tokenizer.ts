@@ -47,7 +47,7 @@ function scanToken(): void | Token {
             }
             return null;
         case "+": return match("+") ? makeToken(TokenType.PLUS_PLUS) : makeToken(TokenType.PLUS);
-        case "-": return match(">") ? makeToken(TokenType.SINGLE_ARROW) : makeToken(TokenType.MINUS);
+        case "-": return match(">") ? makeToken(TokenType.RIGHT_SINGLE_ARROW) : makeToken(TokenType.MINUS);
         case "=": return match("=") ? makeToken(TokenType.EQUAL_EQUAL) : makeToken(TokenType.EQUAL);
         case ">": return match("=") ? makeToken(TokenType.GREATER_EQUAL) : makeToken(TokenType.GREATER);
         case "<": return match("=") ? makeToken(TokenType.LESS_EQUAL) : makeToken(TokenType.LESS);

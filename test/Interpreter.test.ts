@@ -366,6 +366,42 @@ describe("exec()", () => {
                 `
                 expect(cfxEval(src)).to.equal(15);
             });
+
+            it("should allow short lambda syntax without parentheses", () => {
+               expect(cfxEval(
+                `
+                {
+                    let double = a -> a * 2
+
+                    double(2)
+                }
+                `
+               )).to.equal(4);
+            });
+
+            it("should allow short lambda syntax with parentheses", () => {
+               expect(cfxEval(
+                `
+                {
+                    let double = (a) -> a * 2
+
+                    double(2)
+                }
+                `
+               )).to.equal(4);
+            });
+
+            it("should allow short lambda syntax with parentheses and multiple args", () => {
+               expect(cfxEval(
+                `
+                {
+                    let sum = (a, b) -> a + b
+
+                    sum(2, 6)
+                }
+                `
+               )).to.equal(8);
+            });
         });
     });
 });

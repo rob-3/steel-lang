@@ -190,14 +190,13 @@ function finishVariableDeclaration(immutable: boolean): Stmt {
         if (matchType(TokenType.STRING)) throw Error(`Expected identifier; got a string literal.`);
         throw Error(`Expected identifier; got "${lookAhead().lexeme}".`);
     }
-    let identifier = lookBehind();
+    let identifier = lookBehind().lexeme;
     if (!matchType(TokenType.EQUAL)) {
         throw Error(`Expected "="; got "${lookAhead().lexeme}".`);
     }
     let right = makeExpr();
-
     if (matchType(TokenType.STMT_TERM, TokenType.EOF)) {
-        return new VariableDeclarationStmt(identifier.lexeme, immutable, right);
+        return new VariableDeclarationStmt(identifier, immutable, right);
     } else {
         throw Error("Expected a newline!");
     }
@@ -250,13 +249,10 @@ function makeUnary(): Expr {
 
 function makeCall(): Expr {
     if (matchType(TokenType.IDENTIFIER)) {
-        let identifier = lookBehind().lexeme;
-        while (true) {
-            if (matchType(TokenType.OPEN_PAREN)) {
-                return finishCall();
-            } else {
-                return new VariableExpr(identifier);
-            }
+        if (matchType(TokenType.OPEN_PAREN)) {
+            return finishCall();
+        } else {
+            current -= 1;
         }
     }
     return makePrimary();
@@ -273,16 +269,51 @@ function makePrimary(): Expr {
     if (matchType(TokenType.FALSE)) return new PrimaryExpr(false);
     if (matchType(TokenType.NUMBER, TokenType.STRING)) return new PrimaryExpr(lookBehind().literal);
     if (matchType(TokenType.IDENTIFIER)) {
-        let identifier = lookBehind().lexeme;
-        return new VariableExpr(identifier);
+        if (matchType(TokenType.RIGHT_SINGLE_ARROW)) {
+            return finishVeryShortLambda(lookBehind(2).lexeme);
+        } else {
+            let identifier = lookBehind().lexeme;
+            return new VariableExpr(identifier);
+        }
     }
 
     if(matchType(TokenType.FUN)) return finishLambda();
 
-    if (matchType(TokenType.OPEN_PAREN)) return finishGrouping();
+    if (matchType(TokenType.OPEN_PAREN)) {
+        if (matchType(TokenType.IDENTIFIER)) {
+            if (matchType(TokenType.COMMA, TokenType.CLOSE_PAREN)) {
+                current -= 2;
+                return finishShortLambda();
+            } else {
+                current -= 1;
+            }
+        }
+        return finishGrouping();
+    }
 
     // should be impossible to get here
     throw Error(`Expected a primary; got "${lookAhead().lexeme}"`);
+}
+
+function finishVeryShortLambda(arg: string): FunctionExpr {
+    // TODO: add checks and error productions
+    matchType(TokenType.OPEN_BRACE);
+    let body = makeExpr();
+    return new FunctionExpr([arg], new BlockStmt([body]));
+}
+
+function finishShortLambda() {
+    let args: string[] = finishFunctDecArgs();
+    if (!matchType(TokenType.RIGHT_SINGLE_ARROW)) {
+        throw Error(`Expected "->", got "${lookAhead().lexeme}"`);
+    }
+    if (matchType(TokenType.OPEN_BRACE)) {
+        let body = finishBlockStmt();
+        return new FunctionExpr(args, body);
+    } else {
+        let body = makeExpr();
+        return new FunctionExpr(args, new BlockStmt([body]));
+    }
 }
 
 function finishLambda(): FunctionExpr {
