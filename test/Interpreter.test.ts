@@ -402,6 +402,26 @@ describe("exec()", () => {
                 `
                )).to.equal(8);
             });
+
+            it("should allow a returned function to be called", () => {
+                expect(cfxEval(
+                    `
+                    {
+                        fun a() {
+                            fun b() {
+                                5
+                            }
+                        }
+
+                        a()()
+                    }
+                    `
+                )).to.equal(5)
+            });
+
+            it("should throw if a noncallable object is called", () => {
+                
+            });
         });
     });
 });

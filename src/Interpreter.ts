@@ -145,12 +145,15 @@ export function exprEval(expr: Expr | Stmt, scope: Scope): Scoped<Value> {
     } else if (expr instanceof VariableExpr) {
         return State.of(lookup(expr.identifier, scope), scope);
     } else if (expr instanceof CallExpr) {
-        let fn: any = lookup(expr.identifier, scope);
-        if (fn instanceof CfxFunction) {
-            return call(fn, expr.args, scope);
-        } else {
-            throw Error(`Can't call ${expr.identifier} because it is not a function.`);
-        }
+        return State.of(expr.callee, scope)
+            .flatMap(exprEval)
+            .flatMap((maybeFn, scope) => {
+                if (maybeFn instanceof CfxFunction) {
+                    return call(maybeFn, expr.args, scope);
+                } else {
+                    throw Error(`Can't call ${maybeFn} because it is not a function.`);
+                }
+            });
     } else if (expr instanceof FunctionExpr) {
         return State.of(new CfxFunction(expr), scope);
     } else if (expr instanceof PrintStmt) {

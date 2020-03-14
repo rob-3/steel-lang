@@ -61,11 +61,11 @@ export class FunctionExpr extends Expr {
 }
 
 export class CallExpr extends Expr {
-    identifier: string;
+    callee: Expr;
     args: Expr[];
-    constructor(identifier: string, args: Expr[]) {
+    constructor(callee: Expr, args: Expr[]) {
         super();
-        this.identifier = identifier;
+        this.callee = callee;
         this.args = args;
     }
 }

@@ -129,16 +129,6 @@ function finishFunctDecArgs(): string[] {
     return args;
 }
 
-function finishCallArgs(): Expr[] {
-    let callArgs: Expr[] = [];
-    while (!matchType(TokenType.CLOSE_PAREN)) {
-        callArgs.push(makeExpr());
-        matchType(TokenType.COMMA);
-        // FIXME consume function needed
-    }
-    return callArgs;
-}
-
 function finishBlockStmt(): BlockStmt {
     let stmts: Stmt[] = [];
     while (!matchType(TokenType.CLOSE_BRACE)) {
@@ -248,20 +238,30 @@ function makeUnary(): Expr {
 }
 
 function makeCall(): Expr {
-    if (matchType(TokenType.IDENTIFIER)) {
+    let expr: Expr = makePrimary();
+
+    while (true) {
         if (matchType(TokenType.OPEN_PAREN)) {
-            return finishCall();
+            console.log("hi")
+            expr = finishCall(expr);
         } else {
-            current -= 1;
+            break;
         }
     }
-    return makePrimary();
+    return expr;
 }
 
-function finishCall() {
-    let identifier = lookBehind(2).lexeme;
-    let args: Expr[] = finishCallArgs();
-    return new CallExpr(identifier, args);
+function finishCall(callee: Expr) {
+    let args: Expr[] = [];
+    if (!matchType(TokenType.CLOSE_PAREN)) {
+        do {
+            args.push(makeExpr());
+        } while (matchType(TokenType.COMMA));
+        if (!matchType(TokenType.CLOSE_PAREN)) {
+            throw Error(`Must terminate function call with ")"`);
+        }
+    }
+    return new CallExpr(callee, args);
 }
 
 function makePrimary(): Expr {
