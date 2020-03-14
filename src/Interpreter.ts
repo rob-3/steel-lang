@@ -14,7 +14,6 @@ import tokenize from "./Tokenizer";
 import parse from "./Parser";
 import { State } from "./lib/Monads";
 export type Scoped<T> = State<T, Scope>
-import { spread } from "./lib/utils";
 import { CfxFunction, Value } from "./InterpreterHelpers";
 
 let printfn = thing => {
@@ -105,29 +104,29 @@ export function exprEval(expr: Expr | Stmt, scope: Scope): Scoped<Value> {
         let monad = State.of([leftMonad.value, rightMonad.value], rightMonad.state);
         switch (expr.operator.type) {
             case TokenType.PLUS:
-                return monad.map(spread(plus));
+                return monad.map(plus);
             case TokenType.MINUS:
-                return monad.map(spread(minus));
+                return monad.map(minus);
             case TokenType.PLUS_PLUS: 
-                return monad.map(spread(plusPlus));
+                return monad.map(plusPlus);
             case TokenType.STAR:
-                return monad.map(spread(star));
+                return monad.map(star);
             case TokenType.SLASH:
-                return monad.map(spread(slash));
+                return monad.map(slash);
             case TokenType.AND:
-                return monad.map(spread(and));
+                return monad.map(and);
             case TokenType.OR:
-                return monad.map(spread(or));
+                return monad.map(or);
             case TokenType.GREATER_EQUAL:
-                return monad.map(spread(greaterEqual));
+                return monad.map(greaterEqual);
             case TokenType.GREATER:
-                return monad.map(spread(greater));
+                return monad.map(greater);
             case TokenType.LESS_EQUAL:
-                return monad.map(spread(lessEqual));
+                return monad.map(lessEqual);
             case TokenType.LESS:
-                return monad.map(spread(less));
+                return monad.map(less);
             case TokenType.EQUAL_EQUAL:
-                return monad.map(spread(equal));
+                return monad.map(equal);
             default:
                 throw Error(`FIXME: Unhandled operator type "${expr.operator}"`);
         }
@@ -223,45 +222,45 @@ function opposite(right: Value): number {
     else throw Error('"-" can only be used on a number');
 }
 
-function plus(left: Value, right: Value): number {
+function plus([left, right]: [Value, Value]): number {
     if (assertNumber(left, right)) {
         return <number>left + <number>right;
     } else throw Error('Operands of "+" must be numbers.');
 }
 
-function minus(left: Value, right: Value): number {
+function minus([left, right]: [Value, Value]): number {
     if (assertNumber(left, right)) {
         return <number>left - <number>right;
     } else throw Error('Operands of "-" must be numbers.');
 }
 
-function plusPlus(left: Value, right: Value): string {
+function plusPlus([left, right]: [Value, Value]): string {
     if (typeof left === "string" &&
         typeof right === "string") {
         return left.concat(right);
     } else throw Error('Operands of "++" must be strings.');
 }
 
-function star(left: Value, right: Value): number {
+function star([left, right]: [Value, Value]): number {
     if (assertNumber(left, right)) {
         return <number>left * <number>right;
     } else throw Error('Operands of "*" must be numbers.');
 }
 
-function slash(left: Value, right: Value): number {
+function slash([left, right]: [Value, Value]): number {
     if (assertNumber(left, right)) {
         return <number>left / <number>right;
     } else throw Error('Operands of "/" must be numbers.');
 }
 
-function and(left: Value, right: Value): boolean {
+function and([left, right]: [Value, Value]): boolean {
     if (assertBool(left, right)) {
         return <boolean>left && <boolean>right;
     } else throw Error('Operands of "and" must be booleans.');
     
 }
 
-function or(left: Value, right: Value): boolean {
+function or([left, right]: [Value, Value]): boolean {
     if (assertBool(left, right)) {
         return <boolean>left || <boolean>right;
     } else {
@@ -289,23 +288,23 @@ function not(right: Value): boolean {
     else throw Error('Operands of "not" should be booleans.');
 }
 
-function greaterEqual(left: Value, right: Value): boolean {
+function greaterEqual([left, right]: [Value, Value]): boolean {
     return comparision(left, right, (l, r) => l >= r, ">=");
 }
 
-function greater(left: Value, right: Value): boolean {
+function greater([left, right]: [Value, Value]): boolean {
     return comparision(left, right, (l, r) => l > r, ">");
 }
 
-function lessEqual(left: Value, right: Value): boolean {
+function lessEqual([left, right]: [Value, Value]): boolean {
     return comparision(left, right, (l, r) => l <= r, "<=");
 }
 
-function less(left: Value, right: Value): boolean {
+function less([left, right]: [Value, Value]): boolean {
     return comparision(left, right, (l, r) => l < r, "<");
 }
 
-function equal(left: Value, right: Value): boolean {
+function equal([left, right]: [Value, Value]): boolean {
     return comparision(left, right, (l, r) => l === r, "==");
 }
 
