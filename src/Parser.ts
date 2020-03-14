@@ -242,7 +242,6 @@ function makeCall(): Expr {
 
     while (true) {
         if (matchType(TokenType.OPEN_PAREN)) {
-            console.log("hi")
             expr = finishCall(expr);
         } else {
             break;
