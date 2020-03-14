@@ -31,6 +31,7 @@ export function setPrintFn(fn) {
 }
 
 export function cfxExec(src: string): Scoped<Value> {
+    // TODO rewrite in functional style
     let stmts: Stmt[] = parse(tokenize(src));
     let scope = new Scope();
     let result: Scoped<Value>;
@@ -39,10 +40,6 @@ export function cfxExec(src: string): Scoped<Value> {
         scope = result.state;
     }
     return result;
-    /*
-    let state: Scoped<Stmt[]> = State.of(stmts, new Scope());
-    return state.map((stmts, scope) => map((stmt) => stmtExec(stmt, scope))(stmts)).map(results => results[results.length - 1]);
-    */
 }
 
 function lookup(identifier: string, scope: Scope): Value {

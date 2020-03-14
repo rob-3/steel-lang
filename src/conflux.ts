@@ -46,7 +46,6 @@ function run(source: string, repl: boolean, scope: Scope): Scope {
     setPrintFn(console.log);
     let tokens = tokenize(source);
     let ast: any = parse(tokens);
-    //console.dir(ast[0].right.body.stmts[0].condition.left)
     for (let stmt of ast) {
         let { value: val, state: newScope } = stmtExec(stmt, scope);
         scope = newScope;

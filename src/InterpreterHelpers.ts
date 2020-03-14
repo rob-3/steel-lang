@@ -15,7 +15,6 @@ export class CfxFunction {
             // FIXME typecheck args
             functionScope.setLocal(this.funExpr.args[i], [callArgs[i], false]);
         }
-        // TODO: real problem here
         let { value, state } = stmtExec(this.funExpr.body, functionScope);
         return State.of(value, state.parentScope);
     }
