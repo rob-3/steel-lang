@@ -109,9 +109,10 @@ function finishFunctionDeclaration(): Stmt {
         throw Error(`Expected "("; got "${lookAhead().lexeme}"`);
     }
     let argsObj = finishFunctDecArgs();
-    matchType(TokenType.OPEN_BRACE);
+    if (!matchType(TokenType.OPEN_BRACE)) {
+        throw Error(`Expected "{"; got "${lookAhead().lexeme}"`);
+    }
     let body = finishBlockStmt();
-    // TODO: bad
     let fnExp = new FunctionExpr(argsObj, body);
     return new VariableDeclarationStmt(fnName, true, fnExp);
 }
