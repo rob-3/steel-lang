@@ -3,13 +3,12 @@ import TokenType from "./TokenType";
 import { 
     Expr, GroupingExpr, BinaryExpr, 
     PrimaryExpr, UnaryExpr, VariableExpr,
-    FunctionExpr, CallExpr
-} from "./Expr";
-import { 
+    FunctionExpr, CallExpr,
+
     Stmt, PrintStmt, VariableDeclarationStmt, 
     VariableAssignmentStmt, IfStmt, BlockStmt,
     WhileStmt
-} from "./Stmt";
+} from "./Expr";
 
 let tokens: Token[];
 let current = 0;

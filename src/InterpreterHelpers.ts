@@ -1,4 +1,4 @@
-import { Scoped, stmtExec } from "./Interpreter";
+import { Scoped, exprEval } from "./Interpreter";
 import { FunctionExpr } from "./Expr";
 import Scope from "./Scope";
 import { State } from "./lib/Monads";
@@ -15,7 +15,7 @@ export class CfxFunction {
             // FIXME typecheck args
             functionScope.setLocal(this.funExpr.args[i], [callArgs[i], false]);
         }
-        let { value, state } = stmtExec(this.funExpr.body, functionScope);
+        let { value, state } = exprEval(this.funExpr.body, functionScope);
         return State.of(value, state.parentScope);
     }
 }

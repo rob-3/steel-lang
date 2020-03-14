@@ -1,13 +1,12 @@
 import { 
     Expr, VariableExpr, BinaryExpr, 
     PrimaryExpr, UnaryExpr, GroupingExpr,
-    CallExpr, FunctionExpr
-} from "./Expr";
-import { 
+    CallExpr, FunctionExpr,
+
     Stmt, VariableDeclarationStmt, PrintStmt, 
     VariableAssignmentStmt, IfStmt, BlockStmt,
     WhileStmt
-} from "./Stmt";
+} from "./Expr";
 import TokenType from "./TokenType";
 import Scope from "./Scope";
 import tokenize from "./Tokenizer";
@@ -36,7 +35,7 @@ export function cfxExec(src: string): Scoped<Value> {
     let scope = new Scope();
     let result: Scoped<Value>;
     for (let stmt of stmts) {
-        result = stmtExec(stmt, scope);
+        result = exprEval(stmt, scope);
         scope = result.state;
     }
     return result;
@@ -81,11 +80,6 @@ function assign(key: string, evaluatedExpr: Value, scope: Scope): Scoped<Value> 
  */
 export function cfxEval(src: string, scope: Scope): Value {
     return exprEval(parse(tokenize(src))[0], scope).value;
-}
-
-
-export function stmtExec(stmt: Stmt, scope: Scope): Scoped<Value> {
-    return exprEval(stmt, scope);
 }
 
 /*
