@@ -85,7 +85,7 @@ export function cfxEval(src: string, scope: Scope): Value {
 /*
  * Ast-based eval() for conflux. Pass in any expression and get the evalutated result.
  */
-export function exprEval(expr: Expr | Stmt, scope: Scope): Scoped<Value> {
+export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
     if (expr instanceof PrimaryExpr) {
         return State.of(expr.literal, scope);
     } else if (expr instanceof BinaryExpr) {
