@@ -7,7 +7,7 @@ import {
 
     Stmt, PrintStmt, VariableDeclarationStmt, 
     VariableAssignmentStmt, IfStmt, BlockStmt,
-    WhileStmt
+    WhileStmt, ReturnStmt
 } from "./Expr";
 
 let tokens: Token[];
@@ -61,6 +61,7 @@ function lookAhead(): Token {
 }
 
 function makeStmt(): Stmt | void {
+    if (matchType(TokenType.RETURN)) return new ReturnStmt(makeExpr());
     if (matchType(TokenType.LET)) return finishVariableDeclaration(true);
     if (matchType(TokenType.VAR)) return finishVariableDeclaration(false);
     if (matchType(TokenType.PRINT)) return finishPrintStmt();

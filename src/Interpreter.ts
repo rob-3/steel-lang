@@ -5,7 +5,7 @@ import {
 
     Stmt, VariableDeclarationStmt, PrintStmt, 
     VariableAssignmentStmt, IfStmt, BlockStmt,
-    WhileStmt
+    WhileStmt, ReturnStmt
 } from "./Expr";
 import TokenType from "./TokenType";
 import Scope from "./Scope";
@@ -192,6 +192,8 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
             conditionValue = exprEval(expr.condition, scope).value;
         }
         return State.of(null, scope);
+    } else if (expr instanceof ReturnStmt) {
+        return State.of(expr.value, scope).flatMap(exprEval);
     } else if (expr instanceof Expr) {
         return State.of(expr, scope).flatMap(exprEval);
     } else {

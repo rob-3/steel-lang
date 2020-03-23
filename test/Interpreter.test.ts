@@ -253,6 +253,20 @@ describe("exec()", () => {
                 `;
                 expect(cfxEval(src)).to.equal(5);
             });
+
+            it("should allow early returns", () => {
+                let src = `
+                {
+                    fun a() {
+                        return 5
+                        6
+                    }
+
+                    a()
+                }
+                `
+                expect(cfxEval(src)).to.equal(5);
+            });
         });
 
         describe("functions with arguments", () => {

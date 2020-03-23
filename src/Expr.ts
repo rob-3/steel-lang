@@ -132,3 +132,11 @@ export class WhileStmt extends Stmt {
         this.body = body;
     }
 }
+
+export class ReturnStmt extends Stmt {
+    value: Expr;
+    constructor(value: Expr) {
+        super();
+        this.value = value;
+    }
+}

@@ -122,6 +122,7 @@ function makeIdentifierOrKeyword(): Token {
         case "not": return makeToken(TokenType.NOT);
         case "in": return makeToken(TokenType.IN);
         case "print": return makeToken(TokenType.PRINT);
+        case "return": return makeToken(TokenType.RETURN);
         default: return makeToken(TokenType.IDENTIFIER);
     }
 }
