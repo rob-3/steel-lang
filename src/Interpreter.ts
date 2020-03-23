@@ -11,9 +11,10 @@ import TokenType from "./TokenType";
 import Scope from "./Scope";
 import tokenize from "./Tokenizer";
 import parse from "./Parser";
-import { State } from "./lib/Monads";
+import { State, ID } from "./lib/Monads";
 export type Scoped<T> = State<T, Scope>
 import { CfxFunction, Value } from "./InterpreterHelpers";
+import { compose } from "./lib/Utils";
 
 let printfn = thing => {
     console.log(thing)
@@ -31,7 +32,9 @@ export function setPrintFn(fn) {
 
 export function cfxExec(src: string): Scoped<Value> {
     // TODO rewrite in functional style
-    let stmts: Stmt[] = parse(tokenize(src));
+    let getAst = compose(tokenize, parse);
+
+    let stmts: Stmt[] = getAst(src);
     let scope = new Scope();
     let result: Scoped<Value>;
     for (let stmt of stmts) {

@@ -37,5 +37,21 @@ export class State<R, S> {
         State.of(fn(this.value, this.state), this.state);
 
     flatMap = <T>(fn: (a: R, b: S) => State<T, S>): State<T, S> => 
-        this.map(fn).value;
+        fn(this.value, this.state)
+}
+
+export class ID<T> {
+    value: T;
+
+    constructor(value: T) {
+        this.value = value;
+    }
+
+    static of = <T>(value: T) => new ID(value);
+
+    map = <S>(fn: (a: T) => S): ID<S> => 
+        ID.of(fn(this.value))
+
+    flatMap = <S>(fn: (a: T) => ID<S>): ID<S> => 
+        fn(this.value)
 }
