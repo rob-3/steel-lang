@@ -186,10 +186,10 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
         }
         return result;
     } else if (expr instanceof WhileStmt) {
-        let conditionValue = exprEval(expr.condition, scope);
+        let conditionValue = exprEval(expr.condition, scope).value;
         while (assertBool(conditionValue) && conditionValue) {
             scope = exprEval(expr.body, scope).state;
-            conditionValue = exprEval(expr.condition, scope);
+            conditionValue = exprEval(expr.condition, scope).value;
         }
         return State.of(null, scope);
     } else if (expr instanceof Expr) {

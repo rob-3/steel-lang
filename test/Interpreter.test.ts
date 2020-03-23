@@ -190,7 +190,6 @@ describe("exec()", () => {
         });
     });
 
-    /*
     describe("while loops", () => {
         let src = `
         var a = 0
@@ -205,7 +204,6 @@ describe("exec()", () => {
             expect(spy).to.have.been.called.exactly(10);
         });
     });
-    */
 
     describe("variables", () => {
         it("should be able to access a variable", () => {

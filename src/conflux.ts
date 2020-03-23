@@ -6,7 +6,7 @@ const rl = require("readline").createInterface({
 
 import tokenize from "./Tokenizer";
 import parse from "./Parser";
-import { stmtExec, setPrintFn } from "./Interpreter";
+import { exprEval, setPrintFn } from "./Interpreter";
 import Scope from "./Scope";
 import { Expr } from "./Expr";
 
@@ -47,7 +47,7 @@ function run(source: string, repl: boolean, scope: Scope): Scope {
     let tokens = tokenize(source);
     let ast: any = parse(tokens);
     for (let stmt of ast) {
-        let { value: val, state: newScope } = stmtExec(stmt, scope);
+        let { value: val, state: newScope } = exprEval(stmt, scope);
         scope = newScope;
         if (stmt instanceof Expr && repl && val !== undefined) {
             console.log(val)
