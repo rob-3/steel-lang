@@ -107,6 +107,8 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
                 return monad.map(star);
             case TokenType.SLASH:
                 return monad.map(slash);
+            case TokenType.MOD:
+                return monad.map(mod);
             case TokenType.AND:
                 return monad.map(and);
             case TokenType.OR:
@@ -306,4 +308,10 @@ function comparision(left: Value, right: Value, operator: (left, right) => boole
     if (assertNumber(left, right)) {
         return operator(left, right);
     } else throw Error(`Operands of ${err} should be numbers.`);
+}
+
+function mod([left, right]: [Value, Value]): number {
+    if (typeof left === "number" && typeof right === "number") {
+        return left % right;
+    } else throw Error(`Operands of % should be numbers.`);
 }

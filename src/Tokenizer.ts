@@ -36,6 +36,7 @@ function scanToken(): void | Token {
         case "{": return makeToken(TokenType.OPEN_BRACE);
         case "}": return makeToken(TokenType.CLOSE_BRACE);
         case ".": return makeToken(TokenType.DOT);
+        case "%": return makeToken(TokenType.MOD);
         case "*": return makeToken(TokenType.STAR);
         case "/": 
             if (match("/")) {

@@ -70,6 +70,12 @@ it("should do division correctly", () => {
             let result = cfxEval(src);
             expect(result).to.equal(7);
         });
+
+        it("should evaluate a modulus correctly", () => {
+            expect(cfxEval("5 % 5")).to.equal(0);
+            expect(cfxEval("5 % 4")).to.equal(1);
+            expect(cfxEval("5 % 2")).to.equal(1);
+        });
     });
 
     describe("comparisions", () => {

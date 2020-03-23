@@ -225,7 +225,11 @@ function makeAddition(): Expr {
 }
 
 function makeMultiplication(): Expr {
-    return makeBinaryExpr([TokenType.STAR, TokenType.SLASH], makeUnary);
+    return makeBinaryExpr([TokenType.STAR, TokenType.SLASH], makeMod);
+}
+
+function makeMod(): Expr {
+    return makeBinaryExpr([TokenType.MOD], makeUnary);
 }
 
 function makeUnary(): Expr {
