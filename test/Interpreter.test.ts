@@ -438,7 +438,11 @@ describe("exec()", () => {
             });
 
             it("should throw if a noncallable object is called", () => {
-                
+                expect(() => cfxEval(
+                    `
+                    5()
+                    `
+                )).to.throw("Can't call 5 because it is not a function.")
             });
         });
     });
