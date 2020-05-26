@@ -77,7 +77,7 @@ function makeStmt(): Stmt | void {
         }
     }
     if (matchType(TokenType.OPEN_BRACE)) return finishBlockStmt();
-    if (matchType(TokenType.STMT_TERM)) return null;
+    if (matchType(TokenType.NEWLINE)) return null;
     return makeExpr();
 }
 
@@ -186,7 +186,7 @@ function finishVariableDeclaration(immutable: boolean): Stmt {
         throw Error(`Expected "="; got "${lookAhead().lexeme}".`);
     }
     let right = makeExpr();
-    if (matchType(TokenType.STMT_TERM, TokenType.EOF)) {
+    if (matchType(TokenType.NEWLINE, TokenType.EOF)) {
         return new VariableDeclarationStmt(identifier, immutable, right);
     } else {
         throw Error("Expected a newline!");

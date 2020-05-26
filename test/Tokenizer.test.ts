@@ -32,14 +32,14 @@ describe("tokenize()", () => {
             new Token(TokenType.IDENTIFIER, "apple", null, 1),
             new Token(TokenType.EQUAL, "=", null, 1),
             new Token(TokenType.NUMBER, "4.3", 4.3, 1),
-            new Token(TokenType.STMT_TERM, "\n", null, 1),
+            new Token(TokenType.NEWLINE, "\n", null, 1),
             new Token(TokenType.LET, "let", null, 2),
             new Token(TokenType.IDENTIFIER, "pancakes", null, 2),
             new Token(TokenType.EQUAL, "=", null, 2),
             new Token(TokenType.IDENTIFIER, "apple", null, 2),
             new Token(TokenType.STAR, "*", null, 2),
             new Token(TokenType.NUMBER, "3", 3, 2),
-            new Token(TokenType.STMT_TERM, "\n", null, 2),
+            new Token(TokenType.NEWLINE, "\n", null, 2),
             new Token(TokenType.EOF, "", null, 3)
         ]);
     });
@@ -52,7 +52,7 @@ describe("tokenize()", () => {
         ]);
     });
 
-    it("should use LET/VAR TokenType and STMT_TERM", () => {
+    it("should use LET/VAR TokenType and NEWLINE", () => {
         let result = tokenize(
             `let a = 23
              var b = 46`
@@ -62,7 +62,7 @@ describe("tokenize()", () => {
             new Token(TokenType.IDENTIFIER, "a", null, 1),
             new Token(TokenType.EQUAL, "=", null, 1),
             new Token(TokenType.NUMBER, "23", 23, 1),
-            new Token(TokenType.STMT_TERM, "\n", null, 1),
+            new Token(TokenType.NEWLINE, "\n", null, 1),
             new Token(TokenType.VAR, "var", null, 2),
             new Token(TokenType.IDENTIFIER, "b", null, 2),
             new Token(TokenType.EQUAL, "=", null, 2),

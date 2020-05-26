@@ -10,11 +10,12 @@ enum TokenType {
     // literals
     STRING, NUMBER, IDENTIFIER,
 
-    // terminator
-    STMT_TERM,
+    // newline
+    NEWLINE,
 
     // keywords
-    LET, VAR, IF, ELSE, TRUE, FALSE, FUN, WHILE, FOR, IN, AND, OR, NOT, RETURN,
+    LET, VAR, IF, THEN, ELSE, TRUE, FALSE, FUN, WHILE, FOR, IN, AND, OR, NOT,
+    RETURN,
 
     EOF,
 
