@@ -202,6 +202,17 @@ describe("exec()", () => {
             expect(spy).not.to.have.been.called.with(5);
             expect(spy).to.have.been.called.with(6);
         });
+
+        it("should support then", () => {
+            expect(cfxEval(
+                `
+                {
+                    let a = if false then 5 else 6
+                    a
+                }
+                `
+            )).to.equal(6);
+        });
     });
 
     describe("while loops", () => {
@@ -376,7 +387,7 @@ describe("exec()", () => {
             it("should permit anonymous function style declaration", () => {
                let src = `
                {
-                    let a = fun(a, b) {
+                    let a = (a, b) -> {
                         a * b
                     }
 
@@ -389,11 +400,11 @@ describe("exec()", () => {
             it("should allow anonymous functions to be passed inline", () => {
                 let src = `
                 {
-                    let math = fun(a, b, c) {
+                    let math = (a, b, c) -> {
                         a(b) * c
                     }
 
-                    math(fun(a) { a + 3 }, 2, 3)
+                    math(a -> { a + 3 }, 2, 3)
                 }
                 `
                 expect(cfxEval(src)).to.equal(15);

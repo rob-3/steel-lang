@@ -16,12 +16,12 @@ let current = 0;
 export default function parse(tokenList: Token[]): Stmt[] {
     tokens = tokenList;
     let ast = [];
+
+    eatNewlines();
     try {
         while (!atEnd()) {
-            let maybeStmt = makeStmt();
-            if (maybeStmt) {
-                ast.push(maybeStmt);
-            }
+            ast.push(makeStmt());
+            eatNewlines();
         }
     } finally {
         reset();
@@ -30,26 +30,17 @@ export default function parse(tokenList: Token[]): Stmt[] {
 }
 
 function matchType(...types: TokenType[]): boolean {
-    if (atEnd()) {
-        if (types.includes(TokenType.EOF)) {
-            // we don't eat the EOF so that the top level loop won't try to
-            // lookAhead past the end of the source array
-            return true;
-        } else {
-            return false;
-        }
+    if (types.includes(lookAhead().type)) {
+        eatToken();
+        return true;
     } else {
-        if (types.includes(lookAhead().type)) {
-            eatToken();
-            return true;
-        } else {
-            return false;
-        }
+        return false;
     }
 }
 
 function atEnd(): boolean {
-    if (lookAhead().type === TokenType.EOF) {
+    // if the counter is beyond the end of the token array we are at EOF as well
+    if (current > tokens.length || lookAhead().type === TokenType.EOF) {
         return true;
     } else {
         return false;
@@ -60,7 +51,11 @@ function lookAhead(): Token {
     return tokens[current];
 }
 
-function makeStmt(): Stmt | void {
+function eatNewlines(): void {
+    while (matchType(TokenType.NEWLINE)) continue;
+}
+
+function makeStmt(): Stmt {
     if (matchType(TokenType.RETURN)) return new ReturnStmt(makeExpr());
     if (matchType(TokenType.LET)) return finishVariableDeclaration(true);
     if (matchType(TokenType.VAR)) return finishVariableDeclaration(false);
@@ -77,7 +72,7 @@ function makeStmt(): Stmt | void {
         }
     }
     if (matchType(TokenType.OPEN_BRACE)) return finishBlockStmt();
-    if (matchType(TokenType.NEWLINE)) return null;
+    if (matchType(TokenType.NEWLINE)) throw Error("Unexpected newline; parser bug.");
     return makeExpr();
 }
 
@@ -89,10 +84,10 @@ function finishWhileStmt(): Stmt {
     if (!matchType(TokenType.CLOSE_PAREN)) {
         throw Error(`Expected ")"; got "${lookAhead().lexeme}"`);
     }
-    let body = makeStmt();
-    if (!body) {
-        throw Error(`After while expected statement, but got ${lookAhead().lexeme}`);
+    if (atEnd()) {
+        throw Error(`After while expected statement, but reached EOF.`);
     }
+    let body = makeStmt();
     return new WhileStmt(condition, body);
 }
 
@@ -132,24 +127,26 @@ function finishFunctDecArgs(): string[] {
 
 function finishBlockStmt(): BlockStmt {
     let stmts: Stmt[] = [];
+    eatNewlines();
     while (!matchType(TokenType.CLOSE_BRACE)) {
-        let maybeStmt = makeStmt();
-        if (maybeStmt) stmts.push(maybeStmt);
         if (atEnd()) {
             throw Error("Encountered EOF before end of block statement.");
         }
+        stmts.push(makeStmt());
+        eatNewlines();
     }
     return new BlockStmt(stmts);
 }
 
 function finishIfStmt(): Stmt {
     let condition = makeExpr();
+    // optionally match then
+    matchType(TokenType.THEN);
+    if (atEnd()) throw Error(`After if expected statement, but reached EOF.`);
     let maybeBody = makeStmt();
-    if (!maybeBody) {
-        throw Error(`After if expected statement, but got ${lookAhead().lexeme}`);
-    }
     let elseBody: Stmt = null;
     if (matchType(TokenType.ELSE)) {
+        if (atEnd()) throw Error(`After if expected statement, but reached EOF.`);
         let maybeElseBody = makeStmt();
         if (maybeElseBody) {
             elseBody = maybeElseBody;
@@ -179,8 +176,8 @@ function finishVariableDeclaration(immutable: boolean): Stmt {
     if (!matchType(TokenType.EQUAL)) {
         throw Error(`Expected "="; got "${lookAhead().lexeme}".`);
     }
-    let right = makeExpr();
-    if (matchType(TokenType.NEWLINE, TokenType.EOF)) {
+    let right = makeStmt();
+    if (matchType(TokenType.NEWLINE) || atEnd()) {
         return new VariableDeclarationStmt(identifier, immutable, right);
     } else {
         throw Error("Expected a newline!");
@@ -194,7 +191,7 @@ function finishAssignment(identifier: string): Stmt {
         throw Error(`Expected "=", got ${lookAhead().lexeme}.`);
     }
     */
-    let right = makeExpr();
+    let right = makeStmt();
     return new VariableAssignmentStmt(identifier, right);
 }
 
@@ -274,8 +271,6 @@ function makePrimary(): Expr {
             return new VariableExpr(identifier);
         }
     }
-
-    if(matchType(TokenType.FUN)) return finishLambda();
 
     if (matchType(TokenType.OPEN_PAREN)) {
         if (matchType(TokenType.IDENTIFIER)) {

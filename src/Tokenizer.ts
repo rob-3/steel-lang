@@ -112,6 +112,7 @@ function makeIdentifierOrKeyword(): Token {
         case "false": return makeToken(TokenType.FALSE, false);
         case "fun": return makeToken(TokenType.FUN);
         case "if": return makeToken(TokenType.IF);
+        case "then": return makeToken(TokenType.THEN);
         case "else": return makeToken(TokenType.ELSE);
         case "for": return makeToken(TokenType.FOR);
         case "while": return makeToken(TokenType.WHILE);
