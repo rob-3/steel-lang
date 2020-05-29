@@ -295,8 +295,10 @@ function makePrimary(): Expr {
 
 function finishVeryShortLambda(arg: string): FunctionExpr {
     // TODO: add checks and error productions
+    // TODO need to check if the braces match
     matchType(TokenType.OPEN_BRACE);
     let body = makeExpr();
+    matchType(TokenType.CLOSE_BRACE);
     return new FunctionExpr([arg], new BlockStmt([body]));
 }
 
