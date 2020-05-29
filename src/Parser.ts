@@ -143,13 +143,7 @@ function finishBlockStmt(): BlockStmt {
 }
 
 function finishIfStmt(): Stmt {
-    if (!matchType(TokenType.OPEN_PAREN)) {
-        throw Error(`Expected "("; got "${lookAhead().lexeme}"`);
-    }
     let condition = makeExpr();
-    if (!matchType(TokenType.CLOSE_PAREN)) {
-        throw Error(`Expected ")"; got "${lookAhead().lexeme}"`);
-    }
     let maybeBody = makeStmt();
     if (!maybeBody) {
         throw Error(`After if expected statement, but got ${lookAhead().lexeme}`);

@@ -188,6 +188,20 @@ describe("exec()", () => {
             cfxExec(src, spy);
             expect(spy).not.to.have.been.called.with(5);
         });
+
+        it("should support no parentheses", () => {
+            let src = `
+            if false {
+                print 5
+            } else {
+                print 6
+            }
+            `;
+            let spy = chai.spy();
+            cfxExec(src, spy);
+            expect(spy).not.to.have.been.called.with(5);
+            expect(spy).to.have.been.called.with(6);
+        });
     });
 
     describe("while loops", () => {
