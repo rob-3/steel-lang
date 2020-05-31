@@ -6,6 +6,7 @@ enum TokenType {
 
     // double char
     EQUAL_EQUAL, GREATER_EQUAL, LESS_EQUAL, PLUS_PLUS, RIGHT_SINGLE_ARROW,
+    RIGHT_DOUBLE_ARROW,
 
     // literals
     STRING, NUMBER, IDENTIFIER,

@@ -164,6 +164,13 @@ describe("tokenize()", () => {
             new Token(TokenType.EOF, "", null, 1),
         ]);
     });
+
+    it("should tokenize right double arrow", () => {
+        expect(tokenize("=>")).to.eql([
+            new Token(TokenType.RIGHT_DOUBLE_ARROW, "=>", null, 1),
+            new Token(TokenType.EOF, "", null, 1)
+        ]);
+    })
 });
 
 describe("isLegalIdentifierChar()", () => {
