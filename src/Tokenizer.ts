@@ -123,6 +123,7 @@ function makeIdentifierOrKeyword(): Token {
         case "in": return makeToken(TokenType.IN);
         case "print": return makeToken(TokenType.PRINT);
         case "return": return makeToken(TokenType.RETURN);
+        case "match": return makeToken(TokenType.MATCH);
         default: return makeToken(TokenType.IDENTIFIER);
     }
 }

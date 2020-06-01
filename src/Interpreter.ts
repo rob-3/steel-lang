@@ -1,11 +1,13 @@
 import { 
     Expr, VariableExpr, BinaryExpr, 
     PrimaryExpr, UnaryExpr, GroupingExpr,
-    CallExpr, FunctionExpr,
+    CallExpr, FunctionExpr, UnderscoreExpr,
 
     Stmt, VariableDeclarationStmt, PrintStmt, 
     VariableAssignmentStmt, IfStmt, BlockStmt,
-    WhileStmt, ReturnStmt
+    WhileStmt, ReturnStmt, MatchStmt,
+
+    MatchCase
 } from "./Expr";
 import TokenType from "./TokenType";
 import Scope from "./Scope";
@@ -181,9 +183,21 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
         return [null, scope];
     } else if (expr instanceof ReturnStmt) {
         return exprEval(expr.value, scope);
-    } else if (expr instanceof Expr) {
-        return exprEval(expr, scope);
+    } else if (expr instanceof MatchStmt) {
+        let rootExpr = expr.expr;
+        let [matchExprValue, newScope] = exprEval(rootExpr, scope);
+        for (let matchCase of expr.cases) {
+            let [caseValue, newScope2] = exprEval(matchCase.matchExpr, newScope);
+            if (matchExprValue instanceof UnderscoreExpr) {
+                return exprEval(matchCase.stmt, newScope2);
+            }
+            if (equal(caseValue, matchExprValue)) {
+                return exprEval(matchCase.stmt, newScope2);
+            }
+        };
+        throw Error("Pattern match failed.");
     } else {
+        console.dir(expr)
         throw Error("Unhandled stmt or expr.");
     }
 }

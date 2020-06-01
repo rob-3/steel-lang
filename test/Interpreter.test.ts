@@ -480,4 +480,32 @@ describe("exec()", () => {
             });
         });
     });
+
+    describe("pattern matching", () => {
+        it("should not throw on match keyword", () => {
+            expect(() => cfxEval(
+                `
+                let x = 15
+                match x {
+                    15 => "correct"
+                    _ => "wrong"
+                }
+                `
+            )).to.not.throw()
+        });
+
+        it("should return the appropriate value", () => {
+            expect(cfxEval(
+                `
+                {
+                    let x = 15
+                    match x {
+                        15 => "correct"
+                        _ => "wrong"
+                    }
+                }
+                `
+            )).to.equal("correct");
+        });
+    });
 });

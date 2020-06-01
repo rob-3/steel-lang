@@ -3,11 +3,11 @@ import TokenType from "./TokenType";
 import { 
     Expr, GroupingExpr, BinaryExpr, 
     PrimaryExpr, UnaryExpr, VariableExpr,
-    FunctionExpr, CallExpr,
+    FunctionExpr, CallExpr, UnderscoreExpr,
 
     Stmt, PrintStmt, VariableDeclarationStmt, 
     VariableAssignmentStmt, IfStmt, BlockStmt,
-    WhileStmt, ReturnStmt
+    WhileStmt, ReturnStmt, MatchStmt, MatchCase
 } from "./Expr";
 
 let tokens: Token[];
@@ -63,6 +63,7 @@ function makeStmt(): Stmt {
     if (matchType(TokenType.IF)) return finishIfStmt();
     if (matchType(TokenType.WHILE)) return finishWhileStmt();
     if (matchType(TokenType.FUN)) return finishFunctionDeclaration();
+    if (matchType(TokenType.MATCH)) return finishMatchStmt();
     if (matchType(TokenType.IDENTIFIER)) {
         // TODO support for dot notation here
         if (matchType(TokenType.EQUAL)) {
@@ -74,6 +75,42 @@ function makeStmt(): Stmt {
     if (matchType(TokenType.OPEN_BRACE)) return finishBlockStmt();
     if (matchType(TokenType.NEWLINE)) throw Error("Unexpected newline; parser bug.");
     return makeExpr();
+}
+
+function finishMatchStmt(): Stmt {
+    let expr = makeExpr();
+    if (!matchType(TokenType.OPEN_BRACE)) {
+        throw Error(`Expected "{"; got "${lookAhead().lexeme}"`);
+    }
+    if (!matchType(TokenType.NEWLINE)) {
+        throw Error(`Expected a newline after "{"`);
+    }
+    let cases: MatchCase[] = [];
+    while (!matchType(TokenType.CLOSE_BRACE)) {
+        eatNewlines();
+        cases.push(makeMatchCase());
+    }
+    return new MatchStmt(expr, cases);
+}
+
+function makeMatchCase(): MatchCase {
+    let matchPrimary = makeMatchPrimary();
+    if (!matchType(TokenType.RIGHT_DOUBLE_ARROW)) {
+        throw Error(`Expected a "=>", got "${lookAhead().lexeme}"`);
+    }
+    let stmt = makeStmt();
+    if (!matchType(TokenType.NEWLINE)) {
+        throw Error(`Expected a newline after match case.`);
+    }
+    return new MatchCase(matchPrimary, stmt);
+}
+
+function makeMatchPrimary(): PrimaryExpr | UnderscoreExpr {
+    if (matchType(TokenType.TRUE)) return new PrimaryExpr(true);
+    if (matchType(TokenType.FALSE)) return new PrimaryExpr(false);
+    if (matchType(TokenType.NUMBER, TokenType.STRING)) return new PrimaryExpr(lookBehind().literal);
+    if (matchType(TokenType.UNDERSCORE)) return new UnderscoreExpr();
+    throw Error(`"${lookAhead().lexeme}" is not a boolean, number, string literal, or "_".`);
 }
 
 function finishWhileStmt(): Stmt {

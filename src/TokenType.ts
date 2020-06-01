@@ -16,7 +16,7 @@ enum TokenType {
 
     // keywords
     LET, VAR, IF, THEN, ELSE, TRUE, FALSE, FUN, WHILE, FOR, IN, AND, OR, NOT,
-    RETURN,
+    MATCH, RETURN,
 
     EOF,
 

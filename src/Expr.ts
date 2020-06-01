@@ -140,3 +140,25 @@ export class ReturnStmt extends Stmt {
         this.value = value;
     }
 }
+
+export class MatchStmt extends Stmt {
+    expr: Expr;
+    cases: MatchCase[];
+    constructor(expr: Expr, cases: MatchCase[]) {
+        super();
+        this.expr = expr;
+        this.cases = cases;
+    }
+}
+
+export class MatchCase {
+    matchExpr: UnderscoreExpr | PrimaryExpr;
+    stmt: Stmt;
+
+    constructor(matchExpr: UnderscoreExpr | PrimaryExpr, stmt: Stmt) {
+        this.matchExpr = matchExpr;
+        this.stmt = stmt;
+    }
+}
+
+export class UnderscoreExpr extends Expr {};
