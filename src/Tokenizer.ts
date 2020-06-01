@@ -53,6 +53,7 @@ function scanToken(): void | Token {
         case ">": return match("=") ? makeToken(TokenType.GREATER_EQUAL) : makeToken(TokenType.GREATER);
         case "<": return match("=") ? makeToken(TokenType.LESS_EQUAL) : makeToken(TokenType.LESS);
         case ",": return makeToken(TokenType.COMMA);
+        case "_": return makeToken(TokenType.UNDERSCORE);
         case "\t":
         case " ": return;
         case "\n": 
