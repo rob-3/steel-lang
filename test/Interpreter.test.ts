@@ -54,7 +54,8 @@ describe("exprEval()", () => {
             let result = cfxEval(src);
             expect(result).to.equal(10);
         });
-it("should do division correctly", () => {
+
+        it("should do division correctly", () => {
             let src = "2 / 2";
             let result = cfxEval(src);
             expect(result).to.equal(1);
