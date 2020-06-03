@@ -35,13 +35,14 @@ export function cfxExec(src: string): Scoped<Value> {
     let getAst = compose(tokenize, parse);
 
     let stmts: Stmt[] = getAst(src);
-    let scope = new Scope();
-    let result: Scoped<Value>;
-    for (let stmt of stmts) {
-        result = exprEval(stmt, scope);
-        scope = result.state;
-    }
-    return result;
+
+    return execStmts(stmts, new Scope());
+}
+
+function execStmts(stmts: Stmt[], scope: Scope): Scoped<Value> {
+    return stmts.reduce<Scoped<Value>>((acc: Scoped<Value>, cur: Stmt) => {
+        return exprEval(cur, acc.state);
+    }, State.of(null, scope));
 }
 
 function lookup(identifier: string, scope: Scope): Value {
@@ -179,12 +180,7 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
             return State.of(null, scope);
         }
     } else if (expr instanceof BlockStmt) {
-        let result: Scoped<Value>;
-        for (let myStmt of expr.stmts) {
-            result = exprEval(myStmt, scope);
-            scope = result.state;
-        }
-        return result;
+        return execStmts(expr.stmts, scope);
     } else if (expr instanceof WhileStmt) {
         let conditionValue = exprEval(expr.condition, scope).value;
         while (assertBool(conditionValue) && conditionValue) {
