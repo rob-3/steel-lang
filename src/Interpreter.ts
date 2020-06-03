@@ -17,7 +17,6 @@ export type Scoped<T> = [T, Scope];
 export const getVal = (arr: [Value, Scope]) => arr[0];
 export const getState = (arr: [Value, Scope]) => arr[1];
 import { CfxFunction, Value } from "./InterpreterHelpers";
-import { compose } from "./lib/Utils";
 
 let printfn = (thing: Value, scope: Scope): [Value, Scope] => {
     let text = String(thing)
@@ -33,11 +32,7 @@ export function setPrintFn(fn): void {
 }
 
 export function cfxExec(src: string): Scoped<Value> {
-    // TODO rewrite in functional style
-    let getAst = compose(tokenize, parse);
-
-    let stmts: Stmt[] = getAst(src);
-
+    let stmts: Stmt[] = parse(tokenize(src));
     return execStmts(stmts, new Scope());
 }
 
