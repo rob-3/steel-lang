@@ -182,12 +182,15 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
         let rootExpr = expr.expr;
         let [matchExprValue, newScope] = exprEval(rootExpr, scope);
         for (let matchCase of expr.cases) {
-            let [caseValue, newScope2] = exprEval(matchCase.matchExpr, newScope);
+            // FIXME decide if side effects are legal in a match expression
+            let arr = exprEval(matchCase.matchExpr, newScope);
+            let caseValue = getVal(arr);
+            newScope = getState(arr);
             if (matchExprValue instanceof UnderscoreExpr) {
-                return exprEval(matchCase.stmt, newScope2);
+                return exprEval(matchCase.stmt, newScope);
             }
             if (equal(caseValue, matchExprValue)) {
-                return exprEval(matchCase.stmt, newScope2);
+                return exprEval(matchCase.stmt, newScope);
             }
         };
         throw Error("Pattern match failed.");
