@@ -507,5 +507,21 @@ describe("exec()", () => {
                 `
             )).to.equal("correct");
         });
+
+        it("should be able to be used as an expression", () => {
+            let spy = chai.spy();
+            cfxExec(
+                `
+                let a = 4
+                let b = a - 2
+                let c = a/b
+                print match c {
+                    3 => "nope"
+                    4 => "def nope"
+                    _ => "yep"
+                }
+                `, spy);
+            expect(spy).to.have.be.called.with("yep");
+        })
     });
 });

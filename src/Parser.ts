@@ -195,7 +195,7 @@ function finishIfStmt(): Stmt {
 }
 
 function finishPrintStmt(): Stmt {
-    let stmt = new PrintStmt(makeExpr());
+    let stmt = new PrintStmt(makeStmt());
     return stmt;
 }
 
