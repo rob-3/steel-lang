@@ -1,7 +1,6 @@
-import { Scoped, exprEval } from "./Interpreter";
+import { Scoped, exprEval, getState, getVal } from "./Interpreter";
 import { FunctionExpr, ReturnStmt } from "./Expr";
 import Scope from "./Scope";
-import { State } from "./lib/Monads";
 
 export class CfxFunction {
     funExpr: FunctionExpr;
@@ -19,12 +18,12 @@ export class CfxFunction {
         let result: Scoped<Value>;
         for (let stmt of this.funExpr.body.stmts) {
             result = exprEval(stmt, functionScope)
-            functionScope = result.state;
+            functionScope = getState(result);
             if (stmt instanceof ReturnStmt) {
                 break;
             }
         }
-        return State.of(result.value, result.state.parentScope);
+        return [getVal(result), getState(result).parentScope];
     }
 }
 

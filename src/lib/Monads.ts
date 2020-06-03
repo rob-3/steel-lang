@@ -23,21 +23,29 @@ export class Maybe<T> {
     flatMap = fn => this.map(fn).value;
 }
 
-export class State<R, S> {
-    value: R;
-    state: S;
-    constructor(value: R, state: S) {
-        this.state = state;
-        this.value = value;
+export class State<S, A> {
+    _fn: (state: S) => [A, S]
+
+    constructor(fn: (state: S) => [A, S]) {
+        this._fn = fn;
     }
 
-    static of = <U, V>(value: U, state: V) => new State<U, V>(value, state);
+    static of = <S, A>(fn: (state: S) => [A, S]) => new State(fn);
+        
+    flatMap = <B>(fn: (value: A, state: S) => [B, S]): State<S, B> => {
+        return State.of<S, B>((state: S): [B, S] => {
+            let [value, newState]: [A, S] = this._fn(state);
+            return fn(value, newState);
+        });
+    }
 
-    map = <T>(fn: (a: R, b: S) => T): State<T, S> => 
-        State.of(fn(this.value, this.state), this.state);
+    map = <B>(fn: (value: A) => B): State<S, B> => {
+        return State.of<S, B>((state: S): [B, S] => {
+            let [value, newState]: [A, S] = this._fn(state);
+            return [fn(value), newState];
+        });
+    }
 
-    flatMap = <T>(fn: (a: R, b: S) => State<T, S>): State<T, S> => 
-        fn(this.value, this.state)
 }
 
 export class ID<T> {

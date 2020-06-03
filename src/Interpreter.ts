@@ -11,22 +11,22 @@ import TokenType from "./TokenType";
 import Scope from "./Scope";
 import tokenize from "./Tokenizer";
 import parse from "./Parser";
-import { State, ID } from "./lib/Monads";
-export type Scoped<T> = State<T, Scope>
+export type Scoped<T> = [T, Scope];
+export const getVal = (arr: [Value, Scope]) => arr[0];
+export const getState = (arr: [Value, Scope]) => arr[1];
 import { CfxFunction, Value } from "./InterpreterHelpers";
 import { compose } from "./lib/Utils";
 
-let printfn = thing => {
-    console.log(thing)
-    // FIXME: magic debugging number
-    return 42;
+let printfn = (thing: Value, scope: Scope): [Value, Scope] => {
+    let text = String(thing)
+    console.log(text)
+    return [String(thing), scope];
 };
 
-export function setPrintFn(fn) {
-    printfn = thing => {
-        fn(thing);
-        // FIXME: magic debugging number
-        return 65;
+export function setPrintFn(fn): void {
+    printfn = (val: Value, scope: Scope) => {
+        fn(val);
+        return [val, scope];
     }
 }
 
@@ -41,8 +41,8 @@ export function cfxExec(src: string): Scoped<Value> {
 
 function execStmts(stmts: Stmt[], scope: Scope): Scoped<Value> {
     return stmts.reduce<Scoped<Value>>((acc: Scoped<Value>, cur: Stmt) => {
-        return exprEval(cur, acc.state);
-    }, State.of(null, scope));
+        return exprEval(cur, getState(acc));
+    }, [null, scope]);
 }
 
 function lookup(identifier: string, scope: Scope): Value {
@@ -58,7 +58,7 @@ function define(key: string, evaluatedExpr: Value, immutable: boolean, scope: Sc
     Scoped<Value> {
     if (!scope.has(key) || !scope.get(key)[1]) {
         scope.setLocal(key, [evaluatedExpr, immutable]);
-        return State.of(evaluatedExpr, scope);
+        return [evaluatedExpr, scope];
     } else {
         throw Error(`Cannot redefine immutable variable "${key}".`);
     }
@@ -72,7 +72,7 @@ function assign(key: string, evaluatedExpr: Value, scope: Scope): Scoped<Value> 
         let immutable = variable[1];
         if (!immutable) {
             scope.assign(key, [evaluatedExpr, false]);
-            return State.of(evaluatedExpr, scope);
+            return [evaluatedExpr, scope];
         } else {
             throw Error(`Cannot assign to immutable variable "${key}".`);
         }
@@ -83,7 +83,7 @@ function assign(key: string, evaluatedExpr: Value, scope: Scope): Scoped<Value> 
  * String-based eval() for conflux.
  */
 export function cfxEval(src: string, scope: Scope): Value {
-    return exprEval(parse(tokenize(src))[0], scope).value;
+    return getVal(exprEval(parse(tokenize(src))[0], scope));
 }
 
 /*
@@ -91,107 +91,98 @@ export function cfxEval(src: string, scope: Scope): Value {
  */
 export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
     if (expr instanceof PrimaryExpr) {
-        return State.of(expr.literal, scope);
+        return [expr.literal, scope];
     } else if (expr instanceof BinaryExpr) {
         // TODO: refactor in functional style
-        let leftMonad = exprEval(expr.left, scope);
-        let rightMonad = exprEval(expr.right, leftMonad.state);
-        let monad = State.of([leftMonad.value, rightMonad.value], rightMonad.state);
+        let [leftVal, newScope] = exprEval(expr.left, scope);
+        let [rightVal, newScope2] = exprEval(expr.right, newScope);
         switch (expr.operator.type) {
             case TokenType.PLUS:
-                return monad.map(plus);
+                return [plus(leftVal, rightVal), newScope2];
             case TokenType.MINUS:
-                return monad.map(minus);
+                return [minus(leftVal, rightVal), newScope2];
             case TokenType.PLUS_PLUS: 
-                return monad.map(plusPlus);
+                return [plusPlus(leftVal, rightVal), newScope2];
             case TokenType.STAR:
-                return monad.map(star);
+                return [star(leftVal, rightVal), newScope2];
             case TokenType.SLASH:
-                return monad.map(slash);
+                return [slash(leftVal, rightVal), newScope2];
             case TokenType.MOD:
-                return monad.map(mod);
+                return [mod(leftVal, rightVal), newScope2];
             case TokenType.AND:
-                return monad.map(and);
+                return [and(leftVal, rightVal), newScope2];
             case TokenType.OR:
-                return monad.map(or);
+                return [or(leftVal, rightVal), newScope2];
             case TokenType.GREATER_EQUAL:
-                return monad.map(greaterEqual);
+                return [greaterEqual(leftVal, rightVal), newScope2];
             case TokenType.GREATER:
-                return monad.map(greater);
+                return [greater(leftVal, rightVal), newScope2];
             case TokenType.LESS_EQUAL:
-                return monad.map(lessEqual);
+                return [lessEqual(leftVal, rightVal), newScope2];
             case TokenType.LESS:
-                return monad.map(less);
+                return [less(leftVal, rightVal), newScope2];
             case TokenType.EQUAL_EQUAL:
-                return monad.map(equal);
+                return [equal(leftVal, rightVal), newScope2];
             default:
                 throw Error(`FIXME: Unhandled operator type "${expr.operator}"`);
         }
     } else if (expr instanceof UnaryExpr) {
-        let monad = State.of(expr.right, scope)
-            .flatMap(exprEval)
+        let [value, newScope] = exprEval(expr.right, scope);
         switch (expr.operator.type) {
             case TokenType.MINUS:
-                return monad.map(opposite);
+                return [opposite(value), newScope];
             case TokenType.NOT: 
-                return monad.map(not);
+                return [not(value), newScope];
         }
     } else if (expr instanceof GroupingExpr) {
         return exprEval(expr.expr, scope);
     } else if (expr instanceof VariableExpr) {
-        return State.of(lookup(expr.identifier, scope), scope);
+        return [lookup(expr.identifier, scope), scope];
     } else if (expr instanceof CallExpr) {
-        return State.of(expr.callee, scope)
-            .flatMap(exprEval)
-            .flatMap((maybeFn, scope) => {
-                if (maybeFn instanceof CfxFunction) {
-                    return call(maybeFn, expr.args, scope);
-                } else {
-                    throw Error(`Can't call ${maybeFn} because it is not a function.`);
-                }
-            });
+        let [maybeFn, newScope] = exprEval(expr.callee, scope);
+        if (maybeFn instanceof CfxFunction) {
+            return call(maybeFn, expr.args, newScope);
+        } else {
+            throw Error(`Can't call ${maybeFn} because it is not a function.`);
+        }
     } else if (expr instanceof FunctionExpr) {
-        return State.of(new CfxFunction(expr), scope);
+        return [new CfxFunction(expr), scope];
     } else if (expr instanceof PrintStmt) {
-        let monad = State.of(expr, scope).flatMap((expr: PrintStmt, scope) => exprEval(expr.thingToPrint, scope))
-        monad.map(printfn)
-        return monad;
+        //let monad = State.of(expr, scope).flatMap((expr: PrintStmt, scope) => exprEval(expr.thingToPrint, scope))
+        let [printValue, newScope] = exprEval(expr.thingToPrint, scope);
+        return printfn(printValue, newScope);
     } else if (expr instanceof VariableDeclarationStmt) {
-        return exprEval(expr.right, scope).flatMap(
-            (rightVal, scope) => define(expr.identifier, rightVal, expr.immutable, scope)
-        );
+        let [rightVal, newScope] = exprEval(expr.right, scope);
+        return define(expr.identifier, rightVal, expr.immutable, newScope);
     } else if (expr instanceof VariableAssignmentStmt) {
-        return exprEval(expr.right, scope).flatMap(
-            (rightVal, scope) => assign(expr.identifier, rightVal, scope)
-        );
+        let [rightVal, newScope] = exprEval(expr.right, scope);
+        return assign(expr.identifier, rightVal, newScope);
     } else if (expr instanceof IfStmt) {
-        let result = exprEval(expr.condition, scope);
-        let shouldBeBool = result.value;
-        scope = result.state;
+        let [shouldBeBool, newScope] = exprEval(expr.condition, scope);
         if (!assertBool(shouldBeBool)) {
             throw Error("Condition doesn't evaluate to a boolean.");
         }
         if (shouldBeBool) {
-            return exprEval(expr.body, scope);
+            return exprEval(expr.body, newScope);
         } else if (expr.elseBody !== null) {
-            return exprEval(expr.elseBody, scope);
+            return exprEval(expr.elseBody, newScope);
         } else {
             // TODO: hack we need to address
-            return State.of(null, scope);
+            return [null, newScope];
         }
     } else if (expr instanceof BlockStmt) {
         return execStmts(expr.stmts, scope);
     } else if (expr instanceof WhileStmt) {
-        let conditionValue = exprEval(expr.condition, scope).value;
+        let conditionValue = getVal(exprEval(expr.condition, scope));
         while (assertBool(conditionValue) && conditionValue) {
-            scope = exprEval(expr.body, scope).state;
-            conditionValue = exprEval(expr.condition, scope).value;
+            scope = getState(exprEval(expr.body, scope));
+            conditionValue = getVal(exprEval(expr.condition, scope));
         }
-        return State.of(null, scope);
+        return [null, scope];
     } else if (expr instanceof ReturnStmt) {
-        return State.of(expr.value, scope).flatMap(exprEval);
+        return exprEval(expr.value, scope);
     } else if (expr instanceof Expr) {
-        return State.of(expr, scope).flatMap(exprEval);
+        return exprEval(expr, scope);
     } else {
         throw Error("Unhandled stmt or expr.");
     }
@@ -200,7 +191,7 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
 function call(fn: CfxFunction, args: Expr[], scope: Scope): Scoped<any> {
     let argValues: Value[] = [];
     for (let arg of args) {
-        let { state: newScope, value } = exprEval(arg, scope);
+        let [value, newScope] = exprEval(arg, scope);
         scope = newScope;
         argValues.push(value);
     }
@@ -216,45 +207,45 @@ function opposite(right: Value): number {
     else throw Error('"-" can only be used on a number');
 }
 
-function plus([left, right]: [Value, Value]): number {
+function plus(left: Value, right: Value): number {
     if (assertNumber(left, right)) {
         return <number>left + <number>right;
     } else throw Error('Operands of "+" must be numbers.');
 }
 
-function minus([left, right]: [Value, Value]): number {
+function minus(left: Value, right: Value): number {
     if (assertNumber(left, right)) {
         return <number>left - <number>right;
     } else throw Error('Operands of "-" must be numbers.');
 }
 
-function plusPlus([left, right]: [Value, Value]): string {
+function plusPlus(left: Value, right: Value): string {
     if (typeof left === "string" &&
         typeof right === "string") {
         return left.concat(right);
     } else throw Error('Operands of "++" must be strings.');
 }
 
-function star([left, right]: [Value, Value]): number {
+function star(left: Value, right: Value): number {
     if (assertNumber(left, right)) {
         return <number>left * <number>right;
     } else throw Error('Operands of "*" must be numbers.');
 }
 
-function slash([left, right]: [Value, Value]): number {
+function slash(left: Value, right: Value): number {
     if (assertNumber(left, right)) {
         return <number>left / <number>right;
     } else throw Error('Operands of "/" must be numbers.');
 }
 
-function and([left, right]: [Value, Value]): boolean {
+function and(left: Value, right: Value): boolean {
     if (assertBool(left, right)) {
         return <boolean>left && <boolean>right;
     } else throw Error('Operands of "and" must be booleans.');
     
 }
 
-function or([left, right]: [Value, Value]): boolean {
+function or(left: Value, right: Value): boolean {
     if (assertBool(left, right)) {
         return <boolean>left || <boolean>right;
     } else {
@@ -282,23 +273,23 @@ function not(right: Value): boolean {
     else throw Error('Operands of "not" should be booleans.');
 }
 
-function greaterEqual([left, right]: [Value, Value]): boolean {
+function greaterEqual(left: Value, right: Value): boolean {
     return comparision(left, right, (l, r) => l >= r, ">=");
 }
 
-function greater([left, right]: [Value, Value]): boolean {
+function greater(left: Value, right: Value): boolean {
     return comparision(left, right, (l, r) => l > r, ">");
 }
 
-function lessEqual([left, right]: [Value, Value]): boolean {
+function lessEqual(left: Value, right: Value): boolean {
     return comparision(left, right, (l, r) => l <= r, "<=");
 }
 
-function less([left, right]: [Value, Value]): boolean {
+function less(left: Value, right: Value): boolean {
     return comparision(left, right, (l, r) => l < r, "<");
 }
 
-function equal([left, right]: [Value, Value]): boolean {
+function equal(left: Value, right: Value): boolean {
     return comparision(left, right, (l, r) => l === r, "==");
 }
 
@@ -308,7 +299,7 @@ function comparision(left: Value, right: Value, operator: (left, right) => boole
     } else throw Error(`Operands of ${err} should be numbers.`);
 }
 
-function mod([left, right]: [Value, Value]): number {
+function mod(left: Value, right: Value): number {
     if (typeof left === "number" && typeof right === "number") {
         return left % right;
     } else throw Error(`Operands of % should be numbers.`);

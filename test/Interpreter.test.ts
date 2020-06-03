@@ -1,4 +1,4 @@
-import { setPrintFn, cfxEval as _cfxEval, cfxExec as _cfxExec } from "../src/Interpreter";
+import { setPrintFn, cfxEval as _cfxEval, cfxExec as _cfxExec, getState } from "../src/Interpreter";
 import Scope from "../src/Scope";
 import chai = require("chai");
 import spies = require("chai-spies");
@@ -233,12 +233,12 @@ describe("exec()", () => {
     describe("variables", () => {
         it("should be able to access a variable", () => {
             let src = "var a = 14";
-            let scope: Scope = cfxExec(src).state;
+            let scope: Scope = getState(cfxExec(src));
             expect(cfxEval("a", scope)).to.equal(14);
         });
 
         it("should be able to assign to a variable", () => {
-            let scope = cfxExec("var a = 14\na = 15").state;
+            let scope = getState(cfxExec("var a = 14\na = 15"));
             expect(cfxEval("a", scope)).to.equal(15);
         });
     });
