@@ -47,7 +47,7 @@ function run(source: string, repl: boolean, scope: Scope): Scope {
     let tokens = tokenize(source);
     let ast: any = parse(tokens);
     for (let stmt of ast) {
-        let { value: val, state: newScope } = exprEval(stmt, scope);
+        let [val, newScope]  = exprEval(stmt, scope);
         scope = newScope;
         if (stmt instanceof Expr && repl && val !== undefined) {
             console.log(val)
