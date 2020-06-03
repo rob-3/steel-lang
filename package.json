@@ -4,7 +4,7 @@
 	"main": "index.js",
 	"scripts": {
 		"start": "ts-node src/main.ts",
-		"test": "mocha -r ts-node/register --watch --watch-extensions ts"
+		"test": "mocha -r ts-node/register --watch-extensions ts"
 	},
 	"keywords": [],
 	"author": "",
