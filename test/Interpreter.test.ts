@@ -1,4 +1,5 @@
-import { setPrintFn, cfxEval as _cfxEval, cfxExec as _cfxExec, getState } from "../src/Interpreter";
+import { setPrintFn, cfxEval as _cfxEval, cfxExec as _cfxExec, exprEval, getState } from "../src/Interpreter";
+import { Expr } from "../src/Expr";
 import Scope from "../src/Scope";
 import chai = require("chai");
 import spies = require("chai-spies");
@@ -138,6 +139,13 @@ it("should do division correctly", () => {
             }
             `;
             expect(cfxEval(src)).to.equal(2);
+        });
+    });
+
+    describe("errors", () => {
+        it("should throw on an invalid expression type", () => {
+            class UnhandledExpr extends Expr {};
+            expect(() => exprEval(new UnhandledExpr, new Scope())).to.throw();
         });
     });
 });
