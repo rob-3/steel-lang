@@ -286,26 +286,26 @@ function not(right: Value): boolean {
 }
 
 function greaterEqual(left: Value, right: Value): boolean {
-    return comparision(left, right, (l, r) => l >= r, ">=");
+    return numberComparision(left, right, (l, r) => l >= r, ">=");
 }
 
 function greater(left: Value, right: Value): boolean {
-    return comparision(left, right, (l, r) => l > r, ">");
+    return numberComparision(left, right, (l, r) => l > r, ">");
 }
 
 function lessEqual(left: Value, right: Value): boolean {
-    return comparision(left, right, (l, r) => l <= r, "<=");
+    return numberComparision(left, right, (l, r) => l <= r, "<=");
 }
 
 function less(left: Value, right: Value): boolean {
-    return comparision(left, right, (l, r) => l < r, "<");
+    return numberComparision(left, right, (l, r) => l < r, "<");
 }
 
 function equal(left: Value, right: Value): boolean {
-    return comparision(left, right, (l, r) => l === r, "==");
+    return left === right;
 }
 
-function comparision(left: Value, right: Value, operator: (left, right) => boolean, err: string): boolean {
+function numberComparision(left: Value, right: Value, operator: (left, right) => boolean, err: string): boolean {
     if (assertNumber(left, right)) {
         return operator(left, right);
     } else throw Error(`Operands of ${err} should be numbers.`);

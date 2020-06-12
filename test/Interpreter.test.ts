@@ -522,6 +522,32 @@ describe("exec()", () => {
                 }
                 `, spy);
             expect(spy).to.have.be.called.with("yep");
-        })
+        });
+
+        it("should be able to match strings", () => {
+            expect(cfxEval(
+                `
+                {
+                    let x = "hello"
+                    match x {
+                        "hello" => "correct"
+                        _ => "incorrect"
+                    }
+                }
+                `
+            )).to.equal("correct");
+        });
+
+        it("should be able to match booleans", () => {
+            expect(cfxEval(
+                `
+                match true {
+                    true => "correct"
+                    false => "wrong"
+                    _ => "really wrong"
+                }
+                `
+            )).to.equal("correct");
+        });
     });
 });
