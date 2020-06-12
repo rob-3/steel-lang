@@ -80,7 +80,12 @@ function assign(key: string, evaluatedExpr: Value, scope: Scope): Scoped<Value> 
  * String-based eval() for conflux.
  */
 export function cfxEval(src: string, scope: Scope): Value {
-    return getVal(exprEval(parse(tokenize(src))[0], scope));
+    let ast = parse(tokenize(src));
+    return getVal(
+        ast.reduce<[Value, Scope]>(
+            (acc, cur) => exprEval(cur, getState(acc)),
+        [null, scope])
+    );
 }
 
 /*

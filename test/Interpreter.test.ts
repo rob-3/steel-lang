@@ -215,10 +215,8 @@ describe("exec()", () => {
         it("should support then", () => {
             expect(cfxEval(
                 `
-                {
-                    let a = if false then 5 else 6
-                    a
-                }
+                let a = if false then 5 else 6
+                a
                 `
             )).to.equal(6);
         });
@@ -279,25 +277,21 @@ describe("exec()", () => {
 
             it("shouldn't care about whitespace in a function", () => {
                 let src = `
-                {
-                    fun a() { 5 }
+                fun a() { 5 }
 
-                    a()
-                }
+                a()
                 `;
                 expect(cfxEval(src)).to.equal(5);
             });
 
             it("should allow early returns", () => {
                 let src = `
-                {
-                    fun a() {
-                        return 5
-                        6
-                    }
-
-                    a()
+                fun a() {
+                    return 5
+                    6
                 }
+
+                a()
                 `
                 expect(cfxEval(src)).to.equal(5);
             });
@@ -329,64 +323,56 @@ describe("exec()", () => {
 
             it("should have the correct scope", () => {
                 let src = `
-                {
-                    fun sum(a, b) {
-                        a + b
-                    }
-
-                    sum(4, 7)
+                fun sum(a, b) {
+                    a + b
                 }
+
+                sum(4, 7)
                 `;
                 expect(cfxEval(src)).to.equal(11);
             });
 
             it("should allow recursion", () => {
                 let src = `
-                {
-                    fun fac(a) {
-                        if (a == 0) {
-                            1
-                        } else {
-                            a * fac(a-1)
-                        }
+                fun fac(a) {
+                    if (a == 0) {
+                        1
+                    } else {
+                        a * fac(a-1)
                     }
-
-                    fac(4)
                 }
+
+                fac(4)
                 `;
                 expect(cfxEval(src)).to.equal(24);
             });
 
             it("should be able to implement fib", () => {
                 let src = `
-                {
-                    fun fib(a) {
-                        if (a == 0 or a == 1) {
-                            1
-                        } else {
-                            fib(a-1) + fib(a-2)
-                        }
+                fun fib(a) {
+                    if (a == 0 or a == 1) {
+                        1
+                    } else {
+                        fib(a-1) + fib(a-2)
                     }
-
-                    fib(4)
                 }
+
+                fib(4)
                 `
                 expect(cfxEval(src)).to.equal(5);
             });
 
             it("should be able to be passed into another function", () => {
                 let src = `
-                {
-                    fun a(a, b) {
-                        a + b
-                    }
-
-                    fun b(a, b, c) {
-                        a(b, c)
-                    }
-
-                    b(a, 4, 5)
+                fun a(a, b) {
+                    a + b
                 }
+
+                fun b(a, b, c) {
+                    a(b, c)
+                }
+
+                b(a, 4, 5)
                 `
                 expect(cfxEval(src)).to.equal(9)
             });
@@ -395,26 +381,22 @@ describe("exec()", () => {
         describe("lambdas", () => {
             it("should permit anonymous function style declaration", () => {
                let src = `
-               {
-                    let a = (a, b) -> {
-                        a * b
-                    }
-
-                    a(5, 6)
+               let a = (a, b) -> {
+                   a * b
                }
+
+               a(5, 6)
                `
                expect(cfxEval(src)).to.equal(30);
             });
 
             it("should allow anonymous functions to be passed inline", () => {
                 let src = `
-                {
-                    let math = (a, b, c) -> {
-                        a(b) * c
-                    }
-
-                    math(a -> { a + 3 }, 2, 3)
+                let math = (a, b, c) -> {
+                    a(b) * c
                 }
+
+                math(a -> { a + 3 }, 2, 3)
                 `
                 expect(cfxEval(src)).to.equal(15);
             });
@@ -422,11 +404,9 @@ describe("exec()", () => {
             it("should allow short lambda syntax without parentheses", () => {
                expect(cfxEval(
                 `
-                {
-                    let double = a -> a * 2
+                let double = a -> a * 2
 
-                    double(2)
-                }
+                double(2)
                 `
                )).to.equal(4);
             });
@@ -434,11 +414,9 @@ describe("exec()", () => {
             it("should allow short lambda syntax with parentheses", () => {
                expect(cfxEval(
                 `
-                {
-                    let double = (a) -> a * 2
+                let double = (a) -> a * 2
 
-                    double(2)
-                }
+                double(2)
                 `
                )).to.equal(4);
             });
@@ -446,11 +424,9 @@ describe("exec()", () => {
             it("should allow short lambda syntax with parentheses and multiple args", () => {
                expect(cfxEval(
                 `
-                {
-                    let sum = (a, b) -> a + b
+                let sum = (a, b) -> a + b
 
-                    sum(2, 6)
-                }
+                sum(2, 6)
                 `
                )).to.equal(8);
             });
@@ -458,15 +434,13 @@ describe("exec()", () => {
             it("should allow a returned function to be called", () => {
                 expect(cfxEval(
                     `
-                    {
-                        fun a() {
-                            fun b() {
-                                5
-                            }
+                    fun a() {
+                        fun b() {
+                            5
                         }
-
-                        a()()
                     }
+
+                    a()()
                     `
                 )).to.equal(5)
             });
@@ -497,12 +471,10 @@ describe("exec()", () => {
         it("should return the appropriate value", () => {
             expect(cfxEval(
                 `
-                {
-                    let x = 15
-                    match x {
-                        15 => "correct"
-                        _ => "wrong"
-                    }
+                let x = 15
+                match x {
+                    15 => "correct"
+                    _ => "wrong"
                 }
                 `
             )).to.equal("correct");
@@ -527,12 +499,10 @@ describe("exec()", () => {
         it("should be able to match strings", () => {
             expect(cfxEval(
                 `
-                {
-                    let x = "hello"
-                    match x {
-                        "hello" => "correct"
-                        _ => "incorrect"
-                    }
+                let x = "hello"
+                match x {
+                    "hello" => "correct"
+                    _ => "incorrect"
                 }
                 `
             )).to.equal("correct");
