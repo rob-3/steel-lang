@@ -74,7 +74,6 @@ describe("parse()", () => {
 
     it("should parse `or` precedence correctly", () => {
         let src = "4 == 5 or 6 == 7";
-        //console.log(parse(tokenize(src)))
         expect(parse(tokenize(src))).to.eql([
             new BinaryExpr(
                 new BinaryExpr(
