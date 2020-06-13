@@ -150,7 +150,6 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
     } else if (expr instanceof FunctionExpr) {
         return [new CfxFunction(expr), scope];
     } else if (expr instanceof PrintStmt) {
-        //let monad = State.of(expr, scope).flatMap((expr: PrintStmt, scope) => exprEval(expr.thingToPrint, scope))
         let [printValue, newScope] = exprEval(expr.thingToPrint, scope);
         return printfn(printValue, newScope);
     } else if (expr instanceof VariableDeclarationStmt) {
