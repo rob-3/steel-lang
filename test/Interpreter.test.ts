@@ -141,6 +141,30 @@ describe("exprEval()", () => {
             `;
             expect(cfxEval(src)).to.equal(2);
         });
+
+        it("should evaluate if stmts", () => {
+            expect(cfxEval(
+                `
+                let a = 5
+                if a == 5 {
+                    6
+                } else {
+                    7
+                }
+                `
+            )).to.equal(6);
+        });
+
+        it("should evaluate while stmts", () => {
+            expect(cfxEval(
+                `
+                var a = 0
+                while a < 5 {
+                    a = a + 1
+                }
+                `
+            )).to.equal(5);
+        });
     });
 
     describe("errors", () => {

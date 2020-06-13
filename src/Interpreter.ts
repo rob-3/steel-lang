@@ -176,11 +176,14 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
         return execStmts(expr.stmts, scope);
     } else if (expr instanceof WhileStmt) {
         let conditionValue = getVal(exprEval(expr.condition, scope));
+        let value: Value;
         while (assertBool(conditionValue) && conditionValue) {
-            scope = getState(exprEval(expr.body, scope));
+            let pair = exprEval(expr.body, scope);
+            scope = getState(pair);
+            value = getVal(pair);
             conditionValue = getVal(exprEval(expr.condition, scope));
         }
-        return [null, scope];
+        return [value, scope];
     } else if (expr instanceof ReturnStmt) {
         return exprEval(expr.value, scope);
     } else if (expr instanceof MatchStmt) {
