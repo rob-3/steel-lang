@@ -90,4 +90,15 @@ describe("parse()", () => {
             )
         ]);
     });
+
+    it("should parse while without parentheses", () => {
+        expect(() => parse(tokenize(
+            `
+            var x = 0
+            while x < 5 {
+                x = x + 1
+            }
+            `
+        ))).to.not.throw();
+    });
 });

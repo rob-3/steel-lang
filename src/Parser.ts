@@ -114,13 +114,7 @@ function makeMatchPrimary(): PrimaryExpr | UnderscoreExpr {
 }
 
 function finishWhileStmt(): Stmt {
-    if (!matchType(TokenType.OPEN_PAREN)) {
-        throw Error(`Expected "("; got "${lookAhead().lexeme}"`);
-    }
-    let condition = makeExpr();
-    if (!matchType(TokenType.CLOSE_PAREN)) {
-        throw Error(`Expected ")"; got "${lookAhead().lexeme}"`);
-    }
+    let condition = makeStmt();
     if (atEnd()) {
         throw Error(`After while expected statement, but reached EOF.`);
     }
