@@ -168,7 +168,7 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
         } else if (expr.elseBody !== null) {
             return exprEval(expr.elseBody, newScope);
         } else {
-            // TODO: hack we need to address
+            // FIXME: hack we need to address
             return [null, newScope];
         }
     } else if (expr instanceof BlockStmt) {
