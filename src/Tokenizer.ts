@@ -124,6 +124,7 @@ function makeIdentifierOrKeyword(): Token {
         case "print": return makeToken(TokenType.PRINT);
         case "return": return makeToken(TokenType.RETURN);
         case "match": return makeToken(TokenType.MATCH);
+        case "until": return makeToken(TokenType.UNTIL);
         default: return makeToken(TokenType.IDENTIFIER);
     }
 }

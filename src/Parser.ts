@@ -62,6 +62,7 @@ function makeStmt(): Stmt {
     if (matchType(TokenType.PRINT)) return finishPrintStmt();
     if (matchType(TokenType.IF)) return finishIfStmt();
     if (matchType(TokenType.WHILE)) return finishWhileStmt();
+    if (matchType(TokenType.UNTIL)) return finishUntilStmt();
     if (matchType(TokenType.FUN)) return finishFunctionDeclaration();
     if (matchType(TokenType.MATCH)) return finishMatchStmt();
     if (matchType(TokenType.IDENTIFIER)) {
@@ -120,6 +121,15 @@ function finishWhileStmt(): Stmt {
     }
     let body = makeStmt();
     return new WhileStmt(condition, body);
+}
+
+function finishUntilStmt(): Stmt {
+    let condition: Expr = makeStmt();
+    if (atEnd()) {
+        throw Error(`After until expected statement, but reached EOF.`);
+    }
+    let body = makeStmt();
+    return new WhileStmt(new UnaryExpr(new Token(TokenType.NOT, null, null, null), condition), body);
 }
 
 function backTrack(): void {

@@ -115,4 +115,15 @@ describe("parse()", () => {
                     new PrimaryExpr(6)))
         ]);
     });
+
+    it("should support until statement", () => {
+        expect(() => parse(tokenize(
+            `
+            var a = 5
+            until true {
+                a = a + 3
+            }
+            `
+        ))).to.not.throw();
+    });
 });
