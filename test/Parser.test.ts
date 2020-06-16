@@ -2,7 +2,9 @@ import tokenize from "../src/Tokenizer";
 import parse from "../src/Parser";
 import TokenType from "../src/TokenType";
 import Token from "../src/Token";
-import { PrimaryExpr, UnaryExpr, BinaryExpr } from "../src/Expr";
+import { 
+    PrimaryExpr, UnaryExpr, BinaryExpr, VariableDeclarationStmt, IfStmt 
+} from "../src/Expr";
 import { expect } from "chai";
 
 describe("parse()", () => {
@@ -100,5 +102,17 @@ describe("parse()", () => {
             }
             `
         ))).to.not.throw();
+    });
+
+    it("should parse if-then", () => {
+        expect(parse(tokenize(
+            `let a = if false then 5 else 6`
+        ))).to.eql([
+            new VariableDeclarationStmt("a", true, 
+                new IfStmt(
+                    new PrimaryExpr(false), 
+                    new PrimaryExpr(5), 
+                    new PrimaryExpr(6)))
+        ]);
     });
 });

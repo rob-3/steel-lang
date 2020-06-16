@@ -240,7 +240,6 @@ describe("exec()", () => {
             expect(cfxEval(
                 `
                 let a = if false then 5 else 6
-                a
                 `
             )).to.equal(6);
         });
@@ -347,6 +346,8 @@ describe("exec()", () => {
 
             it("should have the correct scope", () => {
                 let src = `
+                let a = 42
+                let b = 16
                 fun sum(a, b) {
                     a + b
                 }
