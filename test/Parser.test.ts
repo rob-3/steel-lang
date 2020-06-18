@@ -126,4 +126,15 @@ describe("parse()", () => {
             `
         ))).to.not.throw();
     });
+
+    it("should allow lambda style fib function definition", () => {
+        expect(() => parse(tokenize(
+            `
+            let fib = n -> {
+                if n == 1 or n == 0 then 1
+                else fib(n - 1) + fib(n - 2)
+            }
+            `
+        ))).to.not.throw();
+    });
 });

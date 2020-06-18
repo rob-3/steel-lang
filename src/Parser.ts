@@ -185,10 +185,13 @@ function finishIfStmt(): Stmt {
     matchType(TokenType.THEN);
     if (atEnd()) throw Error(`After if expected statement, but reached EOF.`);
     let maybeBody = makeStmt();
+    eatNewlines();
+
     let elseBody: Stmt = null;
     if (matchType(TokenType.ELSE)) {
         if (atEnd()) throw Error(`After if expected statement, but reached EOF.`);
         let maybeElseBody = makeStmt();
+        eatNewlines();
         if (maybeElseBody) {
             elseBody = maybeElseBody;
         } else {
@@ -333,7 +336,8 @@ function finishVeryShortLambda(arg: string): FunctionExpr {
     // TODO: add checks and error productions
     // TODO need to check if the braces match
     matchType(TokenType.OPEN_BRACE);
-    let body = makeExpr();
+    eatNewlines();
+    let body = makeStmt();
     matchType(TokenType.CLOSE_BRACE);
     return new FunctionExpr([arg], new BlockStmt([body]));
 }
