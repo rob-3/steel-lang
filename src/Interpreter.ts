@@ -37,9 +37,17 @@ export function cfxExec(src: string): Scoped<Value> {
 }
 
 function execStmts(stmts: Stmt[], scope: Scope): Scoped<Value> {
-    return stmts.reduce<Scoped<Value>>((acc: Scoped<Value>, cur: Stmt) => {
-        return exprEval(cur, getState(acc));
-    }, [null, scope]);
+    let value;
+    for (let stmt of stmts) {
+        let pair = exprEval(stmt, scope);
+        if (stmt instanceof ReturnStmt) {
+            return pair;
+        } else {
+            scope = getState(pair);
+            value = getVal(pair);
+        }
+    }
+    return [value, scope];
 }
 
 function lookup(identifier: string, scope: Scope): Value {

@@ -51,8 +51,8 @@ export class VariableExpr extends Expr {
 
 export class FunctionExpr extends Expr {
     args: string[];
-    body: BlockStmt;
-    constructor(args: string[], body: BlockStmt) {
+    body: Stmt;
+    constructor(args: string[], body: Stmt) {
         super();
         this.args = args;
         this.body = body;

@@ -9,20 +9,13 @@ export class CfxFunction {
     }
 
     call(callArgs: Value[], scope: Scope): Scoped<Value> {
-        let functionScope = new Scope(scope);
+        let funScope = new Scope(scope);
         for (let i = 0; i < this.funExpr.args.length; i++) {
             // FIXME typecheck args
-            functionScope.setLocal(this.funExpr.args[i], [callArgs[i], false]);
+            funScope.setLocal(this.funExpr.args[i], [callArgs[i], false]);
         }
 
-        let result: Scoped<Value>;
-        for (let stmt of this.funExpr.body.stmts) {
-            result = exprEval(stmt, functionScope)
-            functionScope = getState(result);
-            if (stmt instanceof ReturnStmt) {
-                break;
-            }
-        }
+        let result: Scoped<Value> = exprEval(this.funExpr.body, funScope);
         return [getVal(result), getState(result).parentScope];
     }
 }

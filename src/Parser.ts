@@ -309,7 +309,7 @@ function makePrimary(): Expr {
     if (matchType(TokenType.NUMBER, TokenType.STRING)) return new PrimaryExpr(lookBehind().literal);
     if (matchType(TokenType.IDENTIFIER)) {
         if (matchType(TokenType.RIGHT_SINGLE_ARROW)) {
-            return finishVeryShortLambda(lookBehind(2).lexeme);
+            return finishLambda([lookBehind(2).lexeme]);
         } else {
             let identifier = lookBehind().lexeme;
             return new VariableExpr(identifier);
@@ -320,7 +320,11 @@ function makePrimary(): Expr {
         if (matchType(TokenType.IDENTIFIER)) {
             if (matchType(TokenType.COMMA, TokenType.CLOSE_PAREN)) {
                 current -= 2;
-                return finishShortLambda();
+                let args: string[] = finishFunctDecArgs();
+                if (!matchType(TokenType.RIGHT_SINGLE_ARROW)) {
+                    throw Error(`Expected "->", got "${lookAhead().lexeme}"`);
+                }
+                return new FunctionExpr(args, makeStmt());
             } else {
                 current -= 1;
             }
@@ -332,39 +336,10 @@ function makePrimary(): Expr {
     throw Error(`Expected a primary; got "${lookAhead().lexeme}"`);
 }
 
-function finishVeryShortLambda(arg: string): FunctionExpr {
-    // TODO: add checks and error productions
-    // TODO need to check if the braces match
-    matchType(TokenType.OPEN_BRACE);
-    eatNewlines();
+function finishLambda(args: string[]): FunctionExpr {
     let body = makeStmt();
-    matchType(TokenType.CLOSE_BRACE);
-    return new FunctionExpr([arg], new BlockStmt([body]));
-}
-
-function finishShortLambda() {
-    let args: string[] = finishFunctDecArgs();
-    if (!matchType(TokenType.RIGHT_SINGLE_ARROW)) {
-        throw Error(`Expected "->", got "${lookAhead().lexeme}"`);
-    }
-    if (matchType(TokenType.OPEN_BRACE)) {
-        let body = finishBlockStmt();
-        return new FunctionExpr(args, body);
-    } else {
-        let body = makeExpr();
-        return new FunctionExpr(args, new BlockStmt([body]));
-    }
-}
-
-function finishLambda(): FunctionExpr {
-    if (!matchType(TokenType.OPEN_PAREN)) {
-        throw Error(`Expected "("; got "${lookAhead().lexeme}"`);
-    }
-    let argsObj: string[] = finishFunctDecArgs();
-    matchType(TokenType.OPEN_BRACE);
-    let body = finishBlockStmt();
     // TODO: add checks and nice error messages
-    return new FunctionExpr(argsObj, body);
+    return new FunctionExpr(args, body);
 }
 
 function finishGrouping(): Expr {
