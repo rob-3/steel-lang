@@ -290,4 +290,17 @@ describe("parse() spacing", () => {
             ))).to.not.throw();
         });
     });
+
+    describe("while loops", () => {
+        it("should allow a newline after while", () => {
+            expect(() => parse(tokenize(
+                `
+                while
+                    true {
+                        
+                    }
+                `
+            )))
+        });
+    });
 });
