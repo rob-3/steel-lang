@@ -138,3 +138,156 @@ describe("parse()", () => {
         ))).to.not.throw();
     });
 });
+
+describe("parse() spacing", () => {
+    describe("functions", () => {
+        describe("single arg lambdas", () => {
+            it("should allow a break after the arrow in a function definition", () => {
+                expect(() => parse(tokenize(
+                    `
+                    let addTwo = a -> 
+                        a + 2
+                    `
+                ))).to.not.throw();
+            });
+
+            it("should allow a break after the equals in a function definition", () => {
+                expect(() => parse(tokenize(
+                    `
+                    let addTwo = 
+                        a -> a + 2
+                    `
+                ))).to.not.throw();
+            });
+        });
+
+        describe("multi arg lambdas", () => {
+            it("should allow a break after the arrow in a function definition", () => {
+                expect(() => parse(tokenize(
+                    `
+                    let sum = (a, b) -> 
+                    a + b
+                    `
+                ))).to.not.throw();
+            });
+
+            it("should allow a break after the equals in a function definition", () => {
+                expect(() => parse(tokenize(
+                    `
+                    let sum = 
+                        (a, b) -> a + b
+                    `
+                ))).to.not.throw();
+            });
+
+            it("should allow a break in the args list", () => {
+                expect(() => parse(tokenize(
+                    `
+                    let sum = (a, 
+                               b,
+                               c) -> a + b
+                    `
+                ))).to.not.throw();
+            });
+
+            it("should allow a trailing comma in the arg list", () => {
+                expect(() => parse(tokenize(
+                    `
+                    let sum = (a, b, c,) -> a + b
+                    `
+                ))).to.not.throw();
+            });
+
+            it("should not allow extra commas in the arg list", () => {
+                expect(() => parse(tokenize(
+                    `
+                    let sum = (a,, b, c) -> a + b
+                    `
+                ))).to.throw();
+            });
+        });
+    });
+
+    describe("if stmts", () => {
+        it("should allow newlines after the if", () => {
+            expect(() => parse(tokenize(
+                `
+                let a = true
+                if 
+                    a then 5
+                `
+            ))).to.not.throw();
+        });
+
+        it("should allow newlines after the condition", () => {
+            expect(() => parse(tokenize(
+                `
+                let a = true
+                if a 
+                    then 5
+                `
+            ))).to.not.throw();
+        });
+
+        it("should allow newlines after the then", () => {
+            expect(() => parse(tokenize(
+                `
+                let a = true
+                if a then 
+                    5
+                `
+            ))).to.not.throw();
+        });
+
+        it("should allow multiple newlines within an if", () => {
+            expect(() => parse(tokenize(
+                `
+                let a = true
+                if 
+
+                    a 
+
+
+
+                    then 
+
+
+
+                    5
+                    `
+            ))).to.not.throw();
+        });
+    });
+
+    describe("assignments", () => {
+        it("should not allow a newline before the equals", () => {
+            expect(() => parse(tokenize(
+                `
+                let a
+                      = 5
+                `
+            ))).to.throw();
+        });
+
+        it("should allow a newline immediately after the equals", () => {
+            expect(() => parse(tokenize(
+                `
+                let a = 
+                    5
+                `
+            ))).to.not.throw();
+        });
+
+        it("should allow multiple newlines after the equals", () => {
+            expect(() => parse(tokenize(
+                `
+                let a = 
+
+
+
+                5
+                `
+            ))).to.not.throw();
+        });
+    });
+});

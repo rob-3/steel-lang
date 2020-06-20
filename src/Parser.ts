@@ -158,6 +158,7 @@ function finishFunctDecArgs(): string[] {
     while (matchType(TokenType.IDENTIFIER)) {
         args.push(lookBehind().lexeme);
         matchType(TokenType.COMMA);
+        eatNewlines();
         //FIXME checks are needed
     }
     if (!matchType(TokenType.CLOSE_PAREN)) {
@@ -180,9 +181,12 @@ function finishBlockStmt(): BlockStmt {
 }
 
 function finishIfStmt(): Stmt {
+    eatNewlines();
     let condition = makeExpr();
+    eatNewlines();
     // optionally match then
     matchType(TokenType.THEN);
+    eatNewlines();
     if (atEnd()) throw Error(`After if expected statement, but reached EOF.`);
     let maybeBody = makeStmt();
     eatNewlines();
@@ -220,6 +224,7 @@ function finishVariableDeclaration(immutable: boolean): Stmt {
     if (!matchType(TokenType.EQUAL)) {
         throw Error(`Expected "="; got "${lookAhead().lexeme}".`);
     }
+    eatNewlines();
     let right = makeStmt();
     if (matchType(TokenType.NEWLINE) || atEnd()) {
         return new VariableDeclarationStmt(identifier, immutable, right);
@@ -324,7 +329,7 @@ function makePrimary(): Expr {
                 if (!matchType(TokenType.RIGHT_SINGLE_ARROW)) {
                     throw Error(`Expected "->", got "${lookAhead().lexeme}"`);
                 }
-                return new FunctionExpr(args, makeStmt());
+                return finishLambda(args);
             } else {
                 current -= 1;
             }
@@ -337,6 +342,7 @@ function makePrimary(): Expr {
 }
 
 function finishLambda(args: string[]): FunctionExpr {
+    eatNewlines();
     let body = makeStmt();
     // TODO: add checks and nice error messages
     return new FunctionExpr(args, body);
