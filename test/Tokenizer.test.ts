@@ -4,7 +4,6 @@ import TokenType from "../src/TokenType";
 import { isAlphaNumeric, isAlpha, isNumber, isLegalIdentifierChar } from "../src/Tokenizer";
 import { expect } from "chai";
 
-// TODO fix line numbers
 describe("tokenize()", () => {
     it("should tokenize input", () => {
         const output = tokenize('2 "hello" 6.04 my_identifier');

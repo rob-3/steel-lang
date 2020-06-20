@@ -66,7 +66,6 @@ function makeStmt(): Stmt {
     if (matchType(TokenType.FUN)) return finishFunctionDeclaration();
     if (matchType(TokenType.MATCH)) return finishMatchStmt();
     if (matchType(TokenType.IDENTIFIER)) {
-        // TODO support for dot notation here
         if (matchType(TokenType.EQUAL)) {
             return finishAssignment(lookBehind(2).lexeme);
         } else {
