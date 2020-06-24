@@ -3,7 +3,7 @@ import {
     PrimaryExpr, UnaryExpr, GroupingExpr,
     CallExpr, FunctionExpr, UnderscoreExpr,
 
-    Stmt, VariableDeclarationStmt, PrintStmt, 
+    VariableDeclarationStmt, PrintStmt, 
     VariableAssignmentStmt, IfStmt, BlockStmt,
     WhileStmt, ReturnStmt, MatchStmt,
 
@@ -32,11 +32,11 @@ export function setPrintFn(fn): void {
 }
 
 export function cfxExec(src: string): Scoped<Value> {
-    let stmts: Stmt[] = parse(tokenize(src));
+    let stmts: Expr[] = parse(tokenize(src));
     return execStmts(stmts, new Scope());
 }
 
-function execStmts(stmts: Stmt[], scope: Scope): Scoped<Value> {
+function execStmts(stmts: Expr[], scope: Scope): Scoped<Value> {
     let value;
     for (let stmt of stmts) {
         let pair = exprEval(stmt, scope);
@@ -180,7 +180,7 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
             return [null, newScope];
         }
     } else if (expr instanceof BlockStmt) {
-        return execStmts(expr.stmts, scope);
+        return execStmts(expr.exprs, scope);
     } else if (expr instanceof WhileStmt) {
         let conditionValue = getVal(exprEval(expr.condition, scope));
         let value: Value;
@@ -198,14 +198,14 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
         let [matchExprValue, newScope] = exprEval(rootExpr, scope);
         for (let matchCase of expr.cases) {
             if (matchCase.matchExpr instanceof UnderscoreExpr) {
-                return exprEval(matchCase.stmt, newScope);
+                return exprEval(matchCase.expr, newScope);
             }
             // FIXME decide if side effects are legal in a match expression
             let arr = exprEval(matchCase.matchExpr, newScope);
             let caseValue = getVal(arr);
             newScope = getState(arr);
             if (equal(caseValue, matchExprValue)) {
-                return exprEval(matchCase.stmt, newScope);
+                return exprEval(matchCase.expr, newScope);
             }
         };
         throw Error("Pattern match failed.");

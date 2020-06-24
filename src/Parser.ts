@@ -5,7 +5,7 @@ import {
     PrimaryExpr, UnaryExpr, VariableExpr,
     FunctionExpr, CallExpr, UnderscoreExpr,
 
-    Stmt, PrintStmt, VariableDeclarationStmt, 
+    PrintStmt, VariableDeclarationStmt, 
     VariableAssignmentStmt, IfStmt, BlockStmt,
     WhileStmt, ReturnStmt, MatchStmt, MatchCase
 } from "./Expr";
@@ -13,7 +13,7 @@ import {
 let tokens: Token[];
 let current = 0;
 
-export default function parse(tokenList: Token[]): Stmt[] {
+export default function parse(tokenList: Token[]): Expr[] {
     tokens = tokenList;
     let ast = [];
 
@@ -55,7 +55,7 @@ function eatNewlines(): void {
     while (matchType(TokenType.NEWLINE)) continue;
 }
 
-function makeStmt(): Stmt {
+function makeStmt(): Expr {
     if (matchType(TokenType.RETURN)) return new ReturnStmt(makeExpr());
     if (matchType(TokenType.LET)) return finishVariableDeclaration(true);
     if (matchType(TokenType.VAR)) return finishVariableDeclaration(false);
@@ -77,7 +77,7 @@ function makeStmt(): Stmt {
     return makeExpr();
 }
 
-function finishMatchStmt(): Stmt {
+function finishMatchStmt(): Expr {
     let expr = makeExpr();
     if (!matchType(TokenType.OPEN_BRACE)) {
         throw Error(`Expected "{"; got "${lookAhead().lexeme}"`);
@@ -98,11 +98,11 @@ function makeMatchCase(): MatchCase {
     if (!matchType(TokenType.RIGHT_DOUBLE_ARROW)) {
         throw Error(`Expected a "=>", got "${lookAhead().lexeme}"`);
     }
-    let stmt = makeStmt();
+    let expr = makeStmt();
     if (!matchType(TokenType.NEWLINE)) {
         throw Error(`Expected a newline after match case.`);
     }
-    return new MatchCase(matchPrimary, stmt);
+    return new MatchCase(matchPrimary, expr);
 }
 
 function makeMatchPrimary(): PrimaryExpr | UnderscoreExpr {
@@ -113,7 +113,7 @@ function makeMatchPrimary(): PrimaryExpr | UnderscoreExpr {
     throw Error(`"${lookAhead().lexeme}" is not a boolean, number, string literal, or "_".`);
 }
 
-function finishWhileStmt(): Stmt {
+function finishWhileStmt(): Expr {
     let condition = makeStmt();
     if (atEnd()) {
         throw Error(`After while expected statement, but reached EOF.`);
@@ -122,7 +122,7 @@ function finishWhileStmt(): Stmt {
     return new WhileStmt(condition, body);
 }
 
-function finishUntilStmt(): Stmt {
+function finishUntilStmt(): Expr {
     let condition: Expr = makeStmt();
     if (atEnd()) {
         throw Error(`After until expected statement, but reached EOF.`);
@@ -135,7 +135,7 @@ function backTrack(): void {
     current -= 1;
 }
 
-function finishFunctionDeclaration(): Stmt {
+function finishFunctionDeclaration(): Expr {
     if (!matchType(TokenType.IDENTIFIER)) {
         throw Error(`Expected an identifier; got "${lookAhead().lexeme}"`);
     }
@@ -167,7 +167,7 @@ function finishFunctDecArgs(): string[] {
 }
 
 function finishBlockStmt(): BlockStmt {
-    let stmts: Stmt[] = [];
+    let stmts: Expr[] = [];
     eatNewlines();
     while (!matchType(TokenType.CLOSE_BRACE)) {
         if (atEnd()) {
@@ -179,7 +179,7 @@ function finishBlockStmt(): BlockStmt {
     return new BlockStmt(stmts);
 }
 
-function finishIfStmt(): Stmt {
+function finishIfStmt(): Expr {
     eatNewlines();
     let condition = makeExpr();
     eatNewlines();
@@ -190,7 +190,7 @@ function finishIfStmt(): Stmt {
     let maybeBody = makeStmt();
     eatNewlines();
 
-    let elseBody: Stmt = null;
+    let elseBody: Expr = null;
     if (matchType(TokenType.ELSE)) {
         if (atEnd()) throw Error(`After if expected statement, but reached EOF.`);
         let maybeElseBody = makeStmt();
@@ -204,7 +204,7 @@ function finishIfStmt(): Stmt {
     return new IfStmt(condition, maybeBody, elseBody);
 }
 
-function finishPrintStmt(): Stmt {
+function finishPrintStmt(): Expr {
     let stmt = new PrintStmt(makeStmt());
     return stmt;
 }
@@ -213,7 +213,7 @@ function makeExpr(): Expr {
     return makeBinaryLogical();
 }
 
-function finishVariableDeclaration(immutable: boolean): Stmt {
+function finishVariableDeclaration(immutable: boolean): Expr {
     // TODO check if variable has already been declared
     if (!matchType(TokenType.IDENTIFIER)) {
         if (matchType(TokenType.STRING)) throw Error(`Expected identifier; got a string literal.`);
@@ -232,7 +232,7 @@ function finishVariableDeclaration(immutable: boolean): Stmt {
     }
 }
 
-function finishAssignment(identifier: string): Stmt {
+function finishAssignment(identifier: string): Expr {
     // TODO check if identifier has already been declared
     /*
     if (!matchType(TokenType.EQUAL)) {

@@ -51,8 +51,8 @@ export class VariableExpr extends Expr {
 
 export class FunctionExpr extends Expr {
     args: string[];
-    body: Stmt;
-    constructor(args: string[], body: Stmt) {
+    body: Expr;
+    constructor(args: string[], body: Expr) {
         super();
         this.args = args;
         this.body = body;
@@ -69,10 +69,7 @@ export class CallExpr extends Expr {
     }
 }
 
-export class Stmt extends Expr {
-}
-
-export class VariableDeclarationStmt extends Stmt {
+export class VariableDeclarationStmt extends Expr {
     immutable: boolean;
     identifier: string;
     right: Expr;
@@ -84,7 +81,7 @@ export class VariableDeclarationStmt extends Stmt {
     }
 }
 
-export class VariableAssignmentStmt extends Stmt {
+export class VariableAssignmentStmt extends Expr {
     identifier: string;
     right: Expr;
     constructor(identifier: string, right: Expr) {
@@ -95,7 +92,7 @@ export class VariableAssignmentStmt extends Stmt {
 }
 
 // TODO: library function
-export class PrintStmt extends Stmt {
+export class PrintStmt extends Expr {
     thingToPrint: Expr;
     constructor(thingToPrint: Expr) {
         super();
@@ -103,11 +100,11 @@ export class PrintStmt extends Stmt {
     }
 }
 
-export class IfStmt extends Stmt {
+export class IfStmt extends Expr {
     condition: Expr;
-    body: Stmt;
-    elseBody: Stmt;
-    constructor(condition: Expr, body: Stmt, elseBody: Stmt) {
+    body: Expr;
+    elseBody: Expr;
+    constructor(condition: Expr, body: Expr, elseBody: Expr) {
         super();
         this.condition = condition;
         this.body = body;
@@ -115,25 +112,25 @@ export class IfStmt extends Stmt {
     }
 }
 
-export class BlockStmt extends Stmt {
-    stmts: Stmt[];
-    constructor(stmts: Stmt[]) {
+export class BlockStmt extends Expr {
+    exprs: Expr[];
+    constructor(exprs: Expr[]) {
         super();
-        this.stmts = stmts;
+        this.exprs = exprs;
     }
 }
 
-export class WhileStmt extends Stmt {
+export class WhileStmt extends Expr {
     condition: Expr;
-    body: Stmt;
-    constructor(condition: Expr, body: Stmt) {
+    body: Expr;
+    constructor(condition: Expr, body: Expr) {
         super();
         this.condition = condition;
         this.body = body;
     }
 }
 
-export class ReturnStmt extends Stmt {
+export class ReturnStmt extends Expr {
     value: Expr;
     constructor(value: Expr) {
         super();
@@ -141,7 +138,7 @@ export class ReturnStmt extends Stmt {
     }
 }
 
-export class MatchStmt extends Stmt {
+export class MatchStmt extends Expr {
     expr: Expr;
     cases: MatchCase[];
     constructor(expr: Expr, cases: MatchCase[]) {
@@ -153,11 +150,11 @@ export class MatchStmt extends Stmt {
 
 export class MatchCase {
     matchExpr: UnderscoreExpr | PrimaryExpr;
-    stmt: Stmt;
+    expr: Expr;
 
-    constructor(matchExpr: UnderscoreExpr | PrimaryExpr, stmt: Stmt) {
+    constructor(matchExpr: UnderscoreExpr | PrimaryExpr, expr: Expr) {
         this.matchExpr = matchExpr;
-        this.stmt = stmt;
+        this.expr = expr;
     }
 }
 
