@@ -7,26 +7,30 @@ import {
 
     PrintStmt, VariableDeclarationStmt, 
     VariableAssignmentStmt, IfStmt, BlockStmt,
-    WhileStmt, ReturnStmt, MatchStmt, MatchCase
+    WhileStmt, ReturnStmt, MatchStmt, MatchCase,
+
+    FunctionDefinition
 } from "./Expr";
+import Ast from "./Ast"
+import astTransforms from "./AstTransforms";
 
 let tokens: Token[];
 let current = 0;
 
 export default function parse(tokenList: Token[]): Expr[] {
     tokens = tokenList;
-    let ast = [];
+    let exprs = [];
 
     eatNewlines();
     try {
         while (!atEnd()) {
-            ast.push(makeStmt());
+            exprs.push(makeStmt());
             eatNewlines();
         }
     } finally {
         reset();
     }
-    return ast;
+    return astTransforms.reduce((acc: Ast, cur: (expr: Expr) => Expr) => acc.map(cur), new Ast(exprs)).exprs;
 }
 
 function matchType(...types: TokenType[]): boolean {
@@ -140,16 +144,28 @@ function finishFunctionDeclaration(): Expr {
         throw Error(`Expected an identifier; got "${lookAhead().lexeme}"`);
     }
     let fnName = lookBehind().lexeme;
-    if (!matchType(TokenType.OPEN_PAREN)) {
-        throw Error(`Expected "("; got "${lookAhead().lexeme}"`);
+    // FIXME better error
+    if (!matchType(TokenType.EQUAL)) throw Error("Expected =");
+    eatNewlines();
+    let lambda = makeLambda();
+    return new FunctionDefinition(
+        new VariableDeclarationStmt(fnName, true, lambda)
+    );
+}
+
+function makeLambda(): FunctionExpr {
+    let args: string[];
+    if (matchType(TokenType.IDENTIFIER)) {
+        args = [lookBehind().lexeme];
+    } else if (matchType(TokenType.OPEN_PAREN)) {
+        args = finishFunctDecArgs();
+    } else {
+        // FIXME better error
+        throw Error("Expected identifier or open paren");
     }
-    let argsObj = finishFunctDecArgs();
-    if (!matchType(TokenType.OPEN_BRACE)) {
-        throw Error(`Expected "{"; got "${lookAhead().lexeme}"`);
-    }
-    let body = finishBlockStmt();
-    let fnExp = new FunctionExpr(argsObj, body);
-    return new VariableDeclarationStmt(fnName, true, fnExp);
+    // FIXME better error
+    if (!matchType(TokenType.RIGHT_SINGLE_ARROW)) throw Error("Expected ->");
+    return finishLambda(args);
 }
 
 function finishFunctDecArgs(): string[] {

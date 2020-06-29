@@ -6,6 +6,7 @@ import {
     VariableDeclarationStmt, PrintStmt, 
     VariableAssignmentStmt, IfStmt, BlockStmt,
     WhileStmt, ReturnStmt, MatchStmt,
+    FunctionDefinition,
 
     MatchCase
 } from "./Expr";
@@ -209,8 +210,9 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
             }
         };
         throw Error("Pattern match failed.");
+    } else if (expr instanceof FunctionDefinition) {
+        return exprEval(expr.definition, scope);
     } else {
-        console.dir(expr)
         throw Error("Unhandled stmt or expr.");
     }
 }

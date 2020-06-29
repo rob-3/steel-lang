@@ -181,7 +181,10 @@ describe("exprEval()", () => {
 
     describe("errors", () => {
         it("should throw on an invalid expression type", () => {
-            class UnhandledExpr extends Expr {};
+            class UnhandledExpr implements Expr {
+                copy = () => this;
+                map = () => this;
+            };
             expect(() => exprEval(new UnhandledExpr, new Scope())).to.throw();
         });
     });
@@ -288,7 +291,7 @@ describe("exec()", () => {
     describe("functions", () => {
         describe("argless functions", () => {
             let src = `
-            fun a() {
+            fun a = () -> {
                 print 5
             }
             `
@@ -312,7 +315,7 @@ describe("exec()", () => {
 
             it("shouldn't care about whitespace in a function", () => {
                 let src = `
-                fun a() { 5 }
+                fun a = () -> { 5 }
 
                 a()
                 `;
@@ -321,7 +324,7 @@ describe("exec()", () => {
 
             it("should allow early returns", () => {
                 let src = `
-                fun a() {
+                fun a = () -> {
                     return 5
                     6
                 }
@@ -331,10 +334,9 @@ describe("exec()", () => {
                 expect(cfxEval(src)).to.equal(5);
             });
         });
-
         describe("functions with arguments", () => {
            let src = `
-           fun a(a, b) {
+           fun a = (a, b) -> {
                 print a + b
            }
            `;
@@ -360,7 +362,7 @@ describe("exec()", () => {
                 let src = `
                 let a = 42
                 let b = 16
-                fun sum(a, b) {
+                fun sum = (a, b) -> {
                     a + b
                 }
 
@@ -371,7 +373,7 @@ describe("exec()", () => {
 
             it("should allow recursion", () => {
                 let src = `
-                fun fac(a) {
+                fun fac = (a) -> {
                     if (a == 0) {
                         1
                     } else {
@@ -386,7 +388,7 @@ describe("exec()", () => {
 
             it("should be able to implement fib", () => {
                 let src = `
-                fun fib(a) {
+                fun fib = (a) -> {
                     if (a == 0 or a == 1) {
                         1
                     } else {
@@ -401,11 +403,11 @@ describe("exec()", () => {
 
             it("should be able to be passed into another function", () => {
                 let src = `
-                fun a(a, b) {
+                fun a = (a, b) -> {
                     a + b
                 }
 
-                fun b(a, b, c) {
+                fun b = (a, b, c) -> {
                     a(b, c)
                 }
 
@@ -471,8 +473,8 @@ describe("exec()", () => {
             it("should allow a returned function to be called", () => {
                 expect(cfxEval(
                     `
-                    fun a() {
-                        fun b() {
+                    fun a = () -> {
+                        fun b = () -> {
                             5
                         }
                     }
@@ -488,6 +490,18 @@ describe("exec()", () => {
                     5()
                     `
                 )).to.throw("Can't call 5 because it is not a function.")
+            });
+        });
+
+        describe("hoisted functions", () => {
+            it("should allow a basic hoisted function", () => {
+                expect(cfxEval(
+                    `
+                    getFive()
+
+                    fun getFive = () -> 5
+                    `
+                )).to.equal(5);
             });
         });
     });
