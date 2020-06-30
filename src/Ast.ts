@@ -8,7 +8,9 @@ export default class Ast {
     }
 
     map(fn: (expr: Expr) => Expr): Ast {
-        let a = fn(new BlockStmt(this.exprs).map((expr: Expr) => fn(expr.map(fn))));
+        let a = fn(
+            new BlockStmt(this.exprs).map((expr: Expr) => fn(expr.map(fn)))
+        );
         if (a instanceof BlockStmt) {
             return new Ast(a.exprs);
         } else {

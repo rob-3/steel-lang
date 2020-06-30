@@ -1,7 +1,12 @@
 import tokenize from "../src/Tokenizer";
 import Token from "../src/Token";
 import TokenType from "../src/TokenType";
-import { isAlphaNumeric, isAlpha, isNumber, isLegalIdentifierChar } from "../src/Tokenizer";
+import {
+    isAlphaNumeric,
+    isAlpha,
+    isNumber,
+    isLegalIdentifierChar
+} from "../src/Tokenizer";
 import { expect } from "chai";
 
 describe("tokenize()", () => {
@@ -25,7 +30,8 @@ describe("tokenize()", () => {
         let result = tokenize(
             `let apple = 4.3 // apple = 0 *//**/??////
             let pancakes = apple * 3 // rando-stuff
-            `);
+            `
+        );
         expect(result).to.deep.equal([
             new Token(TokenType.LET, "let", null, 1),
             new Token(TokenType.IDENTIFIER, "apple", null, 1),
@@ -44,7 +50,9 @@ describe("tokenize()", () => {
     });
 
     it("should ignore nested multi-line comments", () => {
-        let result = tokenize("/**//**\n let var = 32.432.32 *//* laskdjflaskdf 43*/apple");
+        let result = tokenize(
+            "/**//**\n let var = 32.432.32 *//* laskdjflaskdf 43*/apple"
+        );
         expect(result).to.deep.equal([
             new Token(TokenType.IDENTIFIER, "apple", null, 1),
             new Token(TokenType.EOF, "", null, 1)
@@ -72,9 +80,7 @@ describe("tokenize()", () => {
 
     it("should end with an EOF token no matter what", () => {
         let result = tokenize("");
-        expect(result).to.deep.equal([
-            new Token(TokenType.EOF, "", null, 1)
-        ]);
+        expect(result).to.deep.equal([new Token(TokenType.EOF, "", null, 1)]);
     });
 
     it("should tokenize true and false", () => {
@@ -82,15 +88,15 @@ describe("tokenize()", () => {
         expect(result).to.deep.equal([
             new Token(TokenType.TRUE, "true", true, 1),
             new Token(TokenType.FALSE, "false", false, 1),
-            new Token(TokenType.EOF, "", null, 1),
-        ])
+            new Token(TokenType.EOF, "", null, 1)
+        ]);
     });
 
     it("should tokenize the fun keyword", () => {
         let result = tokenize("fun");
         expect(result).to.deep.equal([
             new Token(TokenType.FUN, "fun", null, 1),
-            new Token(TokenType.EOF, "", null, 1),
+            new Token(TokenType.EOF, "", null, 1)
         ]);
     });
 
@@ -98,7 +104,7 @@ describe("tokenize()", () => {
         let result = tokenize("for");
         expect(result).to.deep.equal([
             new Token(TokenType.FOR, "for", null, 1),
-            new Token(TokenType.EOF, "", null, 1),
+            new Token(TokenType.EOF, "", null, 1)
         ]);
     });
 
@@ -106,7 +112,7 @@ describe("tokenize()", () => {
         let result = tokenize("while");
         expect(result).to.deep.equal([
             new Token(TokenType.WHILE, "while", null, 1),
-            new Token(TokenType.EOF, "", null, 1),
+            new Token(TokenType.EOF, "", null, 1)
         ]);
     });
 
@@ -115,7 +121,7 @@ describe("tokenize()", () => {
         expect(result).to.deep.equal([
             new Token(TokenType.IF, "if", null, 1),
             new Token(TokenType.ELSE, "else", null, 1),
-            new Token(TokenType.EOF, "", null, 1),
+            new Token(TokenType.EOF, "", null, 1)
         ]);
     });
 
@@ -125,12 +131,11 @@ describe("tokenize()", () => {
             new Token(TokenType.AND, "and", null, 1),
             new Token(TokenType.OR, "or", null, 1),
             new Token(TokenType.NOT, "not", null, 1),
-            new Token(TokenType.EOF, "", null, 1),
+            new Token(TokenType.EOF, "", null, 1)
         ]);
     });
 
-    it("should not loop if there is a comment and no newline before EOF",
-       function() {
+    it("should not loop if there is a comment and no newline before EOF", function () {
         this.timeout(1000);
         tokenize(
             `let a = 3
@@ -144,8 +149,8 @@ describe("tokenize()", () => {
     });
 
     it("should throw if there is an unexpected character", () => {
-        let source = '\\';
-        expect(() => tokenize(source)).to.throw("Unrecognized character \"\\\"");
+        let source = "\\";
+        expect(() => tokenize(source)).to.throw('Unrecognized character "\\"');
     });
 
     it("should tokenize a unary not", () => {
@@ -153,14 +158,14 @@ describe("tokenize()", () => {
         expect(result).to.deep.equal([
             new Token(TokenType.NOT, "not", null, 1),
             new Token(TokenType.TRUE, "true", true, 1),
-            new Token(TokenType.EOF, "", null, 1),
+            new Token(TokenType.EOF, "", null, 1)
         ]);
     });
-    
+
     it("should tokenize commas", () => {
         expect(tokenize(",")).to.deep.equal([
             new Token(TokenType.COMMA, ",", null, 1),
-            new Token(TokenType.EOF, "", null, 1),
+            new Token(TokenType.EOF, "", null, 1)
         ]);
     });
 
@@ -169,14 +174,14 @@ describe("tokenize()", () => {
             new Token(TokenType.RIGHT_DOUBLE_ARROW, "=>", null, 1),
             new Token(TokenType.EOF, "", null, 1)
         ]);
-    })
+    });
 
     it("should tokenize underscore", () => {
         expect(tokenize("_")).to.eql([
             new Token(TokenType.UNDERSCORE, "_", null, 1),
-            new Token(TokenType.EOF, "", null, 1),
-        ])
-    })
+            new Token(TokenType.EOF, "", null, 1)
+        ]);
+    });
 });
 
 describe("isLegalIdentifierChar()", () => {
@@ -197,13 +202,13 @@ describe("isLegalIdentifierChar()", () => {
         expect(isLegalIdentifierChar("_")).to.equal(true);
     });
 
-    it("should return false if a character is [-\\0\"\'\\n()]", () => {
-       expect(isLegalIdentifierChar("\0")).to.equal(false);
-       expect(isLegalIdentifierChar("\"")).to.equal(false);
-       expect(isLegalIdentifierChar("'")).to.equal(false);
-       expect(isLegalIdentifierChar("\n")).to.equal(false);
-       expect(isLegalIdentifierChar("(")).to.equal(false);
-       expect(isLegalIdentifierChar(")")).to.equal(false);
+    it("should return false if a character is [-\\0\"'\\n()]", () => {
+        expect(isLegalIdentifierChar("\0")).to.equal(false);
+        expect(isLegalIdentifierChar('"')).to.equal(false);
+        expect(isLegalIdentifierChar("'")).to.equal(false);
+        expect(isLegalIdentifierChar("\n")).to.equal(false);
+        expect(isLegalIdentifierChar("(")).to.equal(false);
+        expect(isLegalIdentifierChar(")")).to.equal(false);
     });
 });
 
@@ -220,11 +225,11 @@ describe("isAlphaNumeric()", () => {
         expect(isAlphaNumeric("9")).to.equal(true);
     });
 
-    it("should return false if a character is [_-\\0\"\'\\n]", () => {
+    it("should return false if a character is [_-\\0\"'\\n]", () => {
         expect(isAlphaNumeric("_")).to.equal(false);
         expect(isAlphaNumeric("-")).to.equal(false);
         expect(isAlphaNumeric("\0")).to.equal(false);
-        expect(isAlphaNumeric("\"")).to.equal(false);
+        expect(isAlphaNumeric('"')).to.equal(false);
         expect(isAlphaNumeric("'")).to.equal(false);
         expect(isAlphaNumeric("\n")).to.equal(false);
     });
@@ -238,13 +243,13 @@ describe("isAlpha()", () => {
         expect(isAlpha("Z")).to.equal(true);
     });
 
-    it("should return false if a character is [_-\\0\"\'\\n]", () => {
+    it("should return false if a character is [_-\\0\"'\\n]", () => {
         expect(isAlpha("0")).to.equal(false);
         expect(isAlpha("9")).to.equal(false);
         expect(isAlpha("_")).to.equal(false);
         expect(isAlpha("-")).to.equal(false);
         expect(isAlpha("\0")).to.equal(false);
-        expect(isAlpha("\"")).to.equal(false);
+        expect(isAlpha('"')).to.equal(false);
         expect(isAlpha("'")).to.equal(false);
         expect(isAlpha("\n")).to.equal(false);
     });
@@ -264,7 +269,7 @@ describe("isNumber()", () => {
         expect(isNumber("_")).to.equal(false);
         expect(isNumber("-")).to.equal(false);
         expect(isNumber("\0")).to.equal(false);
-        expect(isNumber("\"")).to.equal(false);
+        expect(isNumber('"')).to.equal(false);
         expect(isNumber("'")).to.equal(false);
     });
 });

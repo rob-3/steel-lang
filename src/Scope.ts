@@ -14,7 +14,7 @@ export default class Scope {
             if (this.parentScope !== null) {
                 return this.parentScope.get(identifier);
             } else {
-                return null
+                return null;
             }
         } else {
             return value[0];

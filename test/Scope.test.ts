@@ -9,8 +9,8 @@ describe("class Scope", () => {
     });
 
     it("should return null if the value doesn't exist", () => {
-       let scope = new Scope(); 
-       expect(scope.get("a")).to.equal(null);
+        let scope = new Scope();
+        expect(scope.get("a")).to.equal(null);
     });
 
     it("should defer to higher parent scope", () => {

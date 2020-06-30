@@ -29,16 +29,25 @@ export default function tokenize(src: string): Token[] {
 function scanToken(): void | Token {
     let char = eatChar();
     switch (char) {
-        case "(": return makeToken(TokenType.OPEN_PAREN);
-        case ")": return makeToken(TokenType.CLOSE_PAREN);
-        case "[": return makeToken(TokenType.OPEN_BRACKET);
-        case "]": return makeToken(TokenType.CLOSE_BRACKET);
-        case "{": return makeToken(TokenType.OPEN_BRACE);
-        case "}": return makeToken(TokenType.CLOSE_BRACE);
-        case ".": return makeToken(TokenType.DOT);
-        case "%": return makeToken(TokenType.MOD);
-        case "*": return makeToken(TokenType.STAR);
-        case "/": 
+        case "(":
+            return makeToken(TokenType.OPEN_PAREN);
+        case ")":
+            return makeToken(TokenType.CLOSE_PAREN);
+        case "[":
+            return makeToken(TokenType.OPEN_BRACKET);
+        case "]":
+            return makeToken(TokenType.CLOSE_BRACKET);
+        case "{":
+            return makeToken(TokenType.OPEN_BRACE);
+        case "}":
+            return makeToken(TokenType.CLOSE_BRACE);
+        case ".":
+            return makeToken(TokenType.DOT);
+        case "%":
+            return makeToken(TokenType.MOD);
+        case "*":
+            return makeToken(TokenType.STAR);
+        case "/":
             if (match("/")) {
                 eatLineComment();
             } else if (match("*")) {
@@ -47,20 +56,41 @@ function scanToken(): void | Token {
                 return makeToken(TokenType.SLASH);
             }
             return null;
-        case "+": return match("+") ? makeToken(TokenType.PLUS_PLUS) : makeToken(TokenType.PLUS);
-        case "-": return match(">") ? makeToken(TokenType.RIGHT_SINGLE_ARROW) : makeToken(TokenType.MINUS);
-        case "=": return match("=") ? makeToken(TokenType.EQUAL_EQUAL) : match(">") ? makeToken(TokenType.RIGHT_DOUBLE_ARROW) : makeToken(TokenType.EQUAL);
-        case ">": return match("=") ? makeToken(TokenType.GREATER_EQUAL) : makeToken(TokenType.GREATER);
-        case "<": return match("=") ? makeToken(TokenType.LESS_EQUAL) : makeToken(TokenType.LESS);
-        case ",": return makeToken(TokenType.COMMA);
-        case "_": return makeToken(TokenType.UNDERSCORE);
+        case "+":
+            return match("+")
+                ? makeToken(TokenType.PLUS_PLUS)
+                : makeToken(TokenType.PLUS);
+        case "-":
+            return match(">")
+                ? makeToken(TokenType.RIGHT_SINGLE_ARROW)
+                : makeToken(TokenType.MINUS);
+        case "=":
+            return match("=")
+                ? makeToken(TokenType.EQUAL_EQUAL)
+                : match(">")
+                ? makeToken(TokenType.RIGHT_DOUBLE_ARROW)
+                : makeToken(TokenType.EQUAL);
+        case ">":
+            return match("=")
+                ? makeToken(TokenType.GREATER_EQUAL)
+                : makeToken(TokenType.GREATER);
+        case "<":
+            return match("=")
+                ? makeToken(TokenType.LESS_EQUAL)
+                : makeToken(TokenType.LESS);
+        case ",":
+            return makeToken(TokenType.COMMA);
+        case "_":
+            return makeToken(TokenType.UNDERSCORE);
         case "\t":
-        case " ": return;
-        case "\n": 
+        case " ":
+            return;
+        case "\n":
             let token = makeToken(TokenType.NEWLINE);
             line += 1;
             return token;
-        case "\"": return makeString();
+        case '"':
+            return makeString();
         //case "\'": return stringInterpolation();
         default:
             if (isNumber(char)) {
@@ -68,7 +98,9 @@ function scanToken(): void | Token {
             } else if (isAlpha(char)) {
                 return makeIdentifierOrKeyword();
             } else {
-                throw Error(`Unrecognized character "${char}". Perhaps you intended to put this in a string?`);
+                throw Error(
+                    `Unrecognized character "${char}". Perhaps you intended to put this in a string?`
+                );
             }
     }
 }
@@ -76,16 +108,19 @@ function scanToken(): void | Token {
 // literal makers
 
 function makeString(): Token {
-    let cache = lookAhead()
-    while (cache !== "\"") {
-        if(cache === "\n" || atEnd()) {
+    let cache = lookAhead();
+    while (cache !== '"') {
+        if (cache === "\n" || atEnd()) {
             throw Error("Unterminated string literal.");
         }
         eatChar();
         cache = lookAhead();
     }
     eatChar();
-    return makeToken(TokenType.STRING, source.slice(startIndex + 1, currentIndex - 1));
+    return makeToken(
+        TokenType.STRING,
+        source.slice(startIndex + 1, currentIndex - 1)
+    );
 }
 
 function makeNumber(): Token {
@@ -98,7 +133,10 @@ function makeNumber(): Token {
             eatChar();
         }
     }
-    return makeToken(TokenType.NUMBER, Number(source.slice(startIndex, currentIndex)));
+    return makeToken(
+        TokenType.NUMBER,
+        Number(source.slice(startIndex, currentIndex))
+    );
 }
 
 function makeIdentifierOrKeyword(): Token {
@@ -107,25 +145,44 @@ function makeIdentifierOrKeyword(): Token {
     }
     let lexeme = source.slice(startIndex, currentIndex);
     switch (lexeme) {
-        case "let": return makeToken(TokenType.LET);
-        case "var": return makeToken(TokenType.VAR);
-        case "true": return makeToken(TokenType.TRUE, true);
-        case "false": return makeToken(TokenType.FALSE, false);
-        case "fun": return makeToken(TokenType.FUN);
-        case "if": return makeToken(TokenType.IF);
-        case "then": return makeToken(TokenType.THEN);
-        case "else": return makeToken(TokenType.ELSE);
-        case "for": return makeToken(TokenType.FOR);
-        case "while": return makeToken(TokenType.WHILE);
-        case "and": return makeToken(TokenType.AND);
-        case "or": return makeToken(TokenType.OR);
-        case "not": return makeToken(TokenType.NOT);
-        case "in": return makeToken(TokenType.IN);
-        case "print": return makeToken(TokenType.PRINT);
-        case "return": return makeToken(TokenType.RETURN);
-        case "match": return makeToken(TokenType.MATCH);
-        case "until": return makeToken(TokenType.UNTIL);
-        default: return makeToken(TokenType.IDENTIFIER);
+        case "let":
+            return makeToken(TokenType.LET);
+        case "var":
+            return makeToken(TokenType.VAR);
+        case "true":
+            return makeToken(TokenType.TRUE, true);
+        case "false":
+            return makeToken(TokenType.FALSE, false);
+        case "fun":
+            return makeToken(TokenType.FUN);
+        case "if":
+            return makeToken(TokenType.IF);
+        case "then":
+            return makeToken(TokenType.THEN);
+        case "else":
+            return makeToken(TokenType.ELSE);
+        case "for":
+            return makeToken(TokenType.FOR);
+        case "while":
+            return makeToken(TokenType.WHILE);
+        case "and":
+            return makeToken(TokenType.AND);
+        case "or":
+            return makeToken(TokenType.OR);
+        case "not":
+            return makeToken(TokenType.NOT);
+        case "in":
+            return makeToken(TokenType.IN);
+        case "print":
+            return makeToken(TokenType.PRINT);
+        case "return":
+            return makeToken(TokenType.RETURN);
+        case "match":
+            return makeToken(TokenType.MATCH);
+        case "until":
+            return makeToken(TokenType.UNTIL);
+        default:
+            return makeToken(TokenType.IDENTIFIER);
     }
 }
 
@@ -168,7 +225,12 @@ function isNumber(char: string): boolean {
 }
 
 function makeToken(type: TokenType, literal: any = null): Token {
-    return new Token(type, source.slice(startIndex, currentIndex), literal, line);
+    return new Token(
+        type,
+        source.slice(startIndex, currentIndex),
+        literal,
+        line
+    );
 }
 
 function eatLineComment(): void {

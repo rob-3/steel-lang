@@ -1,7 +1,7 @@
 const fs = require("fs");
 const rl = require("readline").createInterface({
     input: process.stdin,
-    output: process.stdout,
+    output: process.stdout
 });
 
 import tokenize from "./Tokenizer";
@@ -14,7 +14,7 @@ if (process.argv.length === 2) {
     startRepl();
 } else {
     let filename = process.argv[2];
-    fs.readFile(filename, {encoding: "utf-8"}, (err, contents) => {
+    fs.readFile(filename, { encoding: "utf-8" }, (err, contents) => {
         if (err) {
             console.log("There was a problem reading the file.");
             process.exitCode = 1;
@@ -47,10 +47,10 @@ function run(source: string, repl: boolean, scope: Scope): Scope {
     let tokens = tokenize(source);
     let ast: any = parse(tokens);
     for (let stmt of ast) {
-        let [val, newScope]  = exprEval(stmt, scope);
+        let [val, newScope] = exprEval(stmt, scope);
         scope = newScope;
         if (stmt instanceof Expr && repl && val !== undefined) {
-            console.log(val)
+            console.log(val);
         }
     }
     return scope;

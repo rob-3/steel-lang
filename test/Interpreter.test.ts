@@ -1,4 +1,10 @@
-import { setPrintFn, cfxEval as _cfxEval, cfxExec as _cfxExec, exprEval, getState } from "../src/Interpreter";
+import {
+    setPrintFn,
+    cfxEval as _cfxEval,
+    cfxExec as _cfxExec,
+    exprEval,
+    getState
+} from "../src/Interpreter";
 import { Expr } from "../src/Expr";
 import Scope from "../src/Scope";
 import chai = require("chai");
@@ -14,7 +20,6 @@ const cfxExec = (src: string, printfn = null) => {
     if (printfn) setPrintFn(printfn);
     return _cfxExec(src);
 };
-
 
 describe("exprEval()", () => {
     describe("literals", () => {
@@ -143,8 +148,9 @@ describe("exprEval()", () => {
         });
 
         it("should evaluate if stmts", () => {
-            expect(cfxEval(
-                `
+            expect(
+                cfxEval(
+                    `
                 let a = 5
                 if a == 5 {
                     6
@@ -152,30 +158,34 @@ describe("exprEval()", () => {
                     7
                 }
                 `
-            )).to.equal(6);
+                )
+            ).to.equal(6);
         });
 
         it("should evaluate while stmts", () => {
-            expect(cfxEval(
-                `
+            expect(
+                cfxEval(
+                    `
                 var a = 0
                 while a < 5 {
                     a = a + 1
                 }
                 `
-            )).to.equal(5);
+                )
+            ).to.equal(5);
         });
 
         it("should evalulate until stmts", () => {
-            expect(cfxEval(
-                `
+            expect(
+                cfxEval(
+                    `
                 var a = 0
                 until a == 5 {
                     a = a + 1
                 }
                 `
-            )).to.equal(5);
-            
+                )
+            ).to.equal(5);
         });
     });
 
@@ -184,8 +194,8 @@ describe("exprEval()", () => {
             class UnhandledExpr implements Expr {
                 copy = () => this;
                 map = () => this;
-            };
-            expect(() => exprEval(new UnhandledExpr, new Scope())).to.throw();
+            }
+            expect(() => exprEval(new UnhandledExpr(), new Scope())).to.throw();
         });
     });
 });
@@ -252,11 +262,13 @@ describe("exec()", () => {
         });
 
         it("should support then", () => {
-            expect(cfxEval(
-                `
+            expect(
+                cfxEval(
+                    `
                 let a = if false then 5 else 6
                 `
-            )).to.equal(6);
+                )
+            ).to.equal(6);
         });
     });
 
@@ -267,7 +279,7 @@ describe("exec()", () => {
             print a
             a = a + 1
         }
-        `
+        `;
         it("should loop until the condition is met", () => {
             let spy = chai.spy();
             cfxExec(src, spy);
@@ -294,7 +306,7 @@ describe("exec()", () => {
             fun a = () -> {
                 print 5
             }
-            `
+            `;
             it("should not throw on function definition", () => {
                 expect(() => cfxExec(src, () => {})).to.not.throw();
             });
@@ -330,12 +342,12 @@ describe("exec()", () => {
                 }
 
                 a()
-                `
+                `;
                 expect(cfxEval(src)).to.equal(5);
             });
         });
         describe("functions with arguments", () => {
-           let src = `
+            let src = `
            fun a = (a, b) -> {
                 print a + b
            }
@@ -397,7 +409,7 @@ describe("exec()", () => {
                 }
 
                 fib(4)
-                `
+                `;
                 expect(cfxEval(src)).to.equal(5);
             });
 
@@ -412,21 +424,21 @@ describe("exec()", () => {
                 }
 
                 b(a, 4, 5)
-                `
-                expect(cfxEval(src)).to.equal(9)
+                `;
+                expect(cfxEval(src)).to.equal(9);
             });
         });
 
         describe("lambdas", () => {
             it("should permit anonymous function style declaration", () => {
-               let src = `
+                let src = `
                let a = (a, b) -> {
                    a * b
                }
 
                a(5, 6)
-               `
-               expect(cfxEval(src)).to.equal(30);
+               `;
+                expect(cfxEval(src)).to.equal(30);
             });
 
             it("should allow anonymous functions to be passed inline", () => {
@@ -436,43 +448,50 @@ describe("exec()", () => {
                 }
 
                 math(a -> { a + 3 }, 2, 3)
-                `
+                `;
                 expect(cfxEval(src)).to.equal(15);
             });
 
             it("should allow short lambda syntax without parentheses", () => {
-               expect(cfxEval(
-                `
+                expect(
+                    cfxEval(
+                        `
                 let double = a -> a * 2
 
                 double(2)
                 `
-               )).to.equal(4);
+                    )
+                ).to.equal(4);
             });
 
             it("should allow short lambda syntax with parentheses", () => {
-               expect(cfxEval(
-                `
+                expect(
+                    cfxEval(
+                        `
                 let double = (a) -> a * 2
 
                 double(2)
                 `
-               )).to.equal(4);
+                    )
+                ).to.equal(4);
             });
 
             it("should allow short lambda syntax with parentheses and multiple args", () => {
-               expect(cfxEval(
-                `
+                expect(
+                    cfxEval(
+                        `
                 let sum = (a, b) -> a + b
 
                 sum(2, 6)
                 `
-               )).to.equal(8);
+                    )
+                ).to.equal(8);
             });
 
             it("should allow a returned function to be called", () => {
-                expect(cfxEval(
-                    `
+                expect(
+                    cfxEval(
+                        `
                     fun a = () -> {
                         fun b = () -> {
                             5
@@ -481,54 +500,63 @@ describe("exec()", () => {
 
                     a()()
                     `
-                )).to.equal(5)
+                    )
+                ).to.equal(5);
             });
 
             it("should throw if a noncallable object is called", () => {
-                expect(() => cfxEval(
-                    `
+                expect(() =>
+                    cfxEval(
+                        `
                     5()
                     `
-                )).to.throw("Can't call 5 because it is not a function.")
+                    )
+                ).to.throw("Can't call 5 because it is not a function.");
             });
         });
 
         describe("hoisted functions", () => {
             it("should allow a basic hoisted function", () => {
-                expect(cfxEval(
-                    `
+                expect(
+                    cfxEval(
+                        `
                     getFive()
 
                     fun getFive = () -> 5
                     `
-                )).to.equal(5);
+                    )
+                ).to.equal(5);
             });
         });
     });
 
     describe("pattern matching", () => {
         it("should not throw on match keyword", () => {
-            expect(() => cfxEval(
-                `
+            expect(() =>
+                cfxEval(
+                    `
                 let x = 15
                 match x {
                     15 => "correct"
                     _ => "wrong"
                 }
                 `
-            )).to.not.throw()
+                )
+            ).to.not.throw();
         });
 
         it("should return the appropriate value", () => {
-            expect(cfxEval(
-                `
+            expect(
+                cfxEval(
+                    `
                 let x = 15
                 match x {
                     15 => "correct"
                     _ => "wrong"
                 }
                 `
-            )).to.equal("correct");
+                )
+            ).to.equal("correct");
         });
 
         it("should be able to be used as an expression", () => {
@@ -543,32 +571,38 @@ describe("exec()", () => {
                     4 => "def nope"
                     _ => "yep"
                 }
-                `, spy);
+                `,
+                spy
+            );
             expect(spy).to.have.be.called.with("yep");
         });
 
         it("should be able to match strings", () => {
-            expect(cfxEval(
-                `
+            expect(
+                cfxEval(
+                    `
                 let x = "hello"
                 match x {
                     "hello" => "correct"
                     _ => "incorrect"
                 }
                 `
-            )).to.equal("correct");
+                )
+            ).to.equal("correct");
         });
 
         it("should be able to match booleans", () => {
-            expect(cfxEval(
-                `
+            expect(
+                cfxEval(
+                    `
                 match true {
                     true => "correct"
                     false => "wrong"
                     _ => "really wrong"
                 }
                 `
-            )).to.equal("correct");
+                )
+            ).to.equal("correct");
         });
     });
 });

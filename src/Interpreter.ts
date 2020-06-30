@@ -1,13 +1,22 @@
-import { 
-    Expr, VariableExpr, BinaryExpr, 
-    PrimaryExpr, UnaryExpr, GroupingExpr,
-    CallExpr, FunctionExpr, UnderscoreExpr,
-
-    VariableDeclarationStmt, PrintStmt, 
-    VariableAssignmentStmt, IfStmt, BlockStmt,
-    WhileStmt, ReturnStmt, MatchStmt,
+import {
+    Expr,
+    VariableExpr,
+    BinaryExpr,
+    PrimaryExpr,
+    UnaryExpr,
+    GroupingExpr,
+    CallExpr,
+    FunctionExpr,
+    UnderscoreExpr,
+    VariableDeclarationStmt,
+    PrintStmt,
+    VariableAssignmentStmt,
+    IfStmt,
+    BlockStmt,
+    WhileStmt,
+    ReturnStmt,
+    MatchStmt,
     FunctionDefinition,
-
     MatchCase
 } from "./Expr";
 import TokenType from "./TokenType";
@@ -20,8 +29,8 @@ export const getState = (arr: [Value, Scope]) => arr[1];
 import { CfxFunction, Value } from "./InterpreterHelpers";
 
 let printfn = (thing: Value, scope: Scope): [Value, Scope] => {
-    let text = String(thing)
-    console.log(text)
+    let text = String(thing);
+    console.log(text);
     return [String(thing), scope];
 };
 
@@ -29,7 +38,7 @@ export function setPrintFn(fn): void {
     printfn = (val: Value, scope: Scope) => {
         fn(val);
         return [val, scope];
-    }
+    };
 }
 
 export function cfxExec(src: string): Scoped<Value> {
@@ -60,8 +69,12 @@ function lookup(identifier: string, scope: Scope): Value {
     }
 }
 
-function define(key: string, evaluatedExpr: Value, immutable: boolean, scope: Scope):
-    Scoped<Value> {
+function define(
+    key: string,
+    evaluatedExpr: Value,
+    immutable: boolean,
+    scope: Scope
+): Scoped<Value> {
     if (!scope.has(key) || !scope.get(key)[1]) {
         scope.setLocal(key, [evaluatedExpr, immutable]);
         return [evaluatedExpr, scope];
@@ -70,7 +83,11 @@ function define(key: string, evaluatedExpr: Value, immutable: boolean, scope: Sc
     }
 }
 
-function assign(key: string, evaluatedExpr: Value, scope: Scope): Scoped<Value> {
+function assign(
+    key: string,
+    evaluatedExpr: Value,
+    scope: Scope
+): Scoped<Value> {
     let variable = scope.get(key);
     if (variable === null) {
         throw Error(`Cannot assign to undefined variable "${key}".`);
@@ -91,9 +108,10 @@ function assign(key: string, evaluatedExpr: Value, scope: Scope): Scoped<Value> 
 export function cfxEval(src: string, scope: Scope): Value {
     let ast = parse(tokenize(src));
     return getVal(
-        ast.reduce<[Value, Scope]>(
-            (acc, cur) => exprEval(cur, getState(acc)),
-        [null, scope])
+        ast.reduce<[Value, Scope]>((acc, cur) => exprEval(cur, getState(acc)), [
+            null,
+            scope
+        ])
     );
 }
 
@@ -112,7 +130,7 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
                 return [plus(leftVal, rightVal), newScope2];
             case TokenType.MINUS:
                 return [minus(leftVal, rightVal), newScope2];
-            case TokenType.PLUS_PLUS: 
+            case TokenType.PLUS_PLUS:
                 return [plusPlus(leftVal, rightVal), newScope2];
             case TokenType.STAR:
                 return [star(leftVal, rightVal), newScope2];
@@ -135,14 +153,16 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
             case TokenType.EQUAL_EQUAL:
                 return [equal(leftVal, rightVal), newScope2];
             default:
-                throw Error(`FIXME: Unhandled operator type "${expr.operator}"`);
+                throw Error(
+                    `FIXME: Unhandled operator type "${expr.operator}"`
+                );
         }
     } else if (expr instanceof UnaryExpr) {
         let [value, newScope] = exprEval(expr.right, scope);
         switch (expr.operator.type) {
             case TokenType.MINUS:
                 return [opposite(value), newScope];
-            case TokenType.NOT: 
+            case TokenType.NOT:
                 return [not(value), newScope];
         }
     } else if (expr instanceof GroupingExpr) {
@@ -208,7 +228,7 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
             if (equal(caseValue, matchExprValue)) {
                 return exprEval(matchCase.expr, newScope);
             }
-        };
+        }
         throw Error("Pattern match failed.");
     } else if (expr instanceof FunctionDefinition) {
         return exprEval(expr.definition, scope);
@@ -232,7 +252,7 @@ function call(fn: CfxFunction, args: Expr[], scope: Scope): Scoped<any> {
  * number.
  */
 function opposite(right: Value): number {
-    if (assertNumber(right)) return -<number>right;
+    if (assertNumber(right)) return -(<number>right);
     else throw Error('"-" can only be used on a number');
 }
 
@@ -249,8 +269,7 @@ function minus(left: Value, right: Value): number {
 }
 
 function plusPlus(left: Value, right: Value): string {
-    if (typeof left === "string" &&
-        typeof right === "string") {
+    if (typeof left === "string" && typeof right === "string") {
         return left.concat(right);
     } else throw Error('Operands of "++" must be strings.');
 }
@@ -271,7 +290,6 @@ function and(left: Value, right: Value): boolean {
     if (assertBool(left, right)) {
         return <boolean>left && <boolean>right;
     } else throw Error('Operands of "and" must be booleans.');
-    
 }
 
 function or(left: Value, right: Value): boolean {
@@ -280,7 +298,6 @@ function or(left: Value, right: Value): boolean {
     } else {
         throw Error('Operands of "or" must be booleans.');
     }
-    
 }
 
 function assertNumber(...literals: any[]): boolean {
@@ -322,7 +339,12 @@ function equal(left: Value, right: Value): boolean {
     return left === right;
 }
 
-function numberComparision(left: Value, right: Value, operator: (left, right) => boolean, err: string): boolean {
+function numberComparision(
+    left: Value,
+    right: Value,
+    operator: (left, right) => boolean,
+    err: string
+): boolean {
     if (assertNumber(left, right)) {
         return operator(left, right);
     } else throw Error(`Operands of ${err} should be numbers.`);

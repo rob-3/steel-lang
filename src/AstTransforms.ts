@@ -1,8 +1,6 @@
 import { Expr, BlockStmt, FunctionDefinition } from "./Expr";
 
-const astTransforms: ((expr: Expr) => Expr)[] = [
-    hoistFunctions
-];
+const astTransforms: ((expr: Expr) => Expr)[] = [hoistFunctions];
 
 export default astTransforms;
 
@@ -22,4 +20,3 @@ function hoistFunctions(expr: Expr) {
         return expr;
     }
 }
-
