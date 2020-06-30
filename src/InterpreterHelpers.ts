@@ -2,7 +2,7 @@ import { Scoped, exprEval, getState, getVal } from "./Interpreter";
 import { FunctionExpr, ReturnStmt } from "./Expr";
 import Scope from "./Scope";
 
-export class CfxFunction {
+export class StlFunction {
     funExpr: FunctionExpr;
     constructor(funExpr: FunctionExpr) {
         this.funExpr = funExpr;
@@ -20,4 +20,4 @@ export class CfxFunction {
     }
 }
 
-export type Value = number | boolean | string | CfxFunction;
+export type Value = number | boolean | string | StlFunction;

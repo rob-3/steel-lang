@@ -1,7 +1,7 @@
 import {
     setPrintFn,
-    cfxEval as _cfxEval,
-    cfxExec as _cfxExec,
+    stlEval as _stlEval,
+    stlExec as _stlExec,
     exprEval,
     getState
 } from "../src/Interpreter";
@@ -12,31 +12,31 @@ import spies = require("chai-spies");
 chai.use(spies);
 const expect = chai.expect;
 
-const cfxEval = (src: string, scope: Scope = new Scope()) => {
-    return _cfxEval(src, scope);
+const stlEval = (src: string, scope: Scope = new Scope()) => {
+    return _stlEval(src, scope);
 };
 
-const cfxExec = (src: string, printfn = null) => {
+const stlExec = (src: string, printfn = null) => {
     if (printfn) setPrintFn(printfn);
-    return _cfxExec(src);
+    return _stlExec(src);
 };
 
 describe("exprEval()", () => {
     describe("literals", () => {
         it("should evaluate number literals", () => {
-            expect(cfxEval("2")).to.equal(2);
-            expect(cfxEval("-2")).to.equal(-2);
+            expect(stlEval("2")).to.equal(2);
+            expect(stlEval("-2")).to.equal(-2);
         });
 
         it("should evaluate string literals", () => {
             let src = `"happy day"`;
-            let result = cfxEval(src);
+            let result = stlEval(src);
             expect(result).to.equal("happy day");
         });
 
         it("should evaluate boolean literals", () => {
             let src = "true";
-            let result = cfxEval(src);
+            let result = stlEval(src);
             expect(result).to.equal(true);
         });
     });
@@ -44,96 +44,96 @@ describe("exprEval()", () => {
     describe("math", () => {
         it("should do addition correctly", () => {
             let src = "2 + 2";
-            let result = cfxEval(src);
+            let result = stlEval(src);
             expect(result).to.equal(4);
         });
 
         it("should do subtraction correctly", () => {
             let src = "2 - 2";
-            let result = cfxEval(src);
+            let result = stlEval(src);
             expect(result).to.equal(0);
         });
 
         it("should do multiplication correctly", () => {
             let src = "2 * 5";
-            let result = cfxEval(src);
+            let result = stlEval(src);
             expect(result).to.equal(10);
         });
 
         it("should do division correctly", () => {
             let src = "2 / 2";
-            let result = cfxEval(src);
+            let result = stlEval(src);
             expect(result).to.equal(1);
         });
 
         it("should do floating point division correctly", () => {
             let src = "5 / 2";
-            let result = cfxEval(src);
+            let result = stlEval(src);
             expect(result).to.equal(2.5);
         });
 
         it("should follow order of operations", () => {
             let src = "5 / 5 + 3 * 2";
-            let result = cfxEval(src);
+            let result = stlEval(src);
             expect(result).to.equal(7);
         });
 
         it("should evaluate a modulus correctly", () => {
-            expect(cfxEval("5 % 5")).to.equal(0);
-            expect(cfxEval("5 % 4")).to.equal(1);
-            expect(cfxEval("5 % 2")).to.equal(1);
+            expect(stlEval("5 % 5")).to.equal(0);
+            expect(stlEval("5 % 4")).to.equal(1);
+            expect(stlEval("5 % 2")).to.equal(1);
         });
     });
 
     describe("comparisions", () => {
         it("should handle equality checks", () => {
-            expect(cfxEval("2 == 2")).to.equal(true);
-            expect(cfxEval("2 == 3")).to.equal(false);
+            expect(stlEval("2 == 2")).to.equal(true);
+            expect(stlEval("2 == 3")).to.equal(false);
         });
 
         it("should handle greater equal", () => {
-            expect(cfxEval("2 >= 2")).to.equal(true);
-            expect(cfxEval("1 >= 2")).to.equal(false);
+            expect(stlEval("2 >= 2")).to.equal(true);
+            expect(stlEval("1 >= 2")).to.equal(false);
         });
 
         it("should handle less equal", () => {
-            expect(cfxEval("2 <= 2")).to.equal(true);
-            expect(cfxEval("4 <= 3")).to.equal(false);
+            expect(stlEval("2 <= 2")).to.equal(true);
+            expect(stlEval("4 <= 3")).to.equal(false);
         });
 
         it("should handle greater than", () => {
-            expect(cfxEval("2 > 1")).to.equal(true);
-            expect(cfxEval("1 > 2")).to.equal(false);
+            expect(stlEval("2 > 1")).to.equal(true);
+            expect(stlEval("1 > 2")).to.equal(false);
         });
 
         it("should handle less than", () => {
-            expect(cfxEval("2 < 3")).to.equal(true);
-            expect(cfxEval("4 < 3")).to.equal(false);
+            expect(stlEval("2 < 3")).to.equal(true);
+            expect(stlEval("4 < 3")).to.equal(false);
         });
     });
 
     describe("booleans", () => {
         it("should evaluate logical AND correctly", () => {
-            expect(cfxEval("true and true")).to.equal(true);
-            expect(cfxEval("true and false")).to.equal(false);
-            expect(cfxEval("false and true")).to.equal(false);
-            expect(cfxEval("false and false")).to.equal(false);
+            expect(stlEval("true and true")).to.equal(true);
+            expect(stlEval("true and false")).to.equal(false);
+            expect(stlEval("false and true")).to.equal(false);
+            expect(stlEval("false and false")).to.equal(false);
         });
 
         it("should evaluate logical OR correctly", () => {
-            expect(cfxEval("true or true")).to.equal(true);
-            expect(cfxEval("true or false")).to.equal(true);
-            expect(cfxEval("false or true")).to.equal(true);
-            expect(cfxEval("false or false")).to.equal(false);
+            expect(stlEval("true or true")).to.equal(true);
+            expect(stlEval("true or false")).to.equal(true);
+            expect(stlEval("false or true")).to.equal(true);
+            expect(stlEval("false or false")).to.equal(false);
         });
 
         it("should evaluate logical NOT correctly", () => {
-            expect(cfxEval("not true")).to.equal(false);
-            expect(cfxEval("not false")).to.equal(true);
+            expect(stlEval("not true")).to.equal(false);
+            expect(stlEval("not false")).to.equal(true);
         });
 
         it("should handle logical NOT at a lower precedence than AND and OR", () => {
-            expect(cfxEval("not true and false")).to.equal(false);
+            expect(stlEval("not true and false")).to.equal(false);
         });
 
         it("should evaluate block stmts", () => {
@@ -144,12 +144,12 @@ describe("exprEval()", () => {
                 a + b
             }
             `;
-            expect(cfxEval(src)).to.equal(2);
+            expect(stlEval(src)).to.equal(2);
         });
 
         it("should evaluate if stmts", () => {
             expect(
-                cfxEval(
+                stlEval(
                     `
                 let a = 5
                 if a == 5 {
@@ -164,7 +164,7 @@ describe("exprEval()", () => {
 
         it("should evaluate while stmts", () => {
             expect(
-                cfxEval(
+                stlEval(
                     `
                 var a = 0
                 while a < 5 {
@@ -177,7 +177,7 @@ describe("exprEval()", () => {
 
         it("should evalulate until stmts", () => {
             expect(
-                cfxEval(
+                stlEval(
                     `
                 var a = 0
                 until a == 5 {
@@ -205,7 +205,7 @@ describe("exec()", () => {
         it("should execute an if stmt with true condition", () => {
             let src = "if (true) {\nprint 5\n}";
             let spy = chai.spy();
-            cfxExec(src, spy);
+            stlExec(src, spy);
             expect(spy).to.have.been.called.with(5);
         });
 
@@ -216,7 +216,7 @@ describe("exec()", () => {
             }
             `;
             let spy = chai.spy();
-            cfxExec(src, spy);
+            stlExec(src, spy);
             expect(spy).not.to.have.been.called();
         });
 
@@ -229,7 +229,7 @@ describe("exec()", () => {
             }
             `;
             let spy = chai.spy();
-            cfxExec(src, spy);
+            stlExec(src, spy);
             expect(spy).to.have.been.called.once;
             expect(spy).to.have.been.called.with(6);
         });
@@ -243,7 +243,7 @@ describe("exec()", () => {
             }
             `;
             let spy = chai.spy();
-            cfxExec(src, spy);
+            stlExec(src, spy);
             expect(spy).not.to.have.been.called.with(5);
         });
 
@@ -256,14 +256,14 @@ describe("exec()", () => {
             }
             `;
             let spy = chai.spy();
-            cfxExec(src, spy);
+            stlExec(src, spy);
             expect(spy).not.to.have.been.called.with(5);
             expect(spy).to.have.been.called.with(6);
         });
 
         it("should support then", () => {
             expect(
-                cfxEval(
+                stlEval(
                     `
                 let a = if false then 5 else 6
                 `
@@ -282,7 +282,7 @@ describe("exec()", () => {
         `;
         it("should loop until the condition is met", () => {
             let spy = chai.spy();
-            cfxExec(src, spy);
+            stlExec(src, spy);
             expect(spy).to.have.been.called.exactly(10);
         });
     });
@@ -290,13 +290,13 @@ describe("exec()", () => {
     describe("variables", () => {
         it("should be able to access a variable", () => {
             let src = "var a = 14";
-            let scope: Scope = getState(cfxExec(src));
-            expect(cfxEval("a", scope)).to.equal(14);
+            let scope: Scope = getState(stlExec(src));
+            expect(stlEval("a", scope)).to.equal(14);
         });
 
         it("should be able to assign to a variable", () => {
-            let scope = getState(cfxExec("var a = 14\na = 15"));
-            expect(cfxEval("a", scope)).to.equal(15);
+            let scope = getState(stlExec("var a = 14\na = 15"));
+            expect(stlEval("a", scope)).to.equal(15);
         });
     });
 
@@ -308,19 +308,19 @@ describe("exec()", () => {
             }
             `;
             it("should not throw on function definition", () => {
-                expect(() => cfxExec(src, () => {})).to.not.throw();
+                expect(() => stlExec(src, () => {})).to.not.throw();
             });
 
             it("should not run the definition of a function", () => {
                 let spy = chai.spy();
-                cfxExec(src, spy);
+                stlExec(src, spy);
                 expect(spy).not.to.have.been.called();
             });
 
             it("should be callable", () => {
                 let src2 = src + "a()";
                 let spy = chai.spy();
-                cfxExec(src2, spy);
+                stlExec(src2, spy);
                 expect(spy).to.have.been.called.once;
                 expect(spy).to.have.been.called.with(5);
             });
@@ -331,7 +331,7 @@ describe("exec()", () => {
 
                 a()
                 `;
-                expect(cfxEval(src)).to.equal(5);
+                expect(stlEval(src)).to.equal(5);
             });
 
             it("should allow early returns", () => {
@@ -343,7 +343,7 @@ describe("exec()", () => {
 
                 a()
                 `;
-                expect(cfxEval(src)).to.equal(5);
+                expect(stlEval(src)).to.equal(5);
             });
         });
         describe("functions with arguments", () => {
@@ -353,19 +353,19 @@ describe("exec()", () => {
            }
            `;
             it("should not throw on function definition", () => {
-                expect(() => cfxExec(src, () => {})).to.not.throw();
+                expect(() => stlExec(src, () => {})).to.not.throw();
             });
 
             it("should not run the definition of a function", () => {
                 let spy = chai.spy();
-                cfxExec(src, spy);
+                stlExec(src, spy);
                 expect(spy).not.to.have.been.called();
             });
 
             it("should be callable", () => {
                 let src2 = src + "a(5, 6)";
                 let spy = chai.spy();
-                cfxExec(src2, spy);
+                stlExec(src2, spy);
                 expect(spy).to.have.been.called.once;
                 expect(spy).to.have.been.called.with(11);
             });
@@ -380,7 +380,7 @@ describe("exec()", () => {
 
                 sum(4, 7)
                 `;
-                expect(cfxEval(src)).to.equal(11);
+                expect(stlEval(src)).to.equal(11);
             });
 
             it("should allow recursion", () => {
@@ -395,7 +395,7 @@ describe("exec()", () => {
 
                 fac(4)
                 `;
-                expect(cfxEval(src)).to.equal(24);
+                expect(stlEval(src)).to.equal(24);
             });
 
             it("should be able to implement fib", () => {
@@ -410,7 +410,7 @@ describe("exec()", () => {
 
                 fib(4)
                 `;
-                expect(cfxEval(src)).to.equal(5);
+                expect(stlEval(src)).to.equal(5);
             });
 
             it("should be able to be passed into another function", () => {
@@ -425,7 +425,7 @@ describe("exec()", () => {
 
                 b(a, 4, 5)
                 `;
-                expect(cfxEval(src)).to.equal(9);
+                expect(stlEval(src)).to.equal(9);
             });
         });
 
@@ -438,7 +438,7 @@ describe("exec()", () => {
 
                a(5, 6)
                `;
-                expect(cfxEval(src)).to.equal(30);
+                expect(stlEval(src)).to.equal(30);
             });
 
             it("should allow anonymous functions to be passed inline", () => {
@@ -449,12 +449,12 @@ describe("exec()", () => {
 
                 math(a -> { a + 3 }, 2, 3)
                 `;
-                expect(cfxEval(src)).to.equal(15);
+                expect(stlEval(src)).to.equal(15);
             });
 
             it("should allow short lambda syntax without parentheses", () => {
                 expect(
-                    cfxEval(
+                    stlEval(
                         `
                 let double = a -> a * 2
 
@@ -466,7 +466,7 @@ describe("exec()", () => {
 
             it("should allow short lambda syntax with parentheses", () => {
                 expect(
-                    cfxEval(
+                    stlEval(
                         `
                 let double = (a) -> a * 2
 
@@ -478,7 +478,7 @@ describe("exec()", () => {
 
             it("should allow short lambda syntax with parentheses and multiple args", () => {
                 expect(
-                    cfxEval(
+                    stlEval(
                         `
                 let sum = (a, b) -> a + b
 
@@ -490,7 +490,7 @@ describe("exec()", () => {
 
             it("should allow a returned function to be called", () => {
                 expect(
-                    cfxEval(
+                    stlEval(
                         `
                     fun a = () -> {
                         fun b = () -> {
@@ -506,7 +506,7 @@ describe("exec()", () => {
 
             it("should throw if a noncallable object is called", () => {
                 expect(() =>
-                    cfxEval(
+                    stlEval(
                         `
                     5()
                     `
@@ -518,7 +518,7 @@ describe("exec()", () => {
         describe("hoisted functions", () => {
             it("should allow a basic hoisted function", () => {
                 expect(
-                    cfxEval(
+                    stlEval(
                         `
                     getFive()
 
@@ -533,7 +533,7 @@ describe("exec()", () => {
     describe("pattern matching", () => {
         it("should not throw on match keyword", () => {
             expect(() =>
-                cfxEval(
+                stlEval(
                     `
                 let x = 15
                 match x {
@@ -547,7 +547,7 @@ describe("exec()", () => {
 
         it("should return the appropriate value", () => {
             expect(
-                cfxEval(
+                stlEval(
                     `
                 let x = 15
                 match x {
@@ -561,7 +561,7 @@ describe("exec()", () => {
 
         it("should be able to be used as an expression", () => {
             let spy = chai.spy();
-            cfxExec(
+            stlExec(
                 `
                 let a = 4
                 let b = a - 2
@@ -579,7 +579,7 @@ describe("exec()", () => {
 
         it("should be able to match strings", () => {
             expect(
-                cfxEval(
+                stlEval(
                     `
                 let x = "hello"
                 match x {
@@ -593,7 +593,7 @@ describe("exec()", () => {
 
         it("should be able to match booleans", () => {
             expect(
-                cfxEval(
+                stlEval(
                     `
                 match true {
                     true => "correct"

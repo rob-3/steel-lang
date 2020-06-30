@@ -26,7 +26,7 @@ import parse from "./Parser";
 export type Scoped<T> = [T, Scope];
 export const getVal = (arr: [Value, Scope]) => arr[0];
 export const getState = (arr: [Value, Scope]) => arr[1];
-import { CfxFunction, Value } from "./InterpreterHelpers";
+import { StlFunction, Value } from "./InterpreterHelpers";
 
 let printfn = (thing: Value, scope: Scope): [Value, Scope] => {
     let text = String(thing);
@@ -41,7 +41,7 @@ export function setPrintFn(fn): void {
     };
 }
 
-export function cfxExec(src: string): Scoped<Value> {
+export function stlExec(src: string): Scoped<Value> {
     let stmts: Expr[] = parse(tokenize(src));
     return execStmts(stmts, new Scope());
 }
@@ -105,7 +105,7 @@ function assign(
 /*
  * String-based eval() for conflux.
  */
-export function cfxEval(src: string, scope: Scope): Value {
+export function stlEval(src: string, scope: Scope): Value {
     let ast = parse(tokenize(src));
     return getVal(
         ast.reduce<[Value, Scope]>((acc, cur) => exprEval(cur, getState(acc)), [
@@ -171,13 +171,13 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
         return [lookup(expr.identifier, scope), scope];
     } else if (expr instanceof CallExpr) {
         let [maybeFn, newScope] = exprEval(expr.callee, scope);
-        if (maybeFn instanceof CfxFunction) {
+        if (maybeFn instanceof StlFunction) {
             return call(maybeFn, expr.args, newScope);
         } else {
             throw Error(`Can't call ${maybeFn} because it is not a function.`);
         }
     } else if (expr instanceof FunctionExpr) {
-        return [new CfxFunction(expr), scope];
+        return [new StlFunction(expr), scope];
     } else if (expr instanceof PrintStmt) {
         let [printValue, newScope] = exprEval(expr.thingToPrint, scope);
         return printfn(printValue, newScope);
@@ -237,7 +237,7 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
     }
 }
 
-function call(fn: CfxFunction, args: Expr[], scope: Scope): Scoped<any> {
+function call(fn: StlFunction, args: Expr[], scope: Scope): Scoped<any> {
     let argValues: Value[] = [];
     for (let arg of args) {
         let [value, newScope] = exprEval(arg, scope);
