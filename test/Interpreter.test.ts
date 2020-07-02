@@ -21,7 +21,7 @@ const stlExec = (src: string, printfn = null) => {
     return _stlExec(src);
 };
 
-describe("exprEval()", () => {
+describe("stlEval()", () => {
     describe("literals", () => {
         it("should evaluate number literals", () => {
             expect(stlEval("2")).to.equal(2);
