@@ -16,7 +16,7 @@ import {
     WhileStmt,
     ReturnStmt,
     MatchStmt,
-    FunctionDefinition,
+    FunctionDefinition
 } from "./Expr";
 import TokenType from "./TokenType";
 import Scope from "./Scope";
@@ -38,11 +38,6 @@ export function setPrintFn(fn): void {
         fn(val);
         return [val, scope];
     };
-}
-
-export function stlExec(src: string): Scoped<Value> {
-    let stmts: Expr[] = parse(tokenize(src));
-    return execStmts(stmts, new Scope());
 }
 
 function execStmts(stmts: Expr[], scope: Scope): Scoped<Value> {
@@ -104,13 +99,11 @@ function assign(
 /*
  * String-based eval() for conflux.
  */
-export function stlEval(src: string, scope: Scope): Value {
+export function stlEval(src: string, scope: Scope): Scoped<Value> {
     let ast = parse(tokenize(src));
-    return getVal(
-        ast.reduce<[Value, Scope]>((acc, cur) => exprEval(cur, getState(acc)), [
-            null,
-            scope
-        ])
+    return ast.reduce<[Value, Scope]>(
+        (acc, cur) => exprEval(cur, getState(acc)),
+        [null, scope]
     );
 }
 

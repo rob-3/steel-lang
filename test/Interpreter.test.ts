@@ -1,9 +1,9 @@
 import {
     setPrintFn,
     stlEval as _stlEval,
-    stlExec as _stlExec,
     exprEval,
-    getState
+    getState,
+    getVal
 } from "../src/Interpreter";
 import { Expr } from "../src/Expr";
 import Scope from "../src/Scope";
@@ -13,12 +13,12 @@ chai.use(spies);
 const expect = chai.expect;
 
 const stlEval = (src: string, scope: Scope = new Scope()) => {
-    return _stlEval(src, scope);
+    return getVal(_stlEval(src, scope));
 };
 
 const stlExec = (src: string, printfn = null) => {
     if (printfn) setPrintFn(printfn);
-    return _stlExec(src);
+    return _stlEval(src, new Scope());
 };
 
 describe("stlEval()", () => {
