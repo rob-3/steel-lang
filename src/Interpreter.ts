@@ -17,7 +17,6 @@ import {
     ReturnStmt,
     MatchStmt,
     FunctionDefinition,
-    MatchCase
 } from "./Expr";
 import TokenType from "./TokenType";
 import Scope from "./Scope";
