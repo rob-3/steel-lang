@@ -74,8 +74,30 @@ function eatNewlines(): void {
 
 function makeStmt(): Expr {
     if (matchType(TokenType.RETURN)) return new ReturnStmt(makeExpr());
-    if (matchType(TokenType.LET)) return finishVariableDeclaration(true);
-    if (matchType(TokenType.VAR)) return finishVariableDeclaration(false);
+    if (matchType(TokenType.VAR)) {
+        if (!matchType(TokenType.IDENTIFIER)) {
+            throw Error(`Expected identifier; got "${lookAhead().lexeme}"`);
+        }
+        let identifier: string = lookBehind().lexeme;
+        if (!matchType(TokenType.LEFT_SINGLE_ARROW)) {
+            if (matchType(TokenType.EQUAL)) {
+                throw Error(
+                    `Must use <- for variable declaration and assignment, not =.`
+                );
+            } else {
+                throw Error(`Expected <-, got ${lookAhead().lexeme}`);
+            }
+        }
+        // TODO: this should break a test, but it doesn't. Write a test that
+        // breaks due to this and enable it
+        //eatNewlines();
+        let right: Expr = makeStmt();
+        if (matchType(TokenType.NEWLINE) || atEnd()) {
+            return new VariableDeclarationStmt(identifier, false, right);
+        } else {
+            throw Error("Expected a newline!");
+        }
+    }
     if (matchType(TokenType.PRINT)) return finishPrintStmt();
     if (matchType(TokenType.IF)) return finishIfStmt();
     if (matchType(TokenType.WHILE)) return finishWhileStmt();
@@ -83,8 +105,12 @@ function makeStmt(): Expr {
     if (matchType(TokenType.FUN)) return finishFunctionDeclaration();
     if (matchType(TokenType.MATCH)) return finishMatchStmt();
     if (matchType(TokenType.IDENTIFIER)) {
-        if (matchType(TokenType.EQUAL)) {
-            return finishAssignment(lookBehind(2).lexeme);
+        if (matchType(TokenType.LEFT_SINGLE_ARROW)) {
+            let identifier = lookBehind(2).lexeme;
+            return finishAssignment(identifier);
+        } else if (matchType(TokenType.EQUAL)) {
+            let identifier = lookBehind(2).lexeme;
+            return finishImmutableDeclaration(identifier);
         } else {
             backTrack();
         }
@@ -93,6 +119,16 @@ function makeStmt(): Expr {
     if (matchType(TokenType.NEWLINE))
         throw Error("Unexpected newline; parser bug.");
     return makeExpr();
+}
+
+function finishImmutableDeclaration(identifier: string): Expr {
+    eatNewlines();
+    let expr: Expr = makeStmt();
+    if (matchType(TokenType.NEWLINE) || atEnd()) {
+        return new VariableDeclarationStmt(identifier, true, expr);
+    } else {
+        throw Error("Expected a newline!");
+    }
 }
 
 function finishMatchStmt(): Expr {
@@ -254,14 +290,11 @@ function makeExpr(): Expr {
     return makeBinaryLogical();
 }
 
-function finishVariableDeclaration(immutable: boolean): Expr {
+function finishVariableDeclaration(
+    identifier: string,
+    immutable: boolean
+): Expr {
     // TODO check if variable has already been declared
-    if (!matchType(TokenType.IDENTIFIER)) {
-        if (matchType(TokenType.STRING))
-            throw Error(`Expected identifier; got a string literal.`);
-        throw Error(`Expected identifier; got "${lookAhead().lexeme}".`);
-    }
-    let identifier = lookBehind().lexeme;
     if (!matchType(TokenType.EQUAL)) {
         throw Error(`Expected "="; got "${lookAhead().lexeme}".`);
     }

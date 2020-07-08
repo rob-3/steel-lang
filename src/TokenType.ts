@@ -36,7 +36,6 @@ enum TokenType {
     NEWLINE,
 
     // keywords
-    LET,
     VAR,
     IF,
     THEN,

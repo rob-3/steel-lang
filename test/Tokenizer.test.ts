@@ -28,17 +28,15 @@ describe("tokenize()", () => {
 
     it("should ignore single line comments", () => {
         let result = tokenize(
-            `let apple = 4.3 // apple = 0 *//**/??////
-            let pancakes = apple * 3 // rando-stuff
+            `apple = 4.3 // apple = 0 *//**/??////
+            pancakes = apple * 3 // rando-stuff
             `
         );
         expect(result).to.deep.equal([
-            new Token(TokenType.LET, "let", null, 1),
             new Token(TokenType.IDENTIFIER, "apple", null, 1),
             new Token(TokenType.EQUAL, "=", null, 1),
             new Token(TokenType.NUMBER, "4.3", 4.3, 1),
             new Token(TokenType.NEWLINE, "\n", null, 1),
-            new Token(TokenType.LET, "let", null, 2),
             new Token(TokenType.IDENTIFIER, "pancakes", null, 2),
             new Token(TokenType.EQUAL, "=", null, 2),
             new Token(TokenType.IDENTIFIER, "apple", null, 2),
@@ -59,13 +57,12 @@ describe("tokenize()", () => {
         ]);
     });
 
-    it("should use LET/VAR TokenType and NEWLINE", () => {
+    it("should use VAR TokenType and NEWLINE", () => {
         let result = tokenize(
-            `let a = 23
+            `a = 23
              var b = 46`
         );
         expect(result).to.deep.equal([
-            new Token(TokenType.LET, "let", null, 1),
             new Token(TokenType.IDENTIFIER, "a", null, 1),
             new Token(TokenType.EQUAL, "=", null, 1),
             new Token(TokenType.NUMBER, "23", 23, 1),

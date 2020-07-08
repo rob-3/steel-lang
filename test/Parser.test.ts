@@ -13,7 +13,7 @@ import { expect } from "chai";
 
 describe("parse()", () => {
     it("should throw if a statement isn't terminated by a newline", () => {
-        let src = "let value = 34 let val2 = 14";
+        let src = "value = 34 val2 = 14";
         expect(() => parse(tokenize(src))).to.throw("Expected a newline!");
     });
 
@@ -28,90 +28,54 @@ describe("parse()", () => {
     });
 
     it("should throw if an invalid identifier is used", () => {
-        let src0 = "let let = 4";
-        expect(() => parse(tokenize(src0))).to.throw(
-            'Expected identifier; got "let"'
-        );
-
-        let src1 = "let var = 3";
+        /*
+        let src1 = "var = 3";
         expect(() => parse(tokenize(src1))).to.throw(
             'Expected identifier; got "var"'
         );
+        */
 
-        let src2 = "var let = 0";
-        expect(() => parse(tokenize(src2))).to.throw(
-            'Expected identifier; got "let"'
-        );
+        let src3 = "var var <- 7";
+        expect(() => parse(tokenize(src3))).to.throw();
 
-        let src3 = "var var = 7";
-        expect(() => parse(tokenize(src3))).to.throw(
-            'Expected identifier; got "var"'
-        );
+        let src4 = "2 = 34";
+        expect(() => parse(tokenize(src4))).to.throw();
 
-        let src4 = "let 2 = 34";
-        expect(() => parse(tokenize(src4))).to.throw(
-            'Expected identifier; got "2"'
-        );
+        let src5 = '"string" = 34';
+        expect(() => parse(tokenize(src5))).to.throw();
 
-        let src5 = 'let "string" = 34';
-        expect(() => parse(tokenize(src5))).to.throw(
-            "Expected identifier; got a string literal."
-        );
+        let src6 = "if = 34";
+        expect(() => parse(tokenize(src6))).to.throw();
 
-        let src6 = "let if = 34";
-        expect(() => parse(tokenize(src6))).to.throw(
-            'Expected identifier; got "if"'
-        );
+        let src7 = "else = 34";
+        expect(() => parse(tokenize(src7))).to.throw();
 
-        let src7 = "let else = 34";
-        expect(() => parse(tokenize(src7))).to.throw(
-            'Expected identifier; got "else"'
-        );
+        let src8 = "true = 34";
+        expect(() => parse(tokenize(src8))).to.throw();
 
-        let src8 = "let true = 34";
-        expect(() => parse(tokenize(src8))).to.throw(
-            'Expected identifier; got "true"'
-        );
+        let src9 = "false = 34";
+        expect(() => parse(tokenize(src9))).to.throw();
 
-        let src9 = "let false = 34";
-        expect(() => parse(tokenize(src9))).to.throw(
-            'Expected identifier; got "false"'
-        );
+        let src10 = "fun = 34";
+        expect(() => parse(tokenize(src10))).to.throw();
 
-        let src10 = "let fun = 34";
-        expect(() => parse(tokenize(src10))).to.throw(
-            'Expected identifier; got "fun"'
-        );
+        let src11 = "while = 34";
+        expect(() => parse(tokenize(src11))).to.throw();
 
-        let src11 = "let while = 34";
-        expect(() => parse(tokenize(src11))).to.throw(
-            'Expected identifier; got "while"'
-        );
+        let src12 = "for = 34";
+        expect(() => parse(tokenize(src12))).to.throw();
 
-        let src12 = "let for = 34";
-        expect(() => parse(tokenize(src12))).to.throw(
-            'Expected identifier; got "for"'
-        );
+        let src13 = "in = 34";
+        expect(() => parse(tokenize(src13))).to.throw();
 
-        let src13 = "let in = 34";
-        expect(() => parse(tokenize(src13))).to.throw(
-            'Expected identifier; got "in"'
-        );
+        let src14 = "and = 34";
+        expect(() => parse(tokenize(src14))).to.throw();
 
-        let src14 = "let and = 34";
-        expect(() => parse(tokenize(src14))).to.throw(
-            'Expected identifier; got "and"'
-        );
+        let src15 = "or = 34";
+        expect(() => parse(tokenize(src15))).to.throw();
 
-        let src15 = "let or = 34";
-        expect(() => parse(tokenize(src15))).to.throw(
-            'Expected identifier; got "or"'
-        );
-
-        let src16 = "let not = 34";
-        expect(() => parse(tokenize(src16))).to.throw(
-            'Expected identifier; got "not"'
-        );
+        let src16 = "not = 34";
+        expect(() => parse(tokenize(src16))).to.throw();
     });
 
     it("should parse `or` precedence correctly", () => {
@@ -138,9 +102,9 @@ describe("parse()", () => {
             parse(
                 tokenize(
                     `
-            var x = 0
+            var x <- 0
             while x < 5 {
-                x = x + 1
+                x <- x + 1
             }
             `
                 )
@@ -149,7 +113,7 @@ describe("parse()", () => {
     });
 
     it("should parse if-then", () => {
-        expect(parse(tokenize(`let a = if false then 5 else 6`))).to.eql([
+        expect(parse(tokenize(`a = if false then 5 else 6`))).to.eql([
             new VariableDeclarationStmt(
                 "a",
                 true,
@@ -167,9 +131,9 @@ describe("parse()", () => {
             parse(
                 tokenize(
                     `
-            var a = 5
+            var a <- 5
             until true {
-                a = a + 3
+                a <- a + 3
             }
             `
                 )

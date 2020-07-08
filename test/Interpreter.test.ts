@@ -139,8 +139,8 @@ describe("stlEval()", () => {
         it("should evaluate block stmts", () => {
             let src = `
             {
-                let a = 5
-                let b = -3
+                a = 5
+                b = -3
                 a + b
             }
             `;
@@ -151,7 +151,7 @@ describe("stlEval()", () => {
             expect(
                 stlEval(
                     `
-                let a = 5
+                a = 5
                 if a == 5 {
                     6
                 } else {
@@ -166,9 +166,9 @@ describe("stlEval()", () => {
             expect(
                 stlEval(
                     `
-                var a = 0
+                var a <- 0
                 while a < 5 {
-                    a = a + 1
+                    a <- a + 1
                 }
                 `
                 )
@@ -179,9 +179,9 @@ describe("stlEval()", () => {
             expect(
                 stlEval(
                     `
-                var a = 0
+                var a <- 0
                 until a == 5 {
-                    a = a + 1
+                    a <- a + 1
                 }
                 `
                 )
@@ -265,7 +265,7 @@ describe("exec()", () => {
             expect(
                 stlEval(
                     `
-                let a = if false then 5 else 6
+                a = if false then 5 else 6
                 `
                 )
             ).to.equal(6);
@@ -274,10 +274,10 @@ describe("exec()", () => {
 
     describe("while loops", () => {
         let src = `
-        var a = 0
+        var a <- 0
         while (a < 10) {
             print a
-            a = a + 1
+            a <- a + 1
         }
         `;
         it("should loop until the condition is met", () => {
@@ -289,13 +289,13 @@ describe("exec()", () => {
 
     describe("variables", () => {
         it("should be able to access a variable", () => {
-            let src = "var a = 14";
+            let src = "var a <- 14";
             let scope: Scope = getState(stlExec(src));
             expect(stlEval("a", scope)).to.equal(14);
         });
 
         it("should be able to assign to a variable", () => {
-            let scope = getState(stlExec("var a = 14\na = 15"));
+            let scope = getState(stlExec("var a <- 14\na <- 15"));
             expect(stlEval("a", scope)).to.equal(15);
         });
     });
@@ -372,8 +372,8 @@ describe("exec()", () => {
 
             it("should have the correct scope", () => {
                 let src = `
-                let a = 42
-                let b = 16
+                a = 42
+                b = 16
                 fun sum = (a, b) -> {
                     a + b
                 }
@@ -432,7 +432,7 @@ describe("exec()", () => {
         describe("lambdas", () => {
             it("should permit anonymous function style declaration", () => {
                 let src = `
-               let a = (a, b) -> {
+               a = (a, b) -> {
                    a * b
                }
 
@@ -443,7 +443,7 @@ describe("exec()", () => {
 
             it("should allow anonymous functions to be passed inline", () => {
                 let src = `
-                let math = (a, b, c) -> {
+                math = (a, b, c) -> {
                     a(b) * c
                 }
 
@@ -456,7 +456,7 @@ describe("exec()", () => {
                 expect(
                     stlEval(
                         `
-                let double = a -> a * 2
+                double = a -> a * 2
 
                 double(2)
                 `
@@ -468,7 +468,7 @@ describe("exec()", () => {
                 expect(
                     stlEval(
                         `
-                let double = (a) -> a * 2
+                double = (a) -> a * 2
 
                 double(2)
                 `
@@ -480,7 +480,7 @@ describe("exec()", () => {
                 expect(
                     stlEval(
                         `
-                let sum = (a, b) -> a + b
+                sum = (a, b) -> a + b
 
                 sum(2, 6)
                 `
@@ -535,7 +535,7 @@ describe("exec()", () => {
             expect(() =>
                 stlEval(
                     `
-                let x = 15
+                x = 15
                 match x {
                     15 => "correct"
                     _ => "wrong"
@@ -549,7 +549,7 @@ describe("exec()", () => {
             expect(
                 stlEval(
                     `
-                let x = 15
+                x = 15
                 match x {
                     15 => "correct"
                     _ => "wrong"
@@ -563,9 +563,9 @@ describe("exec()", () => {
             let spy = chai.spy();
             stlExec(
                 `
-                let a = 4
-                let b = a - 2
-                let c = a/b
+                a = 4
+                b = a - 2
+                c = a/b
                 print match c {
                     3 => "nope"
                     4 => "def nope"
@@ -581,7 +581,7 @@ describe("exec()", () => {
             expect(
                 stlEval(
                     `
-                let x = "hello"
+                x = "hello"
                 match x {
                     "hello" => "correct"
                     _ => "incorrect"
