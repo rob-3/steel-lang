@@ -25,6 +25,7 @@ enum TokenType {
     PLUS_PLUS,
     RIGHT_SINGLE_ARROW,
     RIGHT_DOUBLE_ARROW,
+    LEFT_SINGLE_ARROW,
 
     // literals
     STRING,

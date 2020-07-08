@@ -77,6 +77,8 @@ function scanToken(): void | Token {
         case "<":
             return match("=")
                 ? makeToken(TokenType.LESS_EQUAL)
+                : match("-")
+                ? makeToken(TokenType.LEFT_SINGLE_ARROW)
                 : makeToken(TokenType.LESS);
         case ",":
             return makeToken(TokenType.COMMA);
