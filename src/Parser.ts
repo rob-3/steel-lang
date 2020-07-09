@@ -74,28 +74,7 @@ function eatNewlines(): void {
 
 function makeStmt(): Expr {
     if (matchType(TokenType.RETURN)) return new ReturnStmt(makeExpr());
-    if (matchType(TokenType.VAR)) {
-        if (!matchType(TokenType.IDENTIFIER)) {
-            throw Error(`Expected identifier; got "${lookAhead().lexeme}"`);
-        }
-        let identifier: string = lookBehind().lexeme;
-        if (!matchType(TokenType.LEFT_SINGLE_ARROW)) {
-            if (matchType(TokenType.EQUAL)) {
-                throw Error(`Must use "<-" for variable declaration, not "=".`);
-            } else {
-                throw Error(`Expected "<-", got "${lookAhead().lexeme}"`);
-            }
-        }
-        // TODO: this should break a test, but it doesn't. Write a test that
-        // breaks due to this and enable it
-        //eatNewlines();
-        let right: Expr = makeStmt();
-        if (matchType(TokenType.NEWLINE) || atEnd()) {
-            return new VariableDeclarationStmt(identifier, false, right);
-        } else {
-            throw Error("Expected a newline!");
-        }
-    }
+    if (matchType(TokenType.VAR)) return finishVariableDeclaration();
     if (matchType(TokenType.PRINT)) return finishPrintStmt();
     if (matchType(TokenType.IF)) return finishIfStmt();
     if (matchType(TokenType.WHILE)) return finishWhileStmt();
@@ -117,6 +96,29 @@ function makeStmt(): Expr {
     if (matchType(TokenType.NEWLINE))
         throw Error("Unexpected newline; parser bug.");
     return makeExpr();
+}
+
+function finishVariableDeclaration(): Expr {
+    if (!matchType(TokenType.IDENTIFIER)) {
+        throw Error(`Expected identifier; got "${lookAhead().lexeme}"`);
+    }
+    let identifier: string = lookBehind().lexeme;
+    if (!matchType(TokenType.LEFT_SINGLE_ARROW)) {
+        if (matchType(TokenType.EQUAL)) {
+            throw Error(`Must use "<-" for variable declaration, not "=".`);
+        } else {
+            throw Error(`Expected "<-", got "${lookAhead().lexeme}"`);
+        }
+    }
+    // TODO: this should break a test, but it doesn't. Write a test that
+    // breaks due to this and enable it
+    //eatNewlines();
+    let right: Expr = makeStmt();
+    if (matchType(TokenType.NEWLINE) || atEnd()) {
+        return new VariableDeclarationStmt(identifier, false, right);
+    } else {
+        throw Error("Expected a newline!");
+    }
 }
 
 function finishImmutableDeclaration(identifier: string): Expr {
@@ -286,23 +288,6 @@ function finishPrintStmt(): Expr {
 
 function makeExpr(): Expr {
     return makeBinaryLogical();
-}
-
-function finishVariableDeclaration(
-    identifier: string,
-    immutable: boolean
-): Expr {
-    // TODO check if variable has already been declared
-    if (!matchType(TokenType.EQUAL)) {
-        throw Error(`Expected "="; got "${lookAhead().lexeme}".`);
-    }
-    eatNewlines();
-    let right = makeStmt();
-    if (matchType(TokenType.NEWLINE) || atEnd()) {
-        return new VariableDeclarationStmt(identifier, immutable, right);
-    } else {
-        throw Error("Expected a newline!");
-    }
 }
 
 function finishAssignment(identifier: string): Expr {
