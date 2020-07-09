@@ -81,11 +81,9 @@ function makeStmt(): Expr {
         let identifier: string = lookBehind().lexeme;
         if (!matchType(TokenType.LEFT_SINGLE_ARROW)) {
             if (matchType(TokenType.EQUAL)) {
-                throw Error(
-                    `Must use <- for variable declaration and assignment, not =.`
-                );
+                throw Error(`Must use "<-" for variable declaration, not "=".`);
             } else {
-                throw Error(`Expected <-, got ${lookAhead().lexeme}`);
+                throw Error(`Expected "<-", got "${lookAhead().lexeme}"`);
             }
         }
         // TODO: this should break a test, but it doesn't. Write a test that
