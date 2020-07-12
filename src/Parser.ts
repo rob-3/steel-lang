@@ -290,11 +290,6 @@ function makeExpr(): Expr {
 
 function finishAssignment(identifier: string): Expr {
     // TODO check if identifier has already been declared
-    /*
-    if (!matchType(TokenType.EQUAL)) {
-        throw Error(`Expected "=", got ${lookAhead().lexeme}.`);
-    }
-    */
     eatNewlines();
     let right = makeStmt();
     return new VariableAssignmentStmt(identifier, right);
