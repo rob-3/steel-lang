@@ -342,6 +342,17 @@ describe("exec()", () => {
             expect(spy).to.have.been.called.with(15);
             expect(spy).to.have.been.called.with(4);
         });
+
+        it("should prohibit local shadowing", () => {
+            expect(() =>
+                stlEval(
+                    `
+                a = 4
+                a = 5
+                `
+                )
+            ).to.throw();
+        });
     });
 
     describe("functions", () => {
