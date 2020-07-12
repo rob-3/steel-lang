@@ -110,9 +110,7 @@ function finishVariableDeclaration(): Expr {
             throw Error(`Expected "<-", got "${lookAhead().lexeme}"`);
         }
     }
-    // TODO: this should break a test, but it doesn't. Write a test that
-    // breaks due to this and enable it
-    //eatNewlines();
+    eatNewlines();
     let right: Expr = makeStmt();
     if (matchType(TokenType.NEWLINE) || atEnd()) {
         return new VariableDeclarationStmt(identifier, false, right);

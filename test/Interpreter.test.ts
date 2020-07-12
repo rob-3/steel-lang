@@ -298,6 +298,17 @@ describe("exec()", () => {
             let scope = getState(stlExec("var a <- 14\na <- 15"));
             expect(stlEval("a", scope)).to.equal(15);
         });
+
+        it("should allow a variable declaration to spill over lines", () => {
+            expect(
+                stlEval(
+                    `
+                var x <-
+                    42 + 13 + 3
+                `
+                )
+            ).to.equal(42 + 13 + 3);
+        });
     });
 
     describe("functions", () => {
