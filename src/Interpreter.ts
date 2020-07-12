@@ -54,48 +54,6 @@ function execStmts(stmts: Expr[], scope: Scope): Scoped<Value> {
     return [value, scope];
 }
 
-function lookup(identifier: string, scope: Scope): Value {
-    let val = scope.get(identifier);
-    if (val === null) {
-        throw Error(`Variable "${identifier}" is not defined.`);
-    } else {
-        return val;
-    }
-}
-
-function define(
-    key: string,
-    evaluatedExpr: Value,
-    immutable: boolean,
-    scope: Scope
-): Scoped<Value> {
-    if (!scope.has(key) || !scope.get(key)[1]) {
-        scope.setLocal(key, [evaluatedExpr, immutable]);
-        return [evaluatedExpr, scope];
-    } else {
-        throw Error(`Cannot redefine immutable variable "${key}".`);
-    }
-}
-
-function assign(
-    key: string,
-    evaluatedExpr: Value,
-    scope: Scope
-): Scoped<Value> {
-    let variable = scope.get(key);
-    if (variable === null) {
-        throw Error(`Cannot assign to undefined variable "${key}".`);
-    } else {
-        let immutable = variable[1];
-        if (!immutable) {
-            scope.assign(key, [evaluatedExpr, false]);
-            return [evaluatedExpr, scope];
-        } else {
-            throw Error(`Cannot assign to immutable variable "${key}".`);
-        }
-    }
-}
-
 /*
  * String-based eval() for conflux.
  */
@@ -160,7 +118,7 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
     } else if (expr instanceof GroupingExpr) {
         return exprEval(expr.expr, scope);
     } else if (expr instanceof VariableExpr) {
-        return [lookup(expr.identifier, scope), scope];
+        return [scope.lookup(expr.identifier), scope];
     } else if (expr instanceof CallExpr) {
         let [maybeFn, newScope] = exprEval(expr.callee, scope);
         if (maybeFn instanceof StlFunction) {
@@ -175,10 +133,10 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
         return printfn(printValue, newScope);
     } else if (expr instanceof VariableDeclarationStmt) {
         let [rightVal, newScope] = exprEval(expr.right, scope);
-        return define(expr.identifier, rightVal, expr.immutable, newScope);
+        return newScope.define(expr.identifier, rightVal, expr.immutable);
     } else if (expr instanceof VariableAssignmentStmt) {
         let [rightVal, newScope] = exprEval(expr.right, scope);
-        return assign(expr.identifier, rightVal, newScope);
+        return newScope.assign(expr.identifier, rightVal);
     } else if (expr instanceof IfStmt) {
         let [shouldBeBool, newScope] = exprEval(expr.condition, scope);
         if (!assertBool(shouldBeBool)) {
