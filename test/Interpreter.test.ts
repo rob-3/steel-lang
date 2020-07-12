@@ -322,6 +322,26 @@ describe("exec()", () => {
                 )
             ).to.equal(6);
         });
+
+        it("should allow nonlocal shadowing", () => {
+            let spy = chai.spy();
+            stlExec(
+                `
+                    a = 4
+                    b = 6
+                    addTwo = (n) -> {
+                        a = 2
+                        a + n
+                    }
+                    print addTwo(13)
+                    print a
+                    `,
+                spy
+            );
+            expect(spy).to.have.been.called.twice;
+            expect(spy).to.have.been.called.with(15);
+            expect(spy).to.have.been.called.with(4);
+        });
     });
 
     describe("functions", () => {
