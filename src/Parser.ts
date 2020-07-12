@@ -295,6 +295,7 @@ function finishAssignment(identifier: string): Expr {
         throw Error(`Expected "=", got ${lookAhead().lexeme}.`);
     }
     */
+    eatNewlines();
     let right = makeStmt();
     return new VariableAssignmentStmt(identifier, right);
 }

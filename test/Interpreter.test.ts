@@ -309,6 +309,19 @@ describe("exec()", () => {
                 )
             ).to.equal(42 + 13 + 3);
         });
+
+        it("should allow assignment to spill over lines", () => {
+            expect(
+                stlEval(
+                    `
+                    var x <- 3
+                    x <- 
+                        6
+                    x
+                    `
+                )
+            ).to.equal(6);
+        });
     });
 
     describe("functions", () => {
