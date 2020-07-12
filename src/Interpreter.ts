@@ -108,7 +108,7 @@ export function stlEval(src: string, scope: Scope): Scoped<Value> {
 }
 
 /*
- * Ast-based eval() for conflux. Pass in any expression and get the evalutated result.
+ * Ast-based eval() for conflux. Pass in any expression and get the evaluated result.
  */
 export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
     if (expr instanceof PrimaryExpr) {
