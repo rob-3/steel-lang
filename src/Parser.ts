@@ -395,7 +395,14 @@ function makePrimary(): Expr {
             } else {
                 current -= 1;
             }
+        } else if (
+            matchType(TokenType.CLOSE_PAREN) &&
+            matchType(TokenType.RIGHT_SINGLE_ARROW)
+        ) {
+            return finishLambda([]);
         }
+        // be careful moving this statement
+        // the state machine above is subtle
         return finishGrouping();
     }
 

@@ -485,6 +485,18 @@ describe("exec()", () => {
                 expect(stlEval(src)).to.equal(30);
             });
 
+            it("should allow a zero argument lambda", () => {
+                expect(
+                    stlEval(
+                        `
+                    a = 4
+                    getA = () -> a
+                    getA()
+                    `
+                    )
+                ).to.equal(4);
+            });
+
             it("should allow anonymous functions to be passed inline", () => {
                 let src = `
                 math = (a, b, c) -> {
