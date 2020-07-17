@@ -1,13 +1,22 @@
 import TokenType from "./TokenType";
 import Token from "./Token";
+import { Location } from "./TokenizerHelpers";
 
 let startIndex = 0;
 let currentIndex = 0;
+let startColumn = 1;
+let currentColumn = 1;
 let source: string;
-let line = 1;
+let startLine = 1;
+let currentLine = 1;
 let commentNests = 0;
+let filename: string;
 
-export default function tokenize(src: string): Token[] {
+export default function tokenize(
+    src: string,
+    filepath = "<anonymous>"
+): Token[] {
+    filename = filepath;
     let tokens = [];
     try {
         source = src;
@@ -16,10 +25,19 @@ export default function tokenize(src: string): Token[] {
             if (maybeToken) {
                 tokens.push(maybeToken);
             }
-            // reset start for next token
-            startIndex = currentIndex;
         }
-        tokens.push(new Token(TokenType.EOF, "", null, line));
+        tokens.push(
+            new Token(
+                TokenType.EOF,
+                "",
+                null,
+                new Location(
+                    [startLine, startColumn],
+                    [startLine, startColumn], // EOF doesn't take up any space
+                    filename
+                )
+            )
+        );
     } finally {
         reset();
     }
@@ -86,10 +104,13 @@ function scanToken(): void | Token {
             return makeToken(TokenType.UNDERSCORE);
         case "\t":
         case " ":
+            // move the start pointers forward and try again
+            startIndex = currentIndex;
+            startColumn = currentColumn;
             return;
         case "\n":
+            bumpLine();
             let token = makeToken(TokenType.NEWLINE);
-            line += 1;
             return token;
         case '"':
             return makeString();
@@ -199,8 +220,13 @@ function stringInterpolation(): Token {
 function reset() {
     startIndex = 0;
     currentIndex = 0;
-    line = 1;
+    startColumn = 1;
+    currentColumn = 1;
+    source = null;
+    startLine = 1;
+    currentLine = 1;
     commentNests = 0;
+    filename = null;
 }
 
 function isAlphaNumeric(char: string): boolean {
@@ -225,31 +251,48 @@ function isNumber(char: string): boolean {
 }
 
 function makeToken(type: TokenType, literal: any = null): Token {
-    return new Token(
+    let token = new Token(
         type,
         source.slice(startIndex, currentIndex),
         literal,
-        line
+        new Location(
+            [startLine, startColumn],
+            [currentLine, currentColumn],
+            filename
+        )
     );
+    // reset start for next token
+    startIndex = currentIndex;
+    startLine = currentLine;
+    startColumn = currentColumn;
+    return token;
 }
 
 function eatLineComment(): void {
     while (lookAhead() !== "\n" && !atEnd()) {
         eatChar();
     }
+    startIndex = currentIndex;
+    startColumn = currentColumn;
 }
 
 function eatMultiLineComment(): void {
     commentNests += 1;
     while (!atEnd() && commentNests > 0) {
-        if (eatChar() === "/") {
+        let char = eatChar();
+        if (char === "/") {
             if (lookBehind(2) === "*") {
                 commentNests -= 1;
             } else if (match("*")) {
                 commentNests += 1;
             }
+        } else if (char === "\n") {
+            currentLine += 1;
         }
     }
+    startIndex = currentIndex;
+    startColumn = currentColumn;
+    startLine = currentLine;
 }
 
 function atEnd(): boolean {
@@ -257,7 +300,7 @@ function atEnd(): boolean {
 }
 
 function eatChar(): string {
-    currentIndex += 1;
+    bumpIndex();
     return source[currentIndex - 1];
 }
 
@@ -277,6 +320,16 @@ function match(char: string): boolean {
     } else {
         return false;
     }
+}
+
+function bumpIndex(): void {
+    currentIndex += 1;
+    currentColumn += 1;
+}
+
+function bumpLine(): void {
+    currentLine += 1;
+    currentColumn = 1;
 }
 
 export { isAlphaNumeric, isAlpha, isNumber, isLegalIdentifierChar };

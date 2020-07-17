@@ -2,6 +2,7 @@ import tokenize from "../src/Tokenizer";
 import parse from "../src/Parser";
 import TokenType from "../src/TokenType";
 import Token from "../src/Token";
+import { Location } from "../src/TokenizerHelpers";
 import {
     PrimaryExpr,
     UnaryExpr,
@@ -21,7 +22,12 @@ describe("parse()", () => {
         let ast = parse(tokenize("not true"));
         expect(ast).to.deep.equal([
             new UnaryExpr(
-                new Token(TokenType.NOT, "not", null, 1),
+                new Token(
+                    TokenType.NOT,
+                    "not",
+                    null,
+                    new Location([1, 1], [1, 4], "<anonymous>")
+                ),
                 new PrimaryExpr(true)
             )
         ]);
@@ -84,13 +90,28 @@ describe("parse()", () => {
             new BinaryExpr(
                 new BinaryExpr(
                     new PrimaryExpr(4),
-                    new Token(TokenType.EQUAL_EQUAL, "==", null, 1),
+                    new Token(
+                        TokenType.EQUAL_EQUAL,
+                        "==",
+                        null,
+                        new Location([1, 3], [1, 5], "<anonymous>")
+                    ),
                     new PrimaryExpr(5)
                 ),
-                new Token(TokenType.OR, "or", null, 1),
+                new Token(
+                    TokenType.OR,
+                    "or",
+                    null,
+                    new Location([1, 8], [1, 10], "<anonymous>")
+                ),
                 new BinaryExpr(
                     new PrimaryExpr(6),
-                    new Token(TokenType.EQUAL_EQUAL, "==", null, 1),
+                    new Token(
+                        TokenType.EQUAL_EQUAL,
+                        "==",
+                        null,
+                        new Location([1, 13], [1, 15], "<anonymous>")
+                    ),
                     new PrimaryExpr(7)
                 )
             )

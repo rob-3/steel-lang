@@ -1,6 +1,7 @@
 import tokenize from "../src/Tokenizer";
 import Token from "../src/Token";
 import TokenType from "../src/TokenType";
+import { Location } from "../src/TokenizerHelpers";
 import {
     isAlphaNumeric,
     isAlpha,
@@ -13,37 +14,116 @@ describe("tokenize()", () => {
     it("should tokenize input", () => {
         const output = tokenize('2 "hello" 6.04 my_identifier');
         expect(output).to.deep.equal([
-            new Token(TokenType.NUMBER, "2", 2, 1),
-            new Token(TokenType.STRING, '"hello"', "hello", 1),
-            new Token(TokenType.NUMBER, "6.04", 6.04, 1),
-            new Token(TokenType.IDENTIFIER, "my_identifier", null, 1),
-            new Token(TokenType.EOF, "", null, 1)
+            new Token(
+                TokenType.NUMBER,
+                "2",
+                2,
+                new Location([1, 1], [1, 2], "<anonymous>")
+            ),
+            new Token(
+                TokenType.STRING,
+                '"hello"',
+                "hello",
+                new Location([1, 3], [1, 10], "<anonymous>")
+            ),
+            new Token(
+                TokenType.NUMBER,
+                "6.04",
+                6.04,
+                new Location([1, 11], [1, 15], "<anonymous>")
+            ),
+            new Token(
+                TokenType.IDENTIFIER,
+                "my_identifier",
+                null,
+                new Location([1, 16], [1, 29], "<anonymous>")
+            ),
+            new Token(
+                TokenType.EOF,
+                "",
+                null,
+                new Location([1, 29], [1, 29], "<anonymous>")
+            )
         ]);
     });
 
     it("should provide correct line numbers", () => {
         let result = tokenize("hi\n7.543\n92");
-        expect(result.map(t => t.line)).to.deep.equal([1, 1, 2, 2, 3, 3]);
+        expect(result.map(t => t.location.start[0])).to.deep.equal([
+            1,
+            1,
+            2,
+            2,
+            3,
+            3
+        ]);
     });
 
     it("should ignore single line comments", () => {
         let result = tokenize(
-            `apple = 4.3 // apple = 0 *//**/??////
-            pancakes = apple * 3 // rando-stuff
-            `
+            "apple = 4.3 // apple = 0 *//**/??////\npancakes = apple * 3 // rando-stuff"
         );
         expect(result).to.deep.equal([
-            new Token(TokenType.IDENTIFIER, "apple", null, 1),
-            new Token(TokenType.EQUAL, "=", null, 1),
-            new Token(TokenType.NUMBER, "4.3", 4.3, 1),
-            new Token(TokenType.NEWLINE, "\n", null, 1),
-            new Token(TokenType.IDENTIFIER, "pancakes", null, 2),
-            new Token(TokenType.EQUAL, "=", null, 2),
-            new Token(TokenType.IDENTIFIER, "apple", null, 2),
-            new Token(TokenType.STAR, "*", null, 2),
-            new Token(TokenType.NUMBER, "3", 3, 2),
-            new Token(TokenType.NEWLINE, "\n", null, 2),
-            new Token(TokenType.EOF, "", null, 3)
+            new Token(
+                TokenType.IDENTIFIER,
+                "apple",
+                null,
+                new Location([1, 1], [1, 6], "<anonymous>")
+            ),
+            new Token(
+                TokenType.EQUAL,
+                "=",
+                null,
+                new Location([1, 7], [1, 8], "<anonymous>")
+            ),
+            new Token(
+                TokenType.NUMBER,
+                "4.3",
+                4.3,
+                new Location([1, 9], [1, 12], "<anonymous>")
+            ),
+            new Token(
+                TokenType.NEWLINE,
+                "\n",
+                null,
+                new Location([1, 38], [2, 1], "<anonymous>")
+            ),
+            new Token(
+                TokenType.IDENTIFIER,
+                "pancakes",
+                null,
+                new Location([2, 1], [2, 9], "<anonymous>")
+            ),
+            new Token(
+                TokenType.EQUAL,
+                "=",
+                null,
+                new Location([2, 10], [2, 11], "<anonymous>")
+            ),
+            new Token(
+                TokenType.IDENTIFIER,
+                "apple",
+                null,
+                new Location([2, 12], [2, 17], "<anonymous>")
+            ),
+            new Token(
+                TokenType.STAR,
+                "*",
+                null,
+                new Location([2, 18], [2, 19], "<anonymous>")
+            ),
+            new Token(
+                TokenType.NUMBER,
+                "3",
+                3,
+                new Location([2, 20], [2, 21], "<anonymous>")
+            ),
+            new Token(
+                TokenType.EOF,
+                "",
+                null,
+                new Location([2, 36], [2, 36], "<anonymous>")
+            )
         ]);
     });
 
@@ -52,83 +132,222 @@ describe("tokenize()", () => {
             "/**//**\n let var = 32.432.32 *//* laskdjflaskdf 43*/apple"
         );
         expect(result).to.deep.equal([
-            new Token(TokenType.IDENTIFIER, "apple", null, 1),
-            new Token(TokenType.EOF, "", null, 1)
+            new Token(
+                TokenType.IDENTIFIER,
+                "apple",
+                null,
+                new Location([2, 53], [2, 58], "<anonymous>")
+            ),
+            new Token(
+                TokenType.EOF,
+                "",
+                null,
+                new Location([2, 58], [2, 58], "<anonymous>")
+            )
         ]);
     });
 
     it("should use VAR TokenType and NEWLINE", () => {
-        let result = tokenize(
-            `a = 23
-             var b = 46`
-        );
+        let result = tokenize("a = 23\nvar b = 46");
         expect(result).to.deep.equal([
-            new Token(TokenType.IDENTIFIER, "a", null, 1),
-            new Token(TokenType.EQUAL, "=", null, 1),
-            new Token(TokenType.NUMBER, "23", 23, 1),
-            new Token(TokenType.NEWLINE, "\n", null, 1),
-            new Token(TokenType.VAR, "var", null, 2),
-            new Token(TokenType.IDENTIFIER, "b", null, 2),
-            new Token(TokenType.EQUAL, "=", null, 2),
-            new Token(TokenType.NUMBER, "46", 46, 2),
-            new Token(TokenType.EOF, "", null, 2)
+            new Token(
+                TokenType.IDENTIFIER,
+                "a",
+                null,
+                new Location([1, 1], [1, 2], "<anonymous>")
+            ),
+            new Token(
+                TokenType.EQUAL,
+                "=",
+                null,
+                new Location([1, 3], [1, 4], "<anonymous>")
+            ),
+            new Token(
+                TokenType.NUMBER,
+                "23",
+                23,
+                new Location([1, 5], [1, 7], "<anonymous>")
+            ),
+            new Token(
+                TokenType.NEWLINE,
+                "\n",
+                null,
+                new Location([1, 7], [2, 1], "<anonymous>")
+            ),
+            new Token(
+                TokenType.VAR,
+                "var",
+                null,
+                new Location([2, 1], [2, 4], "<anonymous>")
+            ),
+            new Token(
+                TokenType.IDENTIFIER,
+                "b",
+                null,
+                new Location([2, 5], [2, 6], "<anonymous>")
+            ),
+            new Token(
+                TokenType.EQUAL,
+                "=",
+                null,
+                new Location([2, 7], [2, 8], "<anonymous>")
+            ),
+            new Token(
+                TokenType.NUMBER,
+                "46",
+                46,
+                new Location([2, 9], [2, 11], "<anonymous>")
+            ),
+            new Token(
+                TokenType.EOF,
+                "",
+                null,
+                new Location([2, 11], [2, 11], "<anonymous>")
+            )
         ]);
     });
 
     it("should end with an EOF token no matter what", () => {
         let result = tokenize("");
-        expect(result).to.deep.equal([new Token(TokenType.EOF, "", null, 1)]);
+        expect(result).to.deep.equal([
+            new Token(
+                TokenType.EOF,
+                "",
+                null,
+                new Location([1, 1], [1, 1], "<anonymous>")
+            )
+        ]);
     });
 
     it("should tokenize true and false", () => {
         let result = tokenize("true false");
         expect(result).to.deep.equal([
-            new Token(TokenType.TRUE, "true", true, 1),
-            new Token(TokenType.FALSE, "false", false, 1),
-            new Token(TokenType.EOF, "", null, 1)
+            new Token(
+                TokenType.TRUE,
+                "true",
+                true,
+                new Location([1, 1], [1, 5], "<anonymous>")
+            ),
+            new Token(
+                TokenType.FALSE,
+                "false",
+                false,
+                new Location([1, 6], [1, 11], "<anonymous>")
+            ),
+            new Token(
+                TokenType.EOF,
+                "",
+                null,
+                new Location([1, 11], [1, 11], "<anonymous>")
+            )
         ]);
     });
 
     it("should tokenize the fun keyword", () => {
         let result = tokenize("fun");
         expect(result).to.deep.equal([
-            new Token(TokenType.FUN, "fun", null, 1),
-            new Token(TokenType.EOF, "", null, 1)
+            new Token(
+                TokenType.FUN,
+                "fun",
+                null,
+                new Location([1, 1], [1, 4], "<anonymous>")
+            ),
+            new Token(
+                TokenType.EOF,
+                "",
+                null,
+                new Location([1, 4], [1, 4], "<anonymous>")
+            )
         ]);
     });
 
     it("should tokenize the for keyword", () => {
         let result = tokenize("for");
         expect(result).to.deep.equal([
-            new Token(TokenType.FOR, "for", null, 1),
-            new Token(TokenType.EOF, "", null, 1)
+            new Token(
+                TokenType.FOR,
+                "for",
+                null,
+                new Location([1, 1], [1, 4], "<anonymous>")
+            ),
+            new Token(
+                TokenType.EOF,
+                "",
+                null,
+                new Location([1, 4], [1, 4], "<anonymous>")
+            )
         ]);
     });
 
     it("should tokenize the while keyword", () => {
         let result = tokenize("while");
         expect(result).to.deep.equal([
-            new Token(TokenType.WHILE, "while", null, 1),
-            new Token(TokenType.EOF, "", null, 1)
+            new Token(
+                TokenType.WHILE,
+                "while",
+                null,
+                new Location([1, 1], [1, 6], "<anonymous>")
+            ),
+            new Token(
+                TokenType.EOF,
+                "",
+                null,
+                new Location([1, 6], [1, 6], "<anonymous>")
+            )
         ]);
     });
 
     it("should tokenize the if and else keywords", () => {
         let result = tokenize("if else");
         expect(result).to.deep.equal([
-            new Token(TokenType.IF, "if", null, 1),
-            new Token(TokenType.ELSE, "else", null, 1),
-            new Token(TokenType.EOF, "", null, 1)
+            new Token(
+                TokenType.IF,
+                "if",
+                null,
+                new Location([1, 1], [1, 3], "<anonymous>")
+            ),
+            new Token(
+                TokenType.ELSE,
+                "else",
+                null,
+                new Location([1, 4], [1, 8], "<anonymous>")
+            ),
+            new Token(
+                TokenType.EOF,
+                "",
+                null,
+                new Location([1, 8], [1, 8], "<anonymous>")
+            )
         ]);
     });
 
     it("should tokenize the and, or, and not keywords", () => {
         let result = tokenize("and or not");
         expect(result).to.deep.equal([
-            new Token(TokenType.AND, "and", null, 1),
-            new Token(TokenType.OR, "or", null, 1),
-            new Token(TokenType.NOT, "not", null, 1),
-            new Token(TokenType.EOF, "", null, 1)
+            new Token(
+                TokenType.AND,
+                "and",
+                null,
+                new Location([1, 1], [1, 4], "<anonymous>")
+            ),
+            new Token(
+                TokenType.OR,
+                "or",
+                null,
+                new Location([1, 5], [1, 7], "<anonymous>")
+            ),
+            new Token(
+                TokenType.NOT,
+                "not",
+                null,
+                new Location([1, 8], [1, 11], "<anonymous>")
+            ),
+            new Token(
+                TokenType.EOF,
+                "",
+                null,
+                new Location([1, 11], [1, 11], "<anonymous>")
+            )
         ]);
     });
 
@@ -153,30 +372,75 @@ describe("tokenize()", () => {
     it("should tokenize a unary not", () => {
         let result = tokenize("not true");
         expect(result).to.deep.equal([
-            new Token(TokenType.NOT, "not", null, 1),
-            new Token(TokenType.TRUE, "true", true, 1),
-            new Token(TokenType.EOF, "", null, 1)
+            new Token(
+                TokenType.NOT,
+                "not",
+                null,
+                new Location([1, 1], [1, 4], "<anonymous>")
+            ),
+            new Token(
+                TokenType.TRUE,
+                "true",
+                true,
+                new Location([1, 5], [1, 9], "<anonymous>")
+            ),
+            new Token(
+                TokenType.EOF,
+                "",
+                null,
+                new Location([1, 9], [1, 9], "<anonymous>")
+            )
         ]);
     });
 
     it("should tokenize commas", () => {
         expect(tokenize(",")).to.deep.equal([
-            new Token(TokenType.COMMA, ",", null, 1),
-            new Token(TokenType.EOF, "", null, 1)
+            new Token(
+                TokenType.COMMA,
+                ",",
+                null,
+                new Location([1, 1], [1, 2], "<anonymous>")
+            ),
+            new Token(
+                TokenType.EOF,
+                "",
+                null,
+                new Location([1, 2], [1, 2], "<anonymous>")
+            )
         ]);
     });
 
     it("should tokenize right double arrow", () => {
         expect(tokenize("=>")).to.eql([
-            new Token(TokenType.RIGHT_DOUBLE_ARROW, "=>", null, 1),
-            new Token(TokenType.EOF, "", null, 1)
+            new Token(
+                TokenType.RIGHT_DOUBLE_ARROW,
+                "=>",
+                null,
+                new Location([1, 1], [1, 3], "<anonymous>")
+            ),
+            new Token(
+                TokenType.EOF,
+                "",
+                null,
+                new Location([1, 3], [1, 3], "<anonymous>")
+            )
         ]);
     });
 
     it("should tokenize underscore", () => {
         expect(tokenize("_")).to.eql([
-            new Token(TokenType.UNDERSCORE, "_", null, 1),
-            new Token(TokenType.EOF, "", null, 1)
+            new Token(
+                TokenType.UNDERSCORE,
+                "_",
+                null,
+                new Location([1, 1], [1, 2], "<anonymous>")
+            ),
+            new Token(
+                TokenType.EOF,
+                "",
+                null,
+                new Location([1, 2], [1, 2], "<anonymous>")
+            )
         ]);
     });
 });
