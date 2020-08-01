@@ -25,6 +25,7 @@ import Ast from "./Ast";
 import astTransforms from "./AstTransforms";
 
 let tokens: Token[];
+let start = 0;
 let current = 0;
 
 export default function parse(tokenList: Token[]): Expr[] {
@@ -73,7 +74,8 @@ function eatNewlines(): void {
 }
 
 function makeStmt(): Expr {
-    if (matchType(TokenType.RETURN)) return new ReturnStmt(makeExpr());
+    if (matchType(TokenType.RETURN))
+        return new ReturnStmt(makeExpr(), getTokens());
     if (matchType(TokenType.VAR)) return finishVariableDeclaration();
     if (matchType(TokenType.PRINT)) return finishPrintStmt();
     if (matchType(TokenType.IF)) return finishIfStmt();
@@ -113,7 +115,12 @@ function finishVariableDeclaration(): Expr {
     eatNewlines();
     let right: Expr = makeStmt();
     if (matchType(TokenType.NEWLINE) || atEnd()) {
-        return new VariableDeclarationStmt(identifier, false, right);
+        return new VariableDeclarationStmt(
+            identifier,
+            false,
+            right,
+            getTokens()
+        );
     } else {
         throw Error("Expected a newline!");
     }
@@ -123,7 +130,7 @@ function finishImmutableDeclaration(identifier: string): Expr {
     eatNewlines();
     let expr: Expr = makeStmt();
     if (matchType(TokenType.NEWLINE) || atEnd()) {
-        return new VariableDeclarationStmt(identifier, true, expr);
+        return new VariableDeclarationStmt(identifier, true, expr, getTokens());
     } else {
         throw Error("Expected a newline!");
     }
@@ -142,7 +149,7 @@ function finishMatchStmt(): Expr {
         eatNewlines();
         cases.push(makeMatchCase());
     }
-    return new MatchStmt(expr, cases);
+    return new MatchStmt(expr, cases, getTokens());
 }
 
 function makeMatchCase(): MatchCase {
@@ -158,11 +165,11 @@ function makeMatchCase(): MatchCase {
 }
 
 function makeMatchPrimary(): PrimaryExpr | UnderscoreExpr {
-    if (matchType(TokenType.TRUE)) return new PrimaryExpr(true);
-    if (matchType(TokenType.FALSE)) return new PrimaryExpr(false);
+    if (matchType(TokenType.TRUE)) return new PrimaryExpr(true, getTokens());
+    if (matchType(TokenType.FALSE)) return new PrimaryExpr(false, getTokens());
     if (matchType(TokenType.NUMBER, TokenType.STRING))
-        return new PrimaryExpr(lookBehind().literal);
-    if (matchType(TokenType.UNDERSCORE)) return new UnderscoreExpr();
+        return new PrimaryExpr(lookBehind().literal, getTokens());
+    if (matchType(TokenType.UNDERSCORE)) return new UnderscoreExpr(getTokens());
     throw Error(
         `"${
             lookAhead().lexeme
@@ -176,7 +183,7 @@ function finishWhileStmt(): Expr {
         throw Error(`After while expected statement, but reached EOF.`);
     }
     let body = makeStmt();
-    return new WhileStmt(condition, body);
+    return new WhileStmt(condition, body, getTokens());
 }
 
 function finishUntilStmt(): Expr {
@@ -186,8 +193,13 @@ function finishUntilStmt(): Expr {
     }
     let body = makeStmt();
     return new WhileStmt(
-        new UnaryExpr(new Token(TokenType.NOT, null, null, null), condition),
-        body
+        new UnaryExpr(
+            new Token(TokenType.NOT, null, null, null),
+            condition,
+            getTokens()
+        ),
+        body,
+        getTokens()
     );
 }
 
@@ -205,7 +217,8 @@ function finishFunctionDeclaration(): Expr {
     eatNewlines();
     let lambda = makeLambda();
     return new FunctionDefinition(
-        new VariableDeclarationStmt(fnName, true, lambda)
+        new VariableDeclarationStmt(fnName, true, lambda, getTokens()),
+        getTokens()
     );
 }
 
@@ -248,7 +261,7 @@ function finishBlockStmt(): BlockStmt {
         stmts.push(makeStmt());
         eatNewlines();
     }
-    return new BlockStmt(stmts);
+    return new BlockStmt(stmts, getTokens());
 }
 
 function finishIfStmt(): Expr {
@@ -276,11 +289,11 @@ function finishIfStmt(): Expr {
             );
         }
     }
-    return new IfStmt(condition, maybeBody, elseBody);
+    return new IfStmt(condition, maybeBody, elseBody, getTokens());
 }
 
 function finishPrintStmt(): Expr {
-    let stmt = new PrintStmt(makeStmt());
+    let stmt = new PrintStmt(makeStmt(), getTokens());
     return stmt;
 }
 
@@ -292,7 +305,7 @@ function finishAssignment(identifier: string): Expr {
     // TODO check if identifier has already been declared
     eatNewlines();
     let right = makeStmt();
-    return new VariableAssignmentStmt(identifier, right);
+    return new VariableAssignmentStmt(identifier, right, getTokens());
 }
 
 function makeBinaryLogical(): Expr {
@@ -338,7 +351,7 @@ function makeUnary(): Expr {
     if (matchType(TokenType.MINUS, TokenType.NOT)) {
         let operator = lookBehind();
         let right = makeUnary();
-        return new UnaryExpr(operator, right);
+        return new UnaryExpr(operator, right, getTokens());
     }
     return makeCall();
 }
@@ -366,20 +379,20 @@ function finishCall(callee: Expr) {
             throw Error(`Must terminate function call with ")"`);
         }
     }
-    return new CallExpr(callee, args);
+    return new CallExpr(callee, args, getTokens());
 }
 
 function makePrimary(): Expr {
-    if (matchType(TokenType.TRUE)) return new PrimaryExpr(true);
-    if (matchType(TokenType.FALSE)) return new PrimaryExpr(false);
+    if (matchType(TokenType.TRUE)) return new PrimaryExpr(true, getTokens());
+    if (matchType(TokenType.FALSE)) return new PrimaryExpr(false, getTokens());
     if (matchType(TokenType.NUMBER, TokenType.STRING))
-        return new PrimaryExpr(lookBehind().literal);
+        return new PrimaryExpr(lookBehind().literal, getTokens());
     if (matchType(TokenType.IDENTIFIER)) {
         if (matchType(TokenType.RIGHT_SINGLE_ARROW)) {
             return finishLambda([lookBehind(2).lexeme]);
         } else {
             let identifier = lookBehind().lexeme;
-            return new VariableExpr(identifier);
+            return new VariableExpr(identifier, getTokens());
         }
     }
 
@@ -414,12 +427,13 @@ function finishLambda(args: string[]): FunctionExpr {
     eatNewlines();
     let body = makeStmt();
     // TODO: add checks and nice error messages
-    return new FunctionExpr(args, body);
+    return new FunctionExpr(args, body, getTokens());
 }
 
 function finishGrouping(): Expr {
     let expr = makeExpr();
-    if (matchType(TokenType.CLOSE_PAREN)) return new GroupingExpr(expr);
+    if (matchType(TokenType.CLOSE_PAREN))
+        return new GroupingExpr(expr, getTokens());
     else throw Error(`Expected ")", got "${lookAhead().lexeme}"`);
 }
 
@@ -441,11 +455,17 @@ function makeBinaryExpr(
     while (matchType(...matches)) {
         let operator = lookBehind();
         let right = higherPrecedenceOperation();
-        expr = new BinaryExpr(expr, operator, right);
+        expr = new BinaryExpr(expr, operator, right, getTokens());
     }
     return expr;
 }
 
 function reset() {
+    start = 0;
     current = 0;
+    tokens = null;
+}
+
+function getTokens(): Token[] {
+    return tokens.slice(start, current);
 }

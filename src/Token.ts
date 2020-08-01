@@ -6,7 +6,6 @@ export default class Token {
     lexeme: string;
     literal: any;
     location: Location;
-    filename: string;
 
     constructor(
         type: TokenType,

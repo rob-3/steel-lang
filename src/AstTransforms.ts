@@ -18,7 +18,7 @@ function hoistFunctions(expr: Expr) {
             },
             []
         );
-        return new BlockStmt(reorderedChildren);
+        return new BlockStmt(reorderedChildren, expr.tokens);
     } else {
         return expr;
     }

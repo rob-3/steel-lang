@@ -2,15 +2,15 @@ export class Location {
     // [line, column]
     start: [number, number];
     end: [number, number];
-    filepath: string;
+    filename: string;
 
     constructor(
         start: [number, number],
         end: [number, number],
-        filepath: string
+        filename: string
     ) {
         this.start = start;
         this.end = end;
-        this.filepath = filepath;
+        this.filename = filename;
     }
 }

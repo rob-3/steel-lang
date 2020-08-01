@@ -26,6 +26,7 @@ export type Scoped<T> = [T, Scope];
 export const getVal = (arr: [Value, Scope]) => arr[0];
 export const getState = (arr: [Value, Scope]) => arr[1];
 import { StlFunction, Value } from "./InterpreterHelpers";
+import * as stl from "./Stl";
 
 let printfn = (thing: Value, scope: Scope): [Value, Scope] => {
     let text = String(thing);
@@ -124,7 +125,10 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
         if (maybeFn instanceof StlFunction) {
             return call(maybeFn, expr.args, newScope);
         } else {
-            throw Error(`Can't call ${maybeFn} because it is not a function.`);
+            stl.runtimePanic(
+                `Can't call ${maybeFn} because it is not a function.`,
+                expr.callee
+            );
         }
     } else if (expr instanceof FunctionExpr) {
         return [new StlFunction(expr), scope];
