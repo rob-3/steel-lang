@@ -1,5 +1,5 @@
 import { Scoped, exprEval, getState, getVal } from "./Interpreter";
-import { FunctionExpr, ReturnStmt } from "./Expr";
+import { FunctionExpr } from "./Expr";
 import Scope from "./Scope";
 
 export class StlFunction {

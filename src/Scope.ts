@@ -1,5 +1,6 @@
 import { Value } from "./InterpreterHelpers";
 import { Scoped } from "./Interpreter";
+import { runtimePanic } from "./Debug";
 
 export default class Scope {
     bindings: Map<string, [Value, boolean]>;
@@ -41,14 +42,14 @@ export default class Scope {
     assign(key: string, evaluatedExpr: Value): Scoped<Value> {
         let variable = this.get(key);
         if (variable === null) {
-            throw Error(`Cannot assign to undefined variable "${key}".`);
+            runtimePanic(`Cannot assign to undefined variable "${key}".`);
         } else {
             let immutable = variable[1];
             if (!immutable) {
                 this.set(key, [evaluatedExpr, false]);
                 return [evaluatedExpr, this];
             } else {
-                throw Error(`Cannot assign to immutable variable "${key}".`);
+                runtimePanic(`Cannot assign to immutable variable "${key}".`);
             }
         }
     }
@@ -63,7 +64,7 @@ export default class Scope {
         immutable: boolean
     ): Scoped<Value> {
         if (this.has(key)) {
-            throw Error(`Cannot redefine immutable variable ${key}.`);
+            runtimePanic(`Cannot redefine immutable variable ${key}.`);
         } else {
             this.setLocal(key, [evaluatedExpr, immutable]);
             return [evaluatedExpr, this];
@@ -73,7 +74,7 @@ export default class Scope {
     lookup(identifier: string): Value {
         let val = this.get(identifier);
         if (val === null) {
-            throw Error(`Variable "${identifier}" is not defined.`);
+            runtimePanic(`Variable "${identifier}" is not defined.`);
         } else {
             return val;
         }

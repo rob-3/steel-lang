@@ -347,3 +347,11 @@ export class FunctionDefinition implements Expr {
 
     getDebugInfo = getDebugInfo;
 }
+
+export class FailedParse implements Expr {
+    map(fn: (expr: Expr) => Expr) {
+        return this;
+    }
+
+    getDebugInfo = () => null;
+}

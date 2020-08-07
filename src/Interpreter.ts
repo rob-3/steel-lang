@@ -26,9 +26,9 @@ export type Scoped<T> = [T, Scope];
 export const getVal = (arr: [Value, Scope]) => arr[0];
 export const getState = (arr: [Value, Scope]) => arr[1];
 import { StlFunction, Value } from "./InterpreterHelpers";
-import * as stl from "./Stl";
+import { runtimePanic } from "./Debug";
 
-let printfn = (thing: Value, scope: Scope): [Value, Scope] => {
+export let printfn = (thing: Value, scope: Scope): [Value, Scope] => {
     let text = String(thing);
     console.log(text);
     return [String(thing), scope];
@@ -104,7 +104,7 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
             case TokenType.EQUAL_EQUAL:
                 return [equal(leftVal, rightVal), newScope2];
             default:
-                throw Error(
+                runtimePanic(
                     `FIXME: Unhandled operator type "${expr.operator}"`
                 );
         }
@@ -125,10 +125,7 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
         if (maybeFn instanceof StlFunction) {
             return call(maybeFn, expr.args, newScope);
         } else {
-            stl.runtimePanic(
-                `Can't call ${maybeFn} because it is not a function.`,
-                expr.callee
-            );
+            runtimePanic(`Can't call ${maybeFn} because it is not a function.`);
         }
     } else if (expr instanceof FunctionExpr) {
         return [new StlFunction(expr), scope];
@@ -144,7 +141,7 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
     } else if (expr instanceof IfStmt) {
         let [shouldBeBool, newScope] = exprEval(expr.condition, scope);
         if (!assertBool(shouldBeBool)) {
-            throw Error("Condition doesn't evaluate to a boolean.");
+            runtimePanic("Condition doesn't evaluate to a boolean.");
         }
         if (shouldBeBool) {
             return exprEval(expr.body, newScope);
@@ -183,11 +180,11 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
                 return exprEval(matchCase.expr, newScope);
             }
         }
-        throw Error("Pattern match failed.");
+        runtimePanic("Pattern match failed.");
     } else if (expr instanceof FunctionDefinition) {
         return exprEval(expr.definition, scope);
     } else {
-        throw Error("Unhandled stmt or expr.");
+        runtimePanic("Unhandled stmt or expr.");
     }
 }
 
@@ -207,50 +204,50 @@ function call(fn: StlFunction, args: Expr[], scope: Scope): Scoped<any> {
  */
 function opposite(right: Value): number {
     if (assertNumber(right)) return -(<number>right);
-    else throw Error('"-" can only be used on a number');
+    else runtimePanic('"-" can only be used on a number');
 }
 
 function plus(left: Value, right: Value): number {
     if (assertNumber(left, right)) {
         return <number>left + <number>right;
-    } else throw Error('Operands of "+" must be numbers.');
+    } else runtimePanic('Operands of "+" must be numbers.');
 }
 
 function minus(left: Value, right: Value): number {
     if (assertNumber(left, right)) {
         return <number>left - <number>right;
-    } else throw Error('Operands of "-" must be numbers.');
+    } else runtimePanic('Operands of "-" must be numbers.');
 }
 
 function plusPlus(left: Value, right: Value): string {
     if (typeof left === "string" && typeof right === "string") {
         return left.concat(right);
-    } else throw Error('Operands of "++" must be strings.');
+    } else runtimePanic('Operands of "++" must be strings.');
 }
 
 function star(left: Value, right: Value): number {
     if (assertNumber(left, right)) {
         return <number>left * <number>right;
-    } else throw Error('Operands of "*" must be numbers.');
+    } else runtimePanic('Operands of "*" must be numbers.');
 }
 
 function slash(left: Value, right: Value): number {
     if (assertNumber(left, right)) {
         return <number>left / <number>right;
-    } else throw Error('Operands of "/" must be numbers.');
+    } else runtimePanic('Operands of "/" must be numbers.');
 }
 
 function and(left: Value, right: Value): boolean {
     if (assertBool(left, right)) {
         return <boolean>left && <boolean>right;
-    } else throw Error('Operands of "and" must be booleans.');
+    } else runtimePanic('Operands of "and" must be booleans.');
 }
 
 function or(left: Value, right: Value): boolean {
     if (assertBool(left, right)) {
         return <boolean>left || <boolean>right;
     } else {
-        throw Error('Operands of "or" must be booleans.');
+        runtimePanic('Operands of "or" must be booleans.');
     }
 }
 
@@ -270,7 +267,7 @@ function assertBool(...literals: any[]): boolean {
 
 function not(right: Value): boolean {
     if (assertBool(right)) return !right;
-    else throw Error('Operands of "not" should be booleans.');
+    else runtimePanic('Operands of "not" should be booleans.');
 }
 
 function greaterEqual(left: Value, right: Value): boolean {
@@ -301,11 +298,11 @@ function numberComparision(
 ): boolean {
     if (assertNumber(left, right)) {
         return operator(left, right);
-    } else throw Error(`Operands of ${err} should be numbers.`);
+    } else runtimePanic(`Operands of ${err} should be numbers.`);
 }
 
 function mod(left: Value, right: Value): number {
     if (typeof left === "number" && typeof right === "number") {
         return left % right;
-    } else throw Error(`Operands of % should be numbers.`);
+    } else runtimePanic(`Operands of % should be numbers.`);
 }

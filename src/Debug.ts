@@ -1,29 +1,66 @@
-import { Location } from "./TokenizerHelpers";
-export class StlError {
-    message: string;
-    location: Location;
-    badLine: string;
+import Token from "./Token";
+import { printfn } from "./Interpreter";
+import { source } from "./steel";
 
-    constructor(message: string, location: Location, badLine: string) {
-        this.message = message;
-        this.location = location;
-        this.badLine = badLine;
-    }
+/*
+ * The standard error format, shamelessly stolen from rust
+ */
+
+/*
+error: 
+  --> ${filename}:${line}:${column}
+   |
+26 |        ${bad_line}
+   |        ^^^^^
+*/
+
+/*
+ * A panic means we're doomed with no hope of recovery from this. We tear down
+ * the process. Anything that happens at runtime is a panic.
+ */
+export function runtimePanic(message: string) {
+    throw message;
 }
 
-export function generateMessage(err: StlError): string {
-    let { message, location, badLine } = err;
-    let [line, column] = location.start;
+/*
+ * An error means the compile will fail.
+ */
+export function parseError(message: string, highlight: Token) {
+    let location = highlight.location;
+    let line: number = location.start[0];
+    let column: number = location.start[1];
     let filename = location.filename;
-    let start = location.start[1];
-    let end = location.end[1];
-    let highlightString = " ".repeat(start - 1) + "^".repeat(end - start);
 
     let pad = line.toString().length;
-    return `error: ${message} 
+
+    // calculate highlight string
+    let startColumn = location.start[1];
+    let endColumn = location.end[1];
+    let highlightString =
+        " ".repeat(startColumn - 1) + "^".repeat(endColumn - startColumn);
+
+    // FIXME handle EOF
+    let lineNumber = 1;
+    let index = 0;
+    while (lineNumber < line) {
+        let char = source[index];
+        if (char === "\n") {
+            lineNumber++;
+        }
+        index++;
+    }
+    let startIndex = index;
+    let endIndex = index;
+    while (source[endIndex] !== "\n") {
+        endIndex++;
+    }
+    let lineString = source.slice(startIndex, endIndex);
+    return `parse error: ${message} 
 ${" ".repeat(pad)}--> ${filename}:${line}:${column}
 ${" ".repeat(pad + 1)}|
-${line.toString()} |    ${badLine}
+${line.toString()} |    ${lineString}
 ${" ".repeat(pad + 1)}|    ${highlightString}
 `;
 }
+
+export function lexError(message: string, token: Token) {}

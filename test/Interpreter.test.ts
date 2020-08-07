@@ -5,7 +5,6 @@ import {
     getState,
     getVal
 } from "../src/Interpreter";
-import { generateMessage } from "../src/Debug";
 import { Expr } from "../src/Expr";
 import Scope from "../src/Scope";
 import chai = require("chai");
@@ -189,18 +188,6 @@ describe("stlEval()", () => {
             ).to.equal(5);
         });
     });
-
-    /*
-    describe("errors", () => {
-        it("should throw on an invalid expression type", () => {
-            class UnhandledExpr implements Expr {
-                copy = () => this;
-                map = () => this;
-            }
-            expect(() => exprEval(new UnhandledExpr(), new Scope())).to.throw();
-        });
-    });
-    */
 });
 
 describe("exec()", () => {
@@ -574,20 +561,14 @@ describe("exec()", () => {
                 ).to.equal(5);
             });
 
-            /*
             it("should throw if a noncallable object is called", () => {
                 let spy = chai.spy();
                 stlExec("5()", spy);
 
                 expect(spy).to.have.been.called.with(
-                    generateMessage({
-                        message: "Can't call 5 because it is not a function.",
-                        location: new Location([2, 2]),
-                        badLine: "5()"
-                    })
+                    "Can't call 5 because it is not a function."
                 );
             });
-            */
         });
 
         describe("hoisted functions", () => {
@@ -679,5 +660,15 @@ describe("exec()", () => {
                 )
             ).to.equal("correct");
         });
+    });
+});
+
+describe("debug", () => {
+    it("should print an error correctly", () => {
+        let spy = chai.spy();
+        stlExec("print hi", spy);
+        expect(spy).to.have.been.called.with.exactly(
+            `Variable "hi" is not defined.`
+        );
     });
 });
