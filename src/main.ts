@@ -4,14 +4,11 @@ const rl = require("readline").createInterface({
     output: process.stdout
 });
 
-import tokenize from "./Tokenizer";
-import parse from "./Parser";
-import { exprEval, setPrintFn } from "./Interpreter";
 import Scope from "./Scope";
-import { Expr } from "./Expr";
+import { startRepl, run } from "./steel";
 
 if (process.argv.length === 2) {
-    startRepl();
+    startRepl(rl);
 } else {
     let filename = process.argv[2];
     fs.readFile(filename, { encoding: "utf-8" }, (err, contents) => {
@@ -20,38 +17,7 @@ if (process.argv.length === 2) {
             process.exitCode = 1;
         } else {
             run(contents, false, new Scope());
-            rl.close();
         }
+        rl.close();
     });
-}
-
-function startRepl() {
-    let scope = new Scope();
-    rl.setPrompt("> ");
-    rl.prompt();
-    rl.on("line", input => {
-        try {
-            scope = run(input, true, scope);
-        } catch (err) {
-            console.log(err);
-        }
-        rl.prompt();
-    }).on("close", () => {
-        console.log("Closing REPL...");
-        process.exitCode = 0;
-    });
-}
-
-function run(source: string, repl: boolean, scope: Scope): Scope {
-    setPrintFn(console.log);
-    let tokens = tokenize(source);
-    let ast: any = parse(tokens);
-    for (let stmt of ast) {
-        let [val, newScope] = exprEval(stmt, scope);
-        scope = newScope;
-        if (stmt instanceof Expr && repl && val !== undefined) {
-            console.log(val);
-        }
-    }
-    return scope;
 }
