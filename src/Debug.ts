@@ -19,7 +19,7 @@ error:
  * the process. Anything that happens at runtime is a panic.
  */
 export function runtimePanic(message: string) {
-    throw message;
+    throw Error(message);
 }
 
 /*

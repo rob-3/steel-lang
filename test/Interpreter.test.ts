@@ -562,10 +562,7 @@ describe("exec()", () => {
             });
 
             it("should throw if a noncallable object is called", () => {
-                let spy = chai.spy();
-                stlExec("5()", spy);
-
-                expect(spy).to.have.been.called.with(
+                expect(() => stlEval("5()")).to.throw(
                     "Can't call 5 because it is not a function."
                 );
             });
@@ -665,9 +662,8 @@ describe("exec()", () => {
 
 describe("debug", () => {
     it("should print an error correctly", () => {
-        let spy = chai.spy();
-        stlExec("print hi", spy);
-        expect(spy).to.have.been.called.with.exactly(
+        
+        expect(() => stlEval("print hi")).to.throw(
             `Variable "hi" is not defined.`
         );
     });
