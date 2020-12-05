@@ -23,16 +23,20 @@ export function startRepl(rl) {
 }
 
 export function run(src: string, repl: boolean, scope: Scope): Scope {
-    source = src;
-    setPrintFn(console.log);
-    let tokens = tokenize(source);
-    let ast: any = parse(tokens);
-    for (let stmt of ast) {
-        let [val, newScope] = exprEval(stmt, scope);
-        scope = newScope;
-        if (repl && val !== undefined) {
-            console.log(val);
+    try {
+        source = src;
+        setPrintFn(console.log);
+        let tokens = tokenize(source);
+        let ast: any = parse(tokens);
+        for (let stmt of ast) {
+            let [val, newScope] = exprEval(stmt, scope);
+            scope = newScope;
+            if (repl && val !== undefined) {
+                console.log(val);
+            }
         }
+        return scope;
+    } catch (e) {
+        console.log(e.message);
     }
-    return scope;
 }
