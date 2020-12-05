@@ -1,4 +1,4 @@
-import { Value } from "./InterpreterHelpers";
+import { Value, StlFunction } from "./InterpreterHelpers";
 import { Scoped } from "./Interpreter";
 import { runtimePanic } from "./Debug";
 
@@ -66,8 +66,13 @@ export default class Scope {
         if (this.has(key)) {
             runtimePanic(`Cannot redefine immutable variable ${key}.`);
         } else {
-            this.setLocal(key, [evaluatedExpr, immutable]);
-            return [evaluatedExpr, this];
+            let newScope = new Scope(this);
+            newScope.setLocal(key, [evaluatedExpr, immutable]);
+            // Allow for recursive functions
+            if (evaluatedExpr instanceof StlFunction) {
+                evaluatedExpr.scope = newScope;
+            }
+            return [evaluatedExpr, newScope];
         }
     }
 

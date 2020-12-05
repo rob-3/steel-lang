@@ -195,7 +195,8 @@ function call(fn: StlFunction, args: Expr[], scope: Scope): Scoped<any> {
         scope = newScope;
         argValues.push(value);
     }
-    return fn.call(argValues, scope);
+    let value = fn.call(argValues);
+    return [value, scope]; 
 }
 
 /*

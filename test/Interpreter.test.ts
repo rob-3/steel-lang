@@ -390,6 +390,16 @@ describe("exec()", () => {
                 `;
                 expect(stlEval(src)).to.equal(5);
             });
+
+            it("should not be able to access variable declared after", () => {
+                expect(() => stlEval(
+                    `
+                    print_a = () -> print a
+                    a = 4
+                    print_a()
+                    `
+                )).to.throw(`Variable "a" is not defined.`);
+            });
         });
         describe("functions with arguments", () => {
             let src = `

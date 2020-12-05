@@ -4,19 +4,20 @@ import Scope from "./Scope";
 
 export class StlFunction {
     funExpr: FunctionExpr;
+    scope: Scope;
     constructor(funExpr: FunctionExpr) {
         this.funExpr = funExpr;
     }
 
-    call(callArgs: Value[], scope: Scope): Scoped<Value> {
-        let funScope = new Scope(scope);
+    call(callArgs: Value[]): Value {
+        let funScope = new Scope(this.scope);
         for (let i = 0; i < this.funExpr.args.length; i++) {
             // FIXME typecheck args
             funScope.setLocal(this.funExpr.args[i], [callArgs[i], false]);
         }
 
         let result: Scoped<Value> = exprEval(this.funExpr.body, funScope);
-        return [getVal(result), getState(result).parentScope];
+        return getVal(result);
     }
 }
 
