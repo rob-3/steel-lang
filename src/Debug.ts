@@ -55,12 +55,12 @@ export function parseError(message: string, highlight: Token) {
         endIndex++;
     }
     let lineString = source.slice(startIndex, endIndex);
-    return `parse error: ${message} 
+    return Error(`parse error: ${message} 
 ${" ".repeat(pad)}--> ${filename}:${line}:${column}
 ${" ".repeat(pad + 1)}|
 ${line.toString()} |    ${lineString}
 ${" ".repeat(pad + 1)}|    ${highlightString}
-`;
+`);
 }
 
 export function lexError(message: string, token: Token) {}

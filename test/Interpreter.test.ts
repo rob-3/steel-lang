@@ -188,6 +188,20 @@ describe("stlEval()", () => {
             ).to.equal(5);
         });
     });
+
+    describe("arrays", () => {
+        it("should not throw on empty array literal", () => {
+            expect(() => 
+                stlEval(
+                    `arr = []`
+                )
+            ).to.not.throw();
+        });
+
+        it("should allow nonempty array literals", () => {
+            expect(() => stlEval("arr = [1, 2, 3]")).to.not.throw();
+        })
+    });
 });
 
 describe("exec()", () => {

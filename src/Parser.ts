@@ -23,7 +23,7 @@ import {
 } from "./Expr";
 import Ast from "./Ast";
 import astTransforms from "./AstTransforms";
-import { parseError } from "./Debug";
+import { parseError, runtimePanic } from "./Debug";
 
 let tokens: Token[];
 let start = 0;
@@ -38,7 +38,7 @@ export default function parse(tokenList: Token[]): Expr[] {
         try {
             exprs.push(makeStmt());
         } catch (e) {
-            console.log(e);
+            console.log(e.message);
             eatToken();
         }
         eatNewlines();
@@ -77,6 +77,9 @@ function eatNewlines(): void {
 }
 
 function makeStmt(): Expr {
+    if (matchType(TokenType.OPEN_BRACKET)) {
+        return finishArrayLiteral();
+    }
     if (matchType(TokenType.RETURN))
         return new ReturnStmt(makeExpr(), getTokens());
     if (matchType(TokenType.VAR)) return finishVariableDeclaration();
@@ -101,6 +104,14 @@ function makeStmt(): Expr {
     if (matchType(TokenType.NEWLINE))
         throw Error("Unexpected newline; parser bug.");
     return makeExpr();
+}
+
+function finishArrayLiteral(): Expr {
+    const items = readCommaDelimitedList();
+    if (!matchType(TokenType.CLOSE_BRACKET)) {
+        throw parseError(`Expected "]", got ${lookAhead().lexeme}`, lookAhead());
+    }
+    return new PrimaryExpr(items, getTokens());
 }
 
 function finishVariableDeclaration(): Expr {
@@ -413,12 +424,18 @@ function makeCall(): Expr {
     return expr;
 }
 
+function readCommaDelimitedList(): Expr[] {
+    let list: Expr[] = [];
+    do {
+        list.push(makeExpr());
+    } while (matchType(TokenType.COMMA));
+    return list;
+}
+
 function finishCall(callee: Expr) {
     let args: Expr[] = [];
     if (!matchType(TokenType.CLOSE_PAREN)) {
-        do {
-            args.push(makeExpr());
-        } while (matchType(TokenType.COMMA));
+        args = readCommaDelimitedList();
         if (!matchType(TokenType.CLOSE_PAREN)) {
             throw parseError(
                 `Must terminate function call with ")"`,
@@ -467,6 +484,10 @@ function makePrimary(): Expr {
         // be careful moving this statement
         // the state machine above is subtle
         return finishGrouping();
+    }
+
+    if (matchType(TokenType.OPEN_BRACKET)) {
+        return finishArrayLiteral();
     }
 
     // should be impossible to get here
