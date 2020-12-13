@@ -16,7 +16,8 @@ import {
     WhileStmt,
     ReturnStmt,
     MatchStmt,
-    FunctionDefinition
+    FunctionDefinition,
+    IndexExpr
 } from "./Expr";
 import TokenType from "./TokenType";
 import Scope from "./Scope";
@@ -183,6 +184,18 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
         runtimePanic("Pattern match failed.");
     } else if (expr instanceof FunctionDefinition) {
         return exprEval(expr.definition, scope);
+    } else if (expr instanceof IndexExpr) {
+        const [index, newScope] = exprEval(expr.index, scope);
+        if (typeof index !== "number") {
+            // FIXME we probably should throw every runtimePanic since
+            // TypeScript isn't smart enough to know we throw
+            throw runtimePanic("Indexing expression must evaluate to a number!");
+        }
+        const array = newScope.lookup(expr.arr);
+        if (!Array.isArray(array)) {
+            runtimePanic(`${expr.arr} is not an array!`);
+        }
+        return [array[index].literal, newScope];
     } else {
         runtimePanic("Unhandled stmt or expr.");
     }

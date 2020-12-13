@@ -201,6 +201,24 @@ describe("stlEval()", () => {
         it("should allow nonempty array literals", () => {
             expect(() => stlEval("arr = [1, 2, 3]")).to.not.throw();
         })
+
+        it("should allow indexing arrays with zero", () => {
+            expect(stlEval(
+                `
+                a = [1, 2, 3]
+                a[0]
+                `
+            )).to.equal(1);
+        })
+
+        it("should allow indexing arrays with nonzero values", () => {
+            expect(stlEval(
+                `
+                a = [1, 2, 3]
+                a[2]
+                `
+            )).to.equal(3);
+        })
     });
 });
 

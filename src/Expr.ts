@@ -348,6 +348,22 @@ export class FunctionDefinition implements Expr {
     getDebugInfo = getDebugInfo;
 }
 
+export class IndexExpr implements Expr {
+    arr: string;
+    index: Expr;
+
+    constructor(arr: string, index: Expr) {
+        this.arr = arr;
+        this.index = index;
+    }
+
+    map(fn: (expr: Expr) => Expr) {
+        return fn(new IndexExpr(copy(this.arr), this.index));
+    }
+
+    getDebugInfo = getDebugInfo;
+};
+
 export class FailedParse implements Expr {
     map(fn: (expr: Expr) => Expr) {
         return this;

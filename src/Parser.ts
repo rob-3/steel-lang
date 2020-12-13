@@ -19,7 +19,8 @@ import {
     ReturnStmt,
     MatchStmt,
     MatchCase,
-    FunctionDefinition
+    FunctionDefinition,
+    IndexExpr
 } from "./Expr";
 import Ast from "./Ast";
 import astTransforms from "./AstTransforms";
@@ -452,8 +453,18 @@ function makePrimary(): Expr {
     if (matchType(TokenType.NUMBER, TokenType.STRING))
         return new PrimaryExpr(lookBehind().literal, getTokens());
     if (matchType(TokenType.IDENTIFIER)) {
+        const id = lookBehind().lexeme;
         if (matchType(TokenType.RIGHT_SINGLE_ARROW)) {
             return finishLambda([lookBehind(2).lexeme]);
+        } else if (matchType(TokenType.OPEN_BRACKET)) {
+            const expr = makeExpr();
+            if (!matchType(TokenType.CLOSE_BRACKET)) {
+                throw parseError(
+                    `Expected "]", got ${lookAhead().lexeme}`,
+                    lookAhead()
+                );
+            }
+            return new IndexExpr(id, expr);
         } else {
             let identifier = lookBehind().lexeme;
             return new VariableExpr(identifier, getTokens());
