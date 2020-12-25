@@ -18,14 +18,14 @@ error:
  * A panic means we're doomed with no hope of recovery from this. We tear down
  * the process. Anything that happens at runtime is a panic.
  */
-export function runtimePanic(message: string) {
-    throw Error(message);
+export function RuntimePanic(message: string) {
+    return Error(message);
 }
 
 /*
  * An error means the compile will fail.
  */
-export function parseError(message: string, highlight: Token) {
+export function ParseError(message: string, highlight: Token) {
     let location = highlight.location;
     let line: number = location.start[0];
     let column: number = location.start[1];

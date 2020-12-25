@@ -1,6 +1,6 @@
 import { Value, StlFunction } from "./InterpreterHelpers";
 import { Scoped } from "./Interpreter";
-import { runtimePanic } from "./Debug";
+import { RuntimePanic } from "./Debug";
 
 export default class Scope {
     bindings: Map<string, [Value, boolean]>;
@@ -42,14 +42,14 @@ export default class Scope {
     assign(key: string, evaluatedExpr: Value): Scoped<Value> {
         let variable = this.get(key);
         if (variable === null) {
-            runtimePanic(`Cannot assign to undefined variable "${key}".`);
+            throw RuntimePanic(`Cannot assign to undefined variable "${key}".`);
         } else {
             let immutable = variable[1];
             if (!immutable) {
                 this.set(key, [evaluatedExpr, false]);
                 return [evaluatedExpr, this];
             } else {
-                runtimePanic(`Cannot assign to immutable variable "${key}".`);
+                throw RuntimePanic(`Cannot assign to immutable variable "${key}".`);
             }
         }
     }
@@ -64,7 +64,7 @@ export default class Scope {
         immutable: boolean
     ): Scoped<Value> {
         if (this.has(key)) {
-            runtimePanic(`Cannot redefine immutable variable ${key}.`);
+            throw RuntimePanic(`Cannot redefine immutable variable ${key}.`);
         } else {
             let newScope = new Scope(this);
             newScope.setLocal(key, [evaluatedExpr, immutable]);
@@ -79,7 +79,7 @@ export default class Scope {
     lookup(identifier: string): Value {
         let val = this.get(identifier);
         if (val === null) {
-            runtimePanic(`Variable "${identifier}" is not defined.`);
+            throw RuntimePanic(`Variable "${identifier}" is not defined.`);
         } else {
             return val;
         }

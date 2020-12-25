@@ -24,7 +24,7 @@ import {
 } from "./Expr";
 import Ast from "./Ast";
 import astTransforms from "./AstTransforms";
-import { parseError, runtimePanic } from "./Debug";
+import { ParseError } from "./Debug";
 
 let tokens: Token[];
 let start = 0;
@@ -110,14 +110,14 @@ function makeStmt(): Expr {
 function finishArrayLiteral(): Expr {
     const items = readCommaDelimitedList();
     if (!matchType(TokenType.CLOSE_BRACKET)) {
-        throw parseError(`Expected "]", got ${lookAhead().lexeme}`, lookAhead());
+        throw ParseError(`Expected "]", got ${lookAhead().lexeme}`, lookAhead());
     }
     return new PrimaryExpr(items, getTokens());
 }
 
 function finishVariableDeclaration(): Expr {
     if (!matchType(TokenType.IDENTIFIER)) {
-        throw parseError(
+        throw ParseError(
             `Expected identifier; got "${lookAhead().lexeme}"`,
             lookAhead()
         );
@@ -125,12 +125,12 @@ function finishVariableDeclaration(): Expr {
     let identifier: string = lookBehind().lexeme;
     if (!matchType(TokenType.LEFT_SINGLE_ARROW)) {
         if (matchType(TokenType.EQUAL)) {
-            throw parseError(
+            throw ParseError(
                 `Must use "<-" for variable declaration, not "=".`,
                 lookBehind()
             );
         } else {
-            throw parseError(
+            throw ParseError(
                 `Expected "<-", got "${lookAhead().lexeme}"`,
                 lookAhead()
             );
@@ -146,7 +146,7 @@ function finishVariableDeclaration(): Expr {
             getTokens()
         );
     } else {
-        throw parseError("Expected a newline!", lookBehind());
+        throw ParseError("Expected a newline!", lookBehind());
     }
 }
 
@@ -156,20 +156,20 @@ function finishImmutableDeclaration(identifier: string): Expr {
     if (matchType(TokenType.NEWLINE) || atEnd() || lookAhead().lexeme === "}") {
         return new VariableDeclarationStmt(identifier, true, expr, getTokens());
     } else {
-        throw parseError("Expected a newline!", lookAhead());
+        throw ParseError("Expected a newline!", lookAhead());
     }
 }
 
 function finishMatchStmt(): Expr {
     let expr = makeExpr();
     if (!matchType(TokenType.OPEN_BRACE)) {
-        throw parseError(
+        throw ParseError(
             `Expected "{"; got "${lookAhead().lexeme}"`,
             lookAhead()
         );
     }
     if (!matchType(TokenType.NEWLINE)) {
-        throw parseError(`Expected a newline after "{"`, lookAhead());
+        throw ParseError(`Expected a newline after "{"`, lookAhead());
     }
     let cases: MatchCase[] = [];
     while (!matchType(TokenType.CLOSE_BRACE)) {
@@ -182,14 +182,14 @@ function finishMatchStmt(): Expr {
 function makeMatchCase(): MatchCase {
     let matchPrimary = makeMatchPrimary();
     if (!matchType(TokenType.RIGHT_DOUBLE_ARROW)) {
-        throw parseError(
+        throw ParseError(
             `Expected a "=>", got "${lookAhead().lexeme}"`,
             lookAhead()
         );
     }
     let expr = makeStmt();
     if (!matchType(TokenType.NEWLINE)) {
-        throw parseError(`Expected a newline after match case.`, lookAhead());
+        throw ParseError(`Expected a newline after match case.`, lookAhead());
     }
     return new MatchCase(matchPrimary, expr);
 }
@@ -200,7 +200,7 @@ function makeMatchPrimary(): PrimaryExpr | UnderscoreExpr {
     if (matchType(TokenType.NUMBER, TokenType.STRING))
         return new PrimaryExpr(lookBehind().literal, getTokens());
     if (matchType(TokenType.UNDERSCORE)) return new UnderscoreExpr(getTokens());
-    throw parseError(
+    throw ParseError(
         `"${
             lookAhead().lexeme
         }" is not a boolean, number, string literal, or "_".`,
@@ -211,7 +211,7 @@ function makeMatchPrimary(): PrimaryExpr | UnderscoreExpr {
 function finishWhileStmt(): Expr {
     let condition = makeStmt();
     if (atEnd()) {
-        throw parseError(
+        throw ParseError(
             `After while expected statement, but reached EOF.`,
             lookBehind()
         );
@@ -223,7 +223,7 @@ function finishWhileStmt(): Expr {
 function finishUntilStmt(): Expr {
     let condition: Expr = makeStmt();
     if (atEnd()) {
-        throw parseError(
+        throw ParseError(
             `After until expected statement, but reached EOF.`,
             lookBehind()
         );
@@ -246,7 +246,7 @@ function backTrack(): void {
 
 function finishFunctionDeclaration(): Expr {
     if (!matchType(TokenType.IDENTIFIER)) {
-        throw parseError(
+        throw ParseError(
             `Expected an identifier; got "${lookAhead().lexeme}"`,
             lookAhead()
         );
@@ -254,7 +254,7 @@ function finishFunctionDeclaration(): Expr {
     let fnName = lookBehind().lexeme;
     // FIXME better error
     if (!matchType(TokenType.EQUAL))
-        throw parseError("Expected =", lookAhead());
+        throw ParseError("Expected =", lookAhead());
     eatNewlines();
     let lambda = makeLambda();
     return new FunctionDefinition(
@@ -271,11 +271,11 @@ function makeLambda(): FunctionExpr {
         args = finishFunctDecArgs();
     } else {
         // FIXME better error
-        throw parseError("Expected identifier or open paren", lookAhead());
+        throw ParseError("Expected identifier or open paren", lookAhead());
     }
     // FIXME better error
     if (!matchType(TokenType.RIGHT_SINGLE_ARROW))
-        throw parseError("Expected ->", lookAhead());
+        throw ParseError("Expected ->", lookAhead());
     return finishLambda(args);
 }
 
@@ -288,7 +288,7 @@ function finishFunctDecArgs(): string[] {
         //FIXME checks are needed
     }
     if (!matchType(TokenType.CLOSE_PAREN)) {
-        throw parseError(
+        throw ParseError(
             `Expected ")"; got "${lookAhead().lexeme}"`,
             lookAhead()
         );
@@ -301,7 +301,7 @@ function finishBlockStmt(): BlockStmt {
     eatNewlines();
     while (!matchType(TokenType.CLOSE_BRACE)) {
         if (atEnd()) {
-            throw parseError(
+            throw ParseError(
                 "Encountered EOF before end of block statement.",
                 lookAhead()
             );
@@ -320,7 +320,7 @@ function finishIfStmt(): Expr {
     matchType(TokenType.THEN);
     eatNewlines();
     if (atEnd())
-        throw parseError(
+        throw ParseError(
             `After if expected statement, but reached EOF.`,
             lookBehind()
         );
@@ -330,7 +330,7 @@ function finishIfStmt(): Expr {
     let elseBody: Expr = null;
     if (matchType(TokenType.ELSE)) {
         if (atEnd())
-            throw parseError(
+            throw ParseError(
                 `After if expected statement, but reached EOF.`,
                 lookBehind()
             );
@@ -339,7 +339,7 @@ function finishIfStmt(): Expr {
         if (maybeElseBody) {
             elseBody = maybeElseBody;
         } else {
-            throw parseError(
+            throw ParseError(
                 `After else expected statement, but got ${lookAhead().lexeme}`,
                 lookAhead()
             );
@@ -438,7 +438,7 @@ function finishCall(callee: Expr) {
     if (!matchType(TokenType.CLOSE_PAREN)) {
         args = readCommaDelimitedList();
         if (!matchType(TokenType.CLOSE_PAREN)) {
-            throw parseError(
+            throw ParseError(
                 `Must terminate function call with ")"`,
                 lookAhead()
             );
@@ -459,7 +459,7 @@ function makePrimary(): Expr {
         } else if (matchType(TokenType.OPEN_BRACKET)) {
             const expr = makeExpr();
             if (!matchType(TokenType.CLOSE_BRACKET)) {
-                throw parseError(
+                throw ParseError(
                     `Expected "]", got ${lookAhead().lexeme}`,
                     lookAhead()
                 );
@@ -477,7 +477,7 @@ function makePrimary(): Expr {
                 current -= 2;
                 let args: string[] = finishFunctDecArgs();
                 if (!matchType(TokenType.RIGHT_SINGLE_ARROW)) {
-                    throw parseError(
+                    throw ParseError(
                         `Expected "->", got "${lookAhead().lexeme}"`,
                         lookAhead()
                     );
@@ -502,7 +502,7 @@ function makePrimary(): Expr {
     }
 
     // should be impossible to get here
-    throw parseError(
+    throw ParseError(
         `Expected a primary; got "${lookAhead().lexeme}"`,
         lookAhead()
     );
@@ -520,7 +520,7 @@ function finishGrouping(): Expr {
     if (matchType(TokenType.CLOSE_PAREN))
         return new GroupingExpr(expr, getTokens());
     else
-        throw parseError(
+        throw ParseError(
             `Expected ")", got "${lookAhead().lexeme}"`,
             lookAhead()
         );

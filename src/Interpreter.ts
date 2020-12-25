@@ -27,7 +27,7 @@ export type Scoped<T> = [T, Scope];
 export const getVal = (arr: [Value, Scope]) => arr[0];
 export const getState = (arr: [Value, Scope]) => arr[1];
 import { StlFunction, Value } from "./InterpreterHelpers";
-import { runtimePanic } from "./Debug";
+import { RuntimePanic } from "./Debug";
 
 export let printfn = (thing: Value, scope: Scope): [Value, Scope] => {
     let text = String(thing);
@@ -105,7 +105,7 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
             case TokenType.EQUAL_EQUAL:
                 return [equal(leftVal, rightVal), newScope2];
             default:
-                runtimePanic(
+                throw RuntimePanic(
                     `FIXME: Unhandled operator type "${expr.operator}"`
                 );
         }
@@ -126,7 +126,7 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
         if (maybeFn instanceof StlFunction) {
             return call(maybeFn, expr.args, newScope);
         } else {
-            runtimePanic(`Can't call ${maybeFn} because it is not a function.`);
+            throw RuntimePanic(`Can't call ${maybeFn} because it is not a function.`);
         }
     } else if (expr instanceof FunctionExpr) {
         return [new StlFunction(expr), scope];
@@ -142,7 +142,7 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
     } else if (expr instanceof IfStmt) {
         let [shouldBeBool, newScope] = exprEval(expr.condition, scope);
         if (!assertBool(shouldBeBool)) {
-            runtimePanic("Condition doesn't evaluate to a boolean.");
+            throw RuntimePanic("Condition doesn't evaluate to a boolean.");
         }
         if (shouldBeBool) {
             return exprEval(expr.body, newScope);
@@ -181,23 +181,23 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
                 return exprEval(matchCase.expr, newScope);
             }
         }
-        runtimePanic("Pattern match failed.");
+        throw RuntimePanic("Pattern match failed.");
     } else if (expr instanceof FunctionDefinition) {
         return exprEval(expr.definition, scope);
     } else if (expr instanceof IndexExpr) {
         const [index, newScope] = exprEval(expr.index, scope);
         if (typeof index !== "number") {
-            // FIXME we probably should throw every runtimePanic since
+            // FIXME we probably should throw every RuntimePanic since
             // TypeScript isn't smart enough to know we throw
-            throw runtimePanic("Indexing expression must evaluate to a number!");
+            throw RuntimePanic("Indexing expression must evaluate to a number!");
         }
         const array = newScope.lookup(expr.arr);
         if (!Array.isArray(array)) {
-            runtimePanic(`${expr.arr} is not an array!`);
+            throw RuntimePanic(`${expr.arr} is not an array!`);
         }
         return [array[index].literal, newScope];
     } else {
-        runtimePanic("Unhandled stmt or expr.");
+        throw RuntimePanic("Unhandled stmt or expr.");
     }
 }
 
@@ -218,50 +218,50 @@ function call(fn: StlFunction, args: Expr[], scope: Scope): Scoped<any> {
  */
 function opposite(right: Value): number {
     if (assertNumber(right)) return -(<number>right);
-    else runtimePanic('"-" can only be used on a number');
+    else throw RuntimePanic('"-" can only be used on a number');
 }
 
 function plus(left: Value, right: Value): number {
     if (assertNumber(left, right)) {
         return <number>left + <number>right;
-    } else runtimePanic('Operands of "+" must be numbers.');
+    } else throw RuntimePanic('Operands of "+" must be numbers.');
 }
 
 function minus(left: Value, right: Value): number {
     if (assertNumber(left, right)) {
         return <number>left - <number>right;
-    } else runtimePanic('Operands of "-" must be numbers.');
+    } else throw RuntimePanic('Operands of "-" must be numbers.');
 }
 
 function plusPlus(left: Value, right: Value): string {
     if (typeof left === "string" && typeof right === "string") {
         return left.concat(right);
-    } else runtimePanic('Operands of "++" must be strings.');
+    } else throw RuntimePanic('Operands of "++" must be strings.');
 }
 
 function star(left: Value, right: Value): number {
     if (assertNumber(left, right)) {
         return <number>left * <number>right;
-    } else runtimePanic('Operands of "*" must be numbers.');
+    } else throw RuntimePanic('Operands of "*" must be numbers.');
 }
 
 function slash(left: Value, right: Value): number {
     if (assertNumber(left, right)) {
         return <number>left / <number>right;
-    } else runtimePanic('Operands of "/" must be numbers.');
+    } else throw RuntimePanic('Operands of "/" must be numbers.');
 }
 
 function and(left: Value, right: Value): boolean {
     if (assertBool(left, right)) {
         return <boolean>left && <boolean>right;
-    } else runtimePanic('Operands of "and" must be booleans.');
+    } else throw RuntimePanic('Operands of "and" must be booleans.');
 }
 
 function or(left: Value, right: Value): boolean {
     if (assertBool(left, right)) {
         return <boolean>left || <boolean>right;
     } else {
-        runtimePanic('Operands of "or" must be booleans.');
+        throw RuntimePanic('Operands of "or" must be booleans.');
     }
 }
 
@@ -281,7 +281,7 @@ function assertBool(...literals: any[]): boolean {
 
 function not(right: Value): boolean {
     if (assertBool(right)) return !right;
-    else runtimePanic('Operands of "not" should be booleans.');
+    else throw RuntimePanic('Operands of "not" should be booleans.');
 }
 
 function greaterEqual(left: Value, right: Value): boolean {
@@ -312,11 +312,11 @@ function numberComparision(
 ): boolean {
     if (assertNumber(left, right)) {
         return operator(left, right);
-    } else runtimePanic(`Operands of ${err} should be numbers.`);
+    } else throw RuntimePanic(`Operands of ${err} should be numbers.`);
 }
 
 function mod(left: Value, right: Value): number {
     if (typeof left === "number" && typeof right === "number") {
         return left % right;
-    } else runtimePanic(`Operands of % should be numbers.`);
+    } else throw RuntimePanic(`Operands of % should be numbers.`);
 }
