@@ -44,9 +44,9 @@ export class BinaryExpr implements Expr {
 }
 
 export class PrimaryExpr implements Expr {
-    literal: any;
+    literal: number | boolean | string;
     tokens: Token[];
-    constructor(literal: any, tokens: Token[]) {
+    constructor(literal: number | boolean | string, tokens: Token[]) {
         this.literal = literal;
         this.tokens = tokens;
     }
@@ -351,14 +351,32 @@ export class FunctionDefinition implements Expr {
 export class IndexExpr implements Expr {
     arr: string;
     index: Expr;
+    tokens: Token[];
 
-    constructor(arr: string, index: Expr) {
+    constructor(arr: string, index: Expr, tokens: Token[]) {
         this.arr = arr;
         this.index = index;
+        this.tokens = tokens;
     }
 
     map(fn: (expr: Expr) => Expr) {
-        return fn(new IndexExpr(copy(this.arr), this.index));
+        return fn(new IndexExpr(copy(this.arr), this.index, copy(this.tokens)));
+    }
+
+    getDebugInfo = getDebugInfo;
+};
+
+export class ArrayLiteral implements Expr {
+    exprs: Expr[];
+    tokens: Token[];
+
+    constructor(exprs: Expr[], tokens: Token[]) {
+        this.exprs = exprs;
+        this.tokens = tokens;
+    }
+
+    map(fn: (expr: Expr) => Expr) {
+        return new ArrayLiteral(this.exprs.map(e => e.map(fn)), copy(this.tokens));
     }
 
     getDebugInfo = getDebugInfo;

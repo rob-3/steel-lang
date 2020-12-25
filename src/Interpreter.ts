@@ -17,7 +17,8 @@ import {
     ReturnStmt,
     MatchStmt,
     FunctionDefinition,
-    IndexExpr
+    IndexExpr,
+    ArrayLiteral,
 } from "./Expr";
 import TokenType from "./TokenType";
 import Scope from "./Scope";
@@ -73,6 +74,14 @@ export function stlEval(src: string, scope: Scope): Scoped<Value> {
 export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
     if (expr instanceof PrimaryExpr) {
         return [expr.literal, scope];
+    } else if (expr instanceof ArrayLiteral) {
+        const resolved: Value[] = [];
+        const newScope = expr.exprs.reduce((acc: Scope, cur: Expr) => {
+            const [val, scope]: [Value, Scope] = exprEval(cur, acc);
+            resolved.push(val);
+            return scope;
+        }, scope);
+        return [resolved, newScope];
     } else if (expr instanceof BinaryExpr) {
         // TODO: refactor in functional style
         let [leftVal, newScope] = exprEval(expr.left, scope);
@@ -195,7 +204,7 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
         if (!Array.isArray(array)) {
             throw RuntimePanic(`${expr.arr} is not an array!`);
         }
-        return [array[index].literal, newScope];
+        return [array[index], newScope];
     } else {
         throw RuntimePanic("Unhandled stmt or expr.");
     }

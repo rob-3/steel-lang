@@ -21,4 +21,4 @@ export class StlFunction {
     }
 }
 
-export type Value = number | boolean | string | StlFunction;
+export type Value = number | boolean | string | StlFunction | Value[];
