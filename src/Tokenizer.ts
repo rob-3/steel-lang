@@ -1,6 +1,7 @@
 import TokenType from "./TokenType";
 import Token from "./Token";
 import { Location } from "./TokenizerHelpers";
+import { Maybe, Just, Nothing } from "purify-ts";
 
 let startIndex = 0;
 let currentIndex = 0;
@@ -21,10 +22,7 @@ export default function tokenize(
     try {
         source = src;
         while (!atEnd()) {
-            let maybeToken = scanToken();
-            if (maybeToken) {
-                tokens.push(maybeToken);
-            }
+            scanToken().map(t => tokens.push(t));
         }
         tokens.push(
             new Token(
@@ -44,82 +42,82 @@ export default function tokenize(
     return tokens;
 }
 
-function scanToken(): void | Token {
+function scanToken(): Maybe<Token> {
     let char = eatChar();
     switch (char) {
         case "(":
-            return makeToken(TokenType.OPEN_PAREN);
+            return Just(makeToken(TokenType.OPEN_PAREN));
         case ")":
-            return makeToken(TokenType.CLOSE_PAREN);
+            return Just(makeToken(TokenType.CLOSE_PAREN));
         case "[":
-            return makeToken(TokenType.OPEN_BRACKET);
+            return Just(makeToken(TokenType.OPEN_BRACKET));
         case "]":
-            return makeToken(TokenType.CLOSE_BRACKET);
+            return Just(makeToken(TokenType.CLOSE_BRACKET));
         case "{":
-            return makeToken(TokenType.OPEN_BRACE);
+            return Just(makeToken(TokenType.OPEN_BRACE));
         case "}":
-            return makeToken(TokenType.CLOSE_BRACE);
+            return Just(makeToken(TokenType.CLOSE_BRACE));
         case ".":
-            return makeToken(TokenType.DOT);
+            return Just(makeToken(TokenType.DOT));
         case "%":
-            return makeToken(TokenType.MOD);
+            return Just(makeToken(TokenType.MOD));
         case "*":
-            return makeToken(TokenType.STAR);
+            return Just(makeToken(TokenType.STAR));
         case "/":
             if (match("/")) {
                 eatLineComment();
             } else if (match("*")) {
                 eatMultiLineComment();
             } else {
-                return makeToken(TokenType.SLASH);
+                return Just(makeToken(TokenType.SLASH));
             }
-            return null;
+            return Nothing;
         case "+":
             return match("+")
-                ? makeToken(TokenType.PLUS_PLUS)
-                : makeToken(TokenType.PLUS);
+                ? Just(makeToken(TokenType.PLUS_PLUS))
+                : Just(makeToken(TokenType.PLUS));
         case "-":
             return match(">")
-                ? makeToken(TokenType.RIGHT_SINGLE_ARROW)
-                : makeToken(TokenType.MINUS);
+                ? Just(makeToken(TokenType.RIGHT_SINGLE_ARROW))
+                : Just(makeToken(TokenType.MINUS));
         case "=":
             return match("=")
-                ? makeToken(TokenType.EQUAL_EQUAL)
+                ? Just(makeToken(TokenType.EQUAL_EQUAL))
                 : match(">")
-                ? makeToken(TokenType.RIGHT_DOUBLE_ARROW)
-                : makeToken(TokenType.EQUAL);
+                ? Just(makeToken(TokenType.RIGHT_DOUBLE_ARROW))
+                : Just(makeToken(TokenType.EQUAL));
         case ">":
             return match("=")
-                ? makeToken(TokenType.GREATER_EQUAL)
-                : makeToken(TokenType.GREATER);
+                ? Just(makeToken(TokenType.GREATER_EQUAL))
+                : Just(makeToken(TokenType.GREATER));
         case "<":
             return match("=")
-                ? makeToken(TokenType.LESS_EQUAL)
+                ? Just(makeToken(TokenType.LESS_EQUAL))
                 : match("-")
-                ? makeToken(TokenType.LEFT_SINGLE_ARROW)
-                : makeToken(TokenType.LESS);
+                ? Just(makeToken(TokenType.LEFT_SINGLE_ARROW))
+                : Just(makeToken(TokenType.LESS));
         case ",":
-            return makeToken(TokenType.COMMA);
+            return Just(makeToken(TokenType.COMMA));
         case "_":
-            return makeToken(TokenType.UNDERSCORE);
+            return Just(makeToken(TokenType.UNDERSCORE));
         case "\t":
         case " ":
             // move the start pointers forward and try again
             startIndex = currentIndex;
             startColumn = currentColumn;
-            return;
+            return Nothing;
         case "\n":
             bumpLine();
-            let token = makeToken(TokenType.NEWLINE);
+            let token = Just(makeToken(TokenType.NEWLINE));
             return token;
         case '"':
-            return makeString();
+            return Just(makeString());
         //case "\'": return stringInterpolation();
         default:
             if (isNumber(char)) {
-                return makeNumber();
+                return Just(makeNumber());
             } else if (isAlpha(char)) {
-                return makeIdentifierOrKeyword();
+                return Just(makeIdentifierOrKeyword());
             } else {
                 throw Error(
                     `Unrecognized character "${char}". Perhaps you intended to put this in a string?`
