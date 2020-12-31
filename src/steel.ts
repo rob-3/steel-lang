@@ -2,14 +2,15 @@ import Scope from "./Scope";
 import { exprEval, setPrintFn } from "./Interpreter";
 import tokenize from "./Tokenizer";
 import parse from "./Parser";
+import { Expr } from "./Expr";
 
 export let source: string;
 
-export function startRepl(rl) {
+export function startRepl(rl: any) {
     let scope = new Scope();
     rl.setPrompt("> ");
     rl.prompt();
-    rl.on("line", input => {
+    rl.on("line", (input: string) => {
         try {
             scope = run(input + "\n", true, scope);
         } catch (err) {
@@ -27,7 +28,7 @@ export function run(src: string, repl: boolean, scope: Scope): Scope {
         source = src;
         setPrintFn(console.log);
         const tokens = tokenize(source);
-        const ast: any = parse(tokens);
+        const ast: Expr[] = parse(tokens);
         for (const stmt of ast) {
             const [val, newScope] = exprEval(stmt, scope);
             scope = newScope;

@@ -36,7 +36,7 @@ export let printfn = (thing: Value, scope: Scope): [Value, Scope] => {
     return [String(thing), scope];
 };
 
-export function setPrintFn(fn): void {
+export function setPrintFn(fn: (v: Value) => void): void {
     printfn = (val: Value, scope: Scope) => {
         fn(val);
         return [val, scope];
@@ -44,7 +44,7 @@ export function setPrintFn(fn): void {
 }
 
 function execStmts(stmts: Expr[], scope: Scope): Scoped<Value> {
-    let value;
+    let value: Value;
     for (const stmt of stmts) {
         const pair = exprEval(stmt, scope);
         if (stmt instanceof ReturnStmt) {
@@ -316,7 +316,7 @@ function equal(left: Value, right: Value): boolean {
 function numberComparision(
     left: Value,
     right: Value,
-    operator: (left, right) => boolean,
+    operator: (left: Value, right: Value) => boolean,
     err: string
 ): boolean {
     if (assertNumber(left, right)) {

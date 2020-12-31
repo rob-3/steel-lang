@@ -11,7 +11,7 @@ if (process.argv.length === 2) {
     startRepl(rl);
 } else {
     const filename = process.argv[2];
-    fs.readFile(filename, { encoding: "utf-8" }, (err, contents) => {
+    fs.readFile(filename, { encoding: "utf-8" }, (err: Error, contents: string) => {
         if (err) {
             console.log("There was a problem reading the file.");
             process.exitCode = 1;
