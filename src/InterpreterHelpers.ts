@@ -1,4 +1,4 @@
-import { Scoped, exprEval, getState, getVal } from "./Interpreter";
+import { Scoped, exprEval, getVal } from "./Interpreter";
 import { FunctionExpr } from "./Expr";
 import Scope from "./Scope";
 

@@ -1,5 +1,4 @@
 import Token from "./Token";
-import { printfn } from "./Interpreter";
 import { source } from "./steel";
 import Ast from "./Ast";
 import {
