@@ -36,7 +36,7 @@ let current = 0;
 
 export default function parse(tokenList: Token[]): Expr[] {
     tokens = tokenList;
-    let parseTree: Result<Expr>[] = [];
+    const parseTree: Result<Expr>[] = [];
 
     eatNewlines();
     while (!atEnd()) {
@@ -92,10 +92,10 @@ function makeStmt(): Result<Expr> {
     if (matchType(TokenType.MATCH)) return finishMatchStmt();
     if (matchType(TokenType.IDENTIFIER)) {
         if (matchType(TokenType.LEFT_SINGLE_ARROW)) {
-            let identifier = lookBehind(2).lexeme;
+            const identifier = lookBehind(2).lexeme;
             return finishAssignment(identifier);
         } else if (matchType(TokenType.EQUAL)) {
-            let identifier = lookBehind(2).lexeme;
+            const identifier = lookBehind(2).lexeme;
             return finishImmutableDeclaration(identifier);
         } else {
             backTrack();
@@ -123,7 +123,7 @@ function finishVariableDeclaration(): Result<Expr> {
             lookAhead()
         ));
     }
-    let identifier: string = lookBehind().lexeme;
+    const identifier: string = lookBehind().lexeme;
     if (!matchType(TokenType.LEFT_SINGLE_ARROW)) {
         if (matchType(TokenType.EQUAL)) {
             return Left(ParseError(
@@ -174,7 +174,7 @@ function finishMatchStmt(): Result<Expr> {
         if (!matchType(TokenType.NEWLINE)) {
             return Left(ParseError(`Expected a newline after "{"`, lookAhead()));
         }
-        let cases: MatchCase[] = [];
+        const cases: MatchCase[] = [];
         while (!matchType(TokenType.CLOSE_BRACE)) {
             eatNewlines();
             cases.push(makeMatchCase().unsafeCoerce());
@@ -191,7 +191,7 @@ function makeMatchCase(): Result<MatchCase> {
                     lookAhead()
             ));
         }
-        let expr = makeStmt();
+        const expr = makeStmt();
         if (!matchType(TokenType.NEWLINE)) {
             return Left(ParseError(`Expected a newline after match case.`, lookAhead()));
         }
@@ -258,7 +258,7 @@ function finishFunctionDeclaration(): Result<Expr> {
             lookAhead()
         ));
     }
-    let fnName = lookBehind().lexeme;
+    const fnName = lookBehind().lexeme;
     // FIXME better error
     if (!matchType(TokenType.EQUAL))
         return Left(ParseError("Expected =", lookAhead()));
@@ -288,7 +288,7 @@ function makeLambda(): Result<FunctionExpr> {
 }
 
 function finishFunctDecArgs(): Result<string[]> {
-    let args: string[] = [];
+    const args: string[] = [];
     while (matchType(TokenType.IDENTIFIER)) {
         args.push(lookBehind().lexeme);
         matchType(TokenType.COMMA);
@@ -305,7 +305,7 @@ function finishFunctDecArgs(): Result<string[]> {
 }
 
 function finishBlockStmt(): Result<BlockStmt> {
-    let stmts: Expr[] = [];
+    const stmts: Expr[] = [];
     eatNewlines();
     while (!matchType(TokenType.CLOSE_BRACE)) {
         if (atEnd()) {
@@ -322,7 +322,7 @@ function finishBlockStmt(): Result<BlockStmt> {
 
 function finishIfStmt(): Result<Expr> {
     eatNewlines();
-    let condition: Result<Expr> = makeExpr();
+    const condition: Result<Expr> = makeExpr();
     eatNewlines();
     // optionally match then
     matchType(TokenType.THEN);
@@ -332,7 +332,7 @@ function finishIfStmt(): Result<Expr> {
             `After if expected statement, but reached EOF.`,
             lookBehind()
         ));
-    let maybeBody: Result<Expr> = makeStmt();
+    const maybeBody: Result<Expr> = makeStmt();
     eatNewlines();
 
     if (matchType(TokenType.ELSE)) {
@@ -409,14 +409,14 @@ function makeMod(): Result<Expr> {
 
 function makeUnary(): Result<Expr> {
     if (matchType(TokenType.MINUS, TokenType.NOT)) {
-        let operator = lookBehind();
+        const operator = lookBehind();
         return makeUnary().map(right => new UnaryExpr(operator, right, getTokens()));
     }
     return makeCall();
 }
 
 function readCommaDelimitedList(): Result<Expr[]> {
-    let list: Result<Expr>[] = [];
+    const list: Result<Expr>[] = [];
     do {
         list.push(makeExpr());
     } while (matchType(TokenType.COMMA));
@@ -465,7 +465,7 @@ function makePrimary(): Result<Expr> {
                 return Right(new IndexExpr(id, expr, getTokens()));
             });
         } else {
-            let identifier = lookBehind().lexeme;
+            const identifier = lookBehind().lexeme;
             return Right(new VariableExpr(identifier, getTokens()));
         }
     }
@@ -474,7 +474,7 @@ function makePrimary(): Result<Expr> {
         if (matchType(TokenType.IDENTIFIER)) {
             if (matchType(TokenType.COMMA, TokenType.CLOSE_PAREN)) {
                 current -= 2;
-                let args: string[] = finishFunctDecArgs().unsafeCoerce();
+                const args: string[] = finishFunctDecArgs().unsafeCoerce();
                 if (!matchType(TokenType.RIGHT_SINGLE_ARROW)) {
                     return Left(ParseError(
                         `Expected "->", got "${lookAhead().lexeme}"`,
@@ -541,8 +541,8 @@ function makeBinaryExpr(
     let expr: Result<Expr> = higherPrecedenceOperation();
 
     while (matchType(...matches)) {
-        let operator = lookBehind();
-        let right = higherPrecedenceOperation();
+        const operator = lookBehind();
+        const right = higherPrecedenceOperation();
         expr = Right(new BinaryExpr(expr.unsafeCoerce(), operator, right.unsafeCoerce(), getTokens()));
     }
     return expr;

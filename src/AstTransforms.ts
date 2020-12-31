@@ -6,8 +6,8 @@ export default astTransforms;
 
 function hoistFunctions(expr: Expr) {
     if (expr instanceof BlockStmt) {
-        let children: Expr[] = expr.exprs;
-        let reorderedChildren: Expr[] = children.reduce<Expr[]>(
+        const children: Expr[] = expr.exprs;
+        const reorderedChildren: Expr[] = children.reduce<Expr[]>(
             (acc: Expr[], cur: Expr) => {
                 if (cur instanceof FunctionDefinition) {
                     acc.unshift(cur);

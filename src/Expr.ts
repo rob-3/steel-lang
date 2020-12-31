@@ -8,12 +8,12 @@ export interface Expr {
 }
 
 function getDebugInfo(): Location {
-    let tokens = this.tokens;
-    let filename = tokens[0].location.filepath;
+    const tokens = this.tokens;
+    const filename = tokens[0].location.filepath;
 
-    let startSpot = tokens[0].location.start;
-    let endSpot = tokens[tokens.length - 1].location.end;
-    let location = new Location(startSpot, endSpot, filename);
+    const startSpot = tokens[0].location.start;
+    const endSpot = tokens[tokens.length - 1].location.end;
+    const location = new Location(startSpot, endSpot, filename);
     return location;
 }
 

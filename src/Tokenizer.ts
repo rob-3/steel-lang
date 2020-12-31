@@ -18,7 +18,7 @@ export default function tokenize(
     filepath = "<anonymous>"
 ): Token[] {
     filename = filepath;
-    let tokens = [];
+    const tokens = [];
     try {
         source = src;
         while (!atEnd()) {
@@ -43,7 +43,7 @@ export default function tokenize(
 }
 
 function scanToken(): Maybe<Token> {
-    let char = eatChar();
+    const char = eatChar();
     switch (char) {
         case "(":
             return Just(makeToken(TokenType.OPEN_PAREN));
@@ -108,7 +108,7 @@ function scanToken(): Maybe<Token> {
             return Nothing;
         case "\n":
             bumpLine();
-            let token = Just(makeToken(TokenType.NEWLINE));
+            const token = Just(makeToken(TokenType.NEWLINE));
             return token;
         case '"':
             return Just(makeString());
@@ -164,7 +164,7 @@ function makeIdentifierOrKeyword(): Token {
     while (!atEnd() && isLegalIdentifierChar(lookAhead())) {
         eatChar();
     }
-    let lexeme = source.slice(startIndex, currentIndex);
+    const lexeme = source.slice(startIndex, currentIndex);
     switch (lexeme) {
         case "var":
             return makeToken(TokenType.VAR);
@@ -240,7 +240,7 @@ function isLegalIdentifierChar(char: string) {
 }
 
 function isAlpha(char: string): boolean {
-    let lower = char.toLowerCase();
+    const lower = char.toLowerCase();
     return lower >= "a" && lower <= "z";
 }
 
@@ -249,7 +249,7 @@ function isNumber(char: string): boolean {
 }
 
 function makeToken(type: TokenType, literal: any = null): Token {
-    let token = new Token(
+    const token = new Token(
         type,
         source.slice(startIndex, currentIndex),
         literal,
@@ -277,7 +277,7 @@ function eatLineComment(): void {
 function eatMultiLineComment(): void {
     commentNests += 1;
     while (!atEnd() && commentNests > 0) {
-        let char = eatChar();
+        const char = eatChar();
         if (char === "/") {
             if (lookBehind(2) === "*") {
                 commentNests -= 1;

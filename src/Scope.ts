@@ -11,7 +11,7 @@ export default class Scope {
     }
 
     get(identifier: string): Value {
-        let value = this.bindings.get(identifier);
+        const value = this.bindings.get(identifier);
         if (value === undefined) {
             if (this.parentScope !== null) {
                 return this.parentScope.get(identifier);
@@ -40,11 +40,11 @@ export default class Scope {
     }
 
     assign(key: string, evaluatedExpr: Value): Scoped<Value> {
-        let variable = this.get(key);
+        const variable = this.get(key);
         if (variable === null) {
             throw RuntimePanic(`Cannot assign to undefined variable "${key}".`);
         } else {
-            let immutable = variable[1];
+            const immutable = variable[1];
             if (!immutable) {
                 this.set(key, [evaluatedExpr, false]);
                 return [evaluatedExpr, this];
@@ -66,7 +66,7 @@ export default class Scope {
         if (this.has(key)) {
             throw RuntimePanic(`Cannot redefine immutable variable ${key}.`);
         } else {
-            let newScope = new Scope(this);
+            const newScope = new Scope(this);
             newScope.setLocal(key, [evaluatedExpr, immutable]);
             // Allow for recursive functions
             if (evaluatedExpr instanceof StlFunction) {
@@ -77,7 +77,7 @@ export default class Scope {
     }
 
     lookup(identifier: string): Value {
-        let val = this.get(identifier);
+        const val = this.get(identifier);
         if (val === null) {
             throw RuntimePanic(`Variable "${identifier}" is not defined.`);
         } else {

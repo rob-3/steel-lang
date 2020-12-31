@@ -10,13 +10,13 @@ export class StlFunction {
     }
 
     call(callArgs: Value[]): Value {
-        let funScope = new Scope(this.scope);
+        const funScope = new Scope(this.scope);
         for (let i = 0; i < this.funExpr.args.length; i++) {
             // FIXME typecheck args
             funScope.setLocal(this.funExpr.args[i], [callArgs[i], false]);
         }
 
-        let result: Scoped<Value> = exprEval(this.funExpr.body, funScope);
+        const result: Scoped<Value> = exprEval(this.funExpr.body, funScope);
         return getVal(result);
     }
 }

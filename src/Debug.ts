@@ -49,35 +49,35 @@ export function RuntimePanic(message: string) {
  * An error means the compile will fail.
  */
 export function ParseError(message: string, highlight: Token) {
-    let location = highlight.location;
-    let line: number = location.start[0];
-    let column: number = location.start[1];
-    let filename = location.filename;
+    const location = highlight.location;
+    const line: number = location.start[0];
+    const column: number = location.start[1];
+    const filename = location.filename;
 
-    let pad = line.toString().length;
+    const pad = line.toString().length;
 
     // calculate highlight string
-    let startColumn = location.start[1];
-    let endColumn = location.end[1];
-    let highlightString =
+    const startColumn = location.start[1];
+    const endColumn = location.end[1];
+    const highlightString =
         " ".repeat(startColumn - 1) + "^".repeat(endColumn - startColumn);
 
     // FIXME handle EOF
     let lineNumber = 1;
     let index = 0;
     while (lineNumber < line) {
-        let char = source[index];
+        const char = source[index];
         if (char === "\n") {
             lineNumber++;
         }
         index++;
     }
-    let startIndex = index;
+    const startIndex = index;
     let endIndex = index;
     while (source[endIndex] !== "\n") {
         endIndex++;
     }
-    let lineString = source.slice(startIndex, endIndex);
+    const lineString = source.slice(startIndex, endIndex);
     return Error(`parse error: ${message} 
 ${" ".repeat(pad)}--> ${filename}:${line}:${column}
 ${" ".repeat(pad + 1)}|

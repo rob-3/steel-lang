@@ -26,10 +26,10 @@ export function run(src: string, repl: boolean, scope: Scope): Scope {
     try {
         source = src;
         setPrintFn(console.log);
-        let tokens = tokenize(source);
-        let ast: any = parse(tokens);
-        for (let stmt of ast) {
-            let [val, newScope] = exprEval(stmt, scope);
+        const tokens = tokenize(source);
+        const ast: any = parse(tokens);
+        for (const stmt of ast) {
+            const [val, newScope] = exprEval(stmt, scope);
             scope = newScope;
             if (repl && val !== undefined) {
                 console.log(val);

@@ -31,7 +31,7 @@ import { StlFunction, Value } from "./InterpreterHelpers";
 import { RuntimePanic } from "./Debug";
 
 export let printfn = (thing: Value, scope: Scope): [Value, Scope] => {
-    let text = String(thing);
+    const text = String(thing);
     console.log(text);
     return [String(thing), scope];
 };
@@ -45,8 +45,8 @@ export function setPrintFn(fn): void {
 
 function execStmts(stmts: Expr[], scope: Scope): Scoped<Value> {
     let value;
-    for (let stmt of stmts) {
-        let pair = exprEval(stmt, scope);
+    for (const stmt of stmts) {
+        const pair = exprEval(stmt, scope);
         if (stmt instanceof ReturnStmt) {
             return pair;
         } else {
@@ -61,7 +61,7 @@ function execStmts(stmts: Expr[], scope: Scope): Scoped<Value> {
  * String-based eval() for conflux.
  */
 export function stlEval(src: string, scope: Scope): Scoped<Value> {
-    let ast = parse(tokenize(src));
+    const ast = parse(tokenize(src));
     return ast.reduce<[Value, Scope]>(
         (acc, cur) => exprEval(cur, getState(acc)),
         [null, scope]
@@ -84,8 +84,8 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
         return [resolved, newScope];
     } else if (expr instanceof BinaryExpr) {
         // TODO: refactor in functional style
-        let [leftVal, newScope] = exprEval(expr.left, scope);
-        let [rightVal, newScope2] = exprEval(expr.right, newScope);
+        const [leftVal, newScope] = exprEval(expr.left, scope);
+        const [rightVal, newScope2] = exprEval(expr.right, newScope);
         switch (expr.operator.type) {
             case TokenType.PLUS:
                 return [plus(leftVal, rightVal), newScope2];
@@ -119,7 +119,7 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
                 );
         }
     } else if (expr instanceof UnaryExpr) {
-        let [value, newScope] = exprEval(expr.right, scope);
+        const [value, newScope] = exprEval(expr.right, scope);
         switch (expr.operator.type) {
             case TokenType.MINUS:
                 return [opposite(value), newScope];
@@ -131,7 +131,7 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
     } else if (expr instanceof VariableExpr) {
         return [scope.lookup(expr.identifier), scope];
     } else if (expr instanceof CallExpr) {
-        let [maybeFn, newScope] = exprEval(expr.callee, scope);
+        const [maybeFn, newScope] = exprEval(expr.callee, scope);
         if (maybeFn instanceof StlFunction) {
             return call(maybeFn, expr.args, newScope);
         } else {
@@ -140,16 +140,16 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
     } else if (expr instanceof FunctionExpr) {
         return [new StlFunction(expr), scope];
     } else if (expr instanceof PrintStmt) {
-        let [printValue, newScope] = exprEval(expr.thingToPrint, scope);
+        const [printValue, newScope] = exprEval(expr.thingToPrint, scope);
         return printfn(printValue, newScope);
     } else if (expr instanceof VariableDeclarationStmt) {
-        let [rightVal, newScope] = exprEval(expr.right, scope);
+        const [rightVal, newScope] = exprEval(expr.right, scope);
         return newScope.define(expr.identifier, rightVal, expr.immutable);
     } else if (expr instanceof VariableAssignmentStmt) {
-        let [rightVal, newScope] = exprEval(expr.right, scope);
+        const [rightVal, newScope] = exprEval(expr.right, scope);
         return newScope.assign(expr.identifier, rightVal);
     } else if (expr instanceof IfStmt) {
-        let [shouldBeBool, newScope] = exprEval(expr.condition, scope);
+        const [shouldBeBool, newScope] = exprEval(expr.condition, scope);
         if (!assertBool(shouldBeBool)) {
             throw RuntimePanic("Condition doesn't evaluate to a boolean.");
         }
@@ -167,7 +167,7 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
         let conditionValue = getVal(exprEval(expr.condition, scope));
         let value: Value;
         while (assertBool(conditionValue) && conditionValue) {
-            let pair = exprEval(expr.body, scope);
+            const pair = exprEval(expr.body, scope);
             scope = getState(pair);
             value = getVal(pair);
             conditionValue = getVal(exprEval(expr.condition, scope));
@@ -176,15 +176,15 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
     } else if (expr instanceof ReturnStmt) {
         return exprEval(expr.value, scope);
     } else if (expr instanceof MatchStmt) {
-        let rootExpr = expr.expr;
+        const rootExpr = expr.expr;
         let [matchExprValue, newScope] = exprEval(rootExpr, scope);
-        for (let matchCase of expr.cases) {
+        for (const matchCase of expr.cases) {
             if (matchCase.matchExpr instanceof UnderscoreExpr) {
                 return exprEval(matchCase.expr, newScope);
             }
             // FIXME decide if side effects are legal in a match expression
-            let arr = exprEval(matchCase.matchExpr, newScope);
-            let caseValue = getVal(arr);
+            const arr = exprEval(matchCase.matchExpr, newScope);
+            const caseValue = getVal(arr);
             newScope = getState(arr);
             if (equal(caseValue, matchExprValue)) {
                 return exprEval(matchCase.expr, newScope);
@@ -211,13 +211,13 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
 }
 
 function call(fn: StlFunction, args: Expr[], scope: Scope): Scoped<any> {
-    let argValues: Value[] = [];
-    for (let arg of args) {
-        let [value, newScope] = exprEval(arg, scope);
+    const argValues: Value[] = [];
+    for (const arg of args) {
+        const [value, newScope] = exprEval(arg, scope);
         scope = newScope;
         argValues.push(value);
     }
-    let value = fn.call(argValues);
+    const value = fn.call(argValues);
     return [value, scope]; 
 }
 
@@ -275,14 +275,14 @@ function or(left: Value, right: Value): boolean {
 }
 
 function assertNumber(...literals: any[]): boolean {
-    for (let literal of literals) {
+    for (const literal of literals) {
         if (typeof literal !== "number") return false;
     }
     return true;
 }
 
 function assertBool(...literals: any[]): boolean {
-    for (let literal of literals) {
+    for (const literal of literals) {
         if (typeof literal !== "boolean") return false;
     }
     return true;
