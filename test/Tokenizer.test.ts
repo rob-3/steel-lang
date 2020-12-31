@@ -6,7 +6,7 @@ import {
     isAlphaNumeric,
     isAlpha,
     isNumber,
-    isLegalIdentifierChar
+    isLegalIdentifierChar,
 } from "../src/Tokenizer";
 import { expect } from "chai";
 
@@ -43,19 +43,19 @@ describe("tokenize()", () => {
                 "",
                 null,
                 new Location([1, 29], [1, 29], "<anonymous>")
-            )
+            ),
         ]);
     });
 
     it("should provide correct line numbers", () => {
         let result = tokenize("hi\n7.543\n92");
-        expect(result.map(t => t.location.start[0])).to.deep.equal([
+        expect(result.map((t) => t.location.start[0])).to.deep.equal([
             1,
             1,
             2,
             2,
             3,
-            3
+            3,
         ]);
     });
 
@@ -123,7 +123,7 @@ describe("tokenize()", () => {
                 "",
                 null,
                 new Location([2, 36], [2, 36], "<anonymous>")
-            )
+            ),
         ]);
     });
 
@@ -143,7 +143,7 @@ describe("tokenize()", () => {
                 "",
                 null,
                 new Location([2, 58], [2, 58], "<anonymous>")
-            )
+            ),
         ]);
     });
 
@@ -203,7 +203,7 @@ describe("tokenize()", () => {
                 "",
                 null,
                 new Location([2, 11], [2, 11], "<anonymous>")
-            )
+            ),
         ]);
     });
 
@@ -215,7 +215,7 @@ describe("tokenize()", () => {
                 "",
                 null,
                 new Location([1, 1], [1, 1], "<anonymous>")
-            )
+            ),
         ]);
     });
 
@@ -239,7 +239,7 @@ describe("tokenize()", () => {
                 "",
                 null,
                 new Location([1, 11], [1, 11], "<anonymous>")
-            )
+            ),
         ]);
     });
 
@@ -257,7 +257,7 @@ describe("tokenize()", () => {
                 "",
                 null,
                 new Location([1, 4], [1, 4], "<anonymous>")
-            )
+            ),
         ]);
     });
 
@@ -275,7 +275,7 @@ describe("tokenize()", () => {
                 "",
                 null,
                 new Location([1, 4], [1, 4], "<anonymous>")
-            )
+            ),
         ]);
     });
 
@@ -293,7 +293,7 @@ describe("tokenize()", () => {
                 "",
                 null,
                 new Location([1, 6], [1, 6], "<anonymous>")
-            )
+            ),
         ]);
     });
 
@@ -317,7 +317,7 @@ describe("tokenize()", () => {
                 "",
                 null,
                 new Location([1, 8], [1, 8], "<anonymous>")
-            )
+            ),
         ]);
     });
 
@@ -347,7 +347,7 @@ describe("tokenize()", () => {
                 "",
                 null,
                 new Location([1, 11], [1, 11], "<anonymous>")
-            )
+            ),
         ]);
     });
 
@@ -389,7 +389,7 @@ describe("tokenize()", () => {
                 "",
                 null,
                 new Location([1, 9], [1, 9], "<anonymous>")
-            )
+            ),
         ]);
     });
 
@@ -406,7 +406,7 @@ describe("tokenize()", () => {
                 "",
                 null,
                 new Location([1, 2], [1, 2], "<anonymous>")
-            )
+            ),
         ]);
     });
 
@@ -423,7 +423,7 @@ describe("tokenize()", () => {
                 "",
                 null,
                 new Location([1, 3], [1, 3], "<anonymous>")
-            )
+            ),
         ]);
     });
 
@@ -440,7 +440,7 @@ describe("tokenize()", () => {
                 "",
                 null,
                 new Location([1, 2], [1, 2], "<anonymous>")
-            )
+            ),
         ]);
     });
 });

@@ -2,7 +2,7 @@ import {
     setPrintFn,
     stlEval as _stlEval,
     getState,
-    getVal
+    getVal,
 } from "../src/Interpreter";
 import Scope from "../src/Scope";
 import chai = require("chai");
@@ -189,34 +189,34 @@ describe("stlEval()", () => {
 
     describe("arrays", () => {
         it("should not throw on empty array literal", () => {
-            expect(() => 
-                stlEval(
-                    `arr = []`
-                )
-            ).to.not.throw();
+            expect(() => stlEval(`arr = []`)).to.not.throw();
         });
 
         it("should allow nonempty array literals", () => {
             expect(() => stlEval("arr = [1, 2, 3]")).to.not.throw();
-        })
+        });
 
         it("should allow indexing arrays with zero", () => {
-            expect(stlEval(
-                `
+            expect(
+                stlEval(
+                    `
                 a = [1, 2, 3]
                 a[0]
                 `
-            )).to.equal(1);
-        })
+                )
+            ).to.equal(1);
+        });
 
         it("should allow indexing arrays with nonzero values", () => {
-            expect(stlEval(
-                `
+            expect(
+                stlEval(
+                    `
                 a = [1, 2, 3]
                 a[2]
                 `
-            )).to.equal(3);
-        })
+                )
+            ).to.equal(3);
+        });
     });
 });
 
@@ -422,13 +422,15 @@ describe("exec()", () => {
             });
 
             it("should not be able to access variable declared after", () => {
-                expect(() => stlEval(
-                    `
+                expect(() =>
+                    stlEval(
+                        `
                     print_a = () -> print a
                     a = 4
                     print_a()
                     `
-                )).to.throw(`Variable "a" is not defined.`);
+                    )
+                ).to.throw(`Variable "a" is not defined.`);
             });
         });
         describe("functions with arguments", () => {
@@ -702,7 +704,6 @@ describe("exec()", () => {
 
 describe("debug", () => {
     it("should print an error correctly", () => {
-        
         expect(() => stlEval("print hi")).to.throw(
             `Variable "hi" is not defined.`
         );
