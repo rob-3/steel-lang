@@ -1,11 +1,9 @@
 import {
     setPrintFn,
     stlEval as _stlEval,
-    exprEval,
     getState,
     getVal
 } from "../src/Interpreter";
-import { Expr } from "../src/Expr";
 import Scope from "../src/Scope";
 import chai = require("chai");
 import spies = require("chai-spies");
