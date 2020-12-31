@@ -383,7 +383,7 @@ export class ArrayLiteral implements Expr {
 };
 
 export class FailedParse implements Expr {
-    map(fn: (expr: Expr) => Expr) {
+    map(_: (expr: Expr) => Expr) {
         return this;
     }
 
