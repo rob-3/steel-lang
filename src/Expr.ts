@@ -364,7 +364,7 @@ export class IndexExpr implements Expr {
     }
 
     getDebugInfo = getDebugInfo;
-};
+}
 
 export class ArrayLiteral implements Expr {
     exprs: Expr[];
@@ -376,11 +376,14 @@ export class ArrayLiteral implements Expr {
     }
 
     map(fn: (expr: Expr) => Expr) {
-        return new ArrayLiteral(this.exprs.map(e => e.map(fn)), copy(this.tokens));
+        return new ArrayLiteral(
+            this.exprs.map((e) => e.map(fn)),
+            copy(this.tokens)
+        );
     }
 
     getDebugInfo = getDebugInfo;
-};
+}
 
 export class FailedParse implements Expr {
     map(_: (expr: Expr) => Expr) {

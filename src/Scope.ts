@@ -49,7 +49,9 @@ export default class Scope {
                 this.set(key, [evaluatedExpr, false]);
                 return [evaluatedExpr, this];
             } else {
-                throw RuntimePanic(`Cannot assign to immutable variable "${key}".`);
+                throw RuntimePanic(
+                    `Cannot assign to immutable variable "${key}".`
+                );
             }
         }
     }

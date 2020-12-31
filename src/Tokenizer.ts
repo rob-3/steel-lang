@@ -22,7 +22,7 @@ export default function tokenize(
     try {
         source = src;
         while (!atEnd()) {
-            scanToken().map(t => tokens.push(t));
+            scanToken().map((t) => tokens.push(t));
         }
         tokens.push(
             new Token(

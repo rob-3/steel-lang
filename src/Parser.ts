@@ -108,44 +108,55 @@ function makeStmt(): Result<Expr> {
 }
 
 function finishArrayLiteral(): Result<Expr> {
-    if (matchType(TokenType.CLOSE_BRACKET)) return Right(new ArrayLiteral([], getTokens()));
+    if (matchType(TokenType.CLOSE_BRACKET))
+        return Right(new ArrayLiteral([], getTokens()));
     const items: Result<Expr[]> = readCommaDelimitedList();
     if (!matchType(TokenType.CLOSE_BRACKET)) {
-        return Left(ParseError(`Expected "]", got ${lookAhead().lexeme}`, lookAhead()));
+        return Left(
+            ParseError(`Expected "]", got ${lookAhead().lexeme}`, lookAhead())
+        );
     }
-    return items.map(items => new ArrayLiteral(items, getTokens()));
+    return items.map((items) => new ArrayLiteral(items, getTokens()));
 }
 
 function finishVariableDeclaration(): Result<Expr> {
     if (!matchType(TokenType.IDENTIFIER)) {
-        return Left(ParseError(
-            `Expected identifier; got "${lookAhead().lexeme}"`,
-            lookAhead()
-        ));
+        return Left(
+            ParseError(
+                `Expected identifier; got "${lookAhead().lexeme}"`,
+                lookAhead()
+            )
+        );
     }
     const identifier: string = lookBehind().lexeme;
     if (!matchType(TokenType.LEFT_SINGLE_ARROW)) {
         if (matchType(TokenType.EQUAL)) {
-            return Left(ParseError(
-                `Must use "<-" for variable declaration, not "=".`,
-                lookBehind()
-            ));
+            return Left(
+                ParseError(
+                    `Must use "<-" for variable declaration, not "=".`,
+                    lookBehind()
+                )
+            );
         } else {
-            return Left(ParseError(
-                `Expected "<-", got "${lookAhead().lexeme}"`,
-                lookAhead()
-            ));
+            return Left(
+                ParseError(
+                    `Expected "<-", got "${lookAhead().lexeme}"`,
+                    lookAhead()
+                )
+            );
         }
     }
     eatNewlines();
-    return makeStmt().chain(stmt => {
+    return makeStmt().chain((stmt) => {
         if (matchType(TokenType.NEWLINE) || atEnd()) {
-            return Right(new VariableDeclarationStmt(
-                identifier,
-                false,
-                stmt,
-                getTokens()
-            ));
+            return Right(
+                new VariableDeclarationStmt(
+                    identifier,
+                    false,
+                    stmt,
+                    getTokens()
+                )
+            );
         } else {
             return Left(ParseError("Expected a newline!", lookBehind()));
         }
@@ -154,9 +165,15 @@ function finishVariableDeclaration(): Result<Expr> {
 
 function finishImmutableDeclaration(identifier: string): Result<Expr> {
     eatNewlines();
-    return makeStmt().chain(expr => {
-        if (matchType(TokenType.NEWLINE) || atEnd() || lookAhead().lexeme === "}") {
-            return Right(new VariableDeclarationStmt(identifier, true, expr, getTokens()));
+    return makeStmt().chain((expr) => {
+        if (
+            matchType(TokenType.NEWLINE) ||
+            atEnd() ||
+            lookAhead().lexeme === "}"
+        ) {
+            return Right(
+                new VariableDeclarationStmt(identifier, true, expr, getTokens())
+            );
         } else {
             return Left(ParseError("Expected a newline!", lookAhead()));
         }
@@ -164,15 +181,19 @@ function finishImmutableDeclaration(identifier: string): Result<Expr> {
 }
 
 function finishMatchStmt(): Result<Expr> {
-    return makeExpr().chain(expr => {
+    return makeExpr().chain((expr) => {
         if (!matchType(TokenType.OPEN_BRACE)) {
-            return Left(ParseError(
-                `Expected "{"; got "${lookAhead().lexeme}"`,
-                lookAhead()
-            ));
+            return Left(
+                ParseError(
+                    `Expected "{"; got "${lookAhead().lexeme}"`,
+                    lookAhead()
+                )
+            );
         }
         if (!matchType(TokenType.NEWLINE)) {
-            return Left(ParseError(`Expected a newline after "{"`, lookAhead()));
+            return Left(
+                ParseError(`Expected a newline after "{"`, lookAhead())
+            );
         }
         const cases: MatchCase[] = [];
         while (!matchType(TokenType.CLOSE_BRACE)) {
@@ -184,65 +205,82 @@ function finishMatchStmt(): Result<Expr> {
 }
 
 function makeMatchCase(): Result<MatchCase> {
-    return makeMatchPrimary().chain(matchPrimary => {
+    return makeMatchPrimary().chain((matchPrimary) => {
         if (!matchType(TokenType.RIGHT_DOUBLE_ARROW)) {
-            return Left(ParseError(
-                `Expected a "=>", got "${lookAhead().lexeme}"`,
+            return Left(
+                ParseError(
+                    `Expected a "=>", got "${lookAhead().lexeme}"`,
                     lookAhead()
-            ));
+                )
+            );
         }
         const expr = makeStmt();
         if (!matchType(TokenType.NEWLINE)) {
-            return Left(ParseError(`Expected a newline after match case.`, lookAhead()));
+            return Left(
+                ParseError(`Expected a newline after match case.`, lookAhead())
+            );
         }
-        return expr.map(expr => new MatchCase(matchPrimary, expr));
+        return expr.map((expr) => new MatchCase(matchPrimary, expr));
     });
 }
 
 function makeMatchPrimary(): Result<PrimaryExpr | UnderscoreExpr> {
-    if (matchType(TokenType.TRUE)) return Right(new PrimaryExpr(true, getTokens()));
-    if (matchType(TokenType.FALSE)) return Right(new PrimaryExpr(false, getTokens()));
+    if (matchType(TokenType.TRUE))
+        return Right(new PrimaryExpr(true, getTokens()));
+    if (matchType(TokenType.FALSE))
+        return Right(new PrimaryExpr(false, getTokens()));
     if (matchType(TokenType.NUMBER, TokenType.STRING))
         return Right(new PrimaryExpr(lookBehind().literal, getTokens()));
-    if (matchType(TokenType.UNDERSCORE)) return Right(new UnderscoreExpr(getTokens()));
-    return Left(ParseError(
-        `"${
-            lookAhead().lexeme
-        }" is not a boolean, number, string literal, or "_".`,
-        lookAhead()
-    ));
+    if (matchType(TokenType.UNDERSCORE))
+        return Right(new UnderscoreExpr(getTokens()));
+    return Left(
+        ParseError(
+            `"${
+                lookAhead().lexeme
+            }" is not a boolean, number, string literal, or "_".`,
+            lookAhead()
+        )
+    );
 }
 
 function finishWhileStmt(): Result<Expr> {
-    return makeStmt().chain(condition => {
+    return makeStmt().chain((condition) => {
         if (atEnd()) {
-            return Left(ParseError(
-                `After while expected statement, but reached EOF.`,
+            return Left(
+                ParseError(
+                    `After while expected statement, but reached EOF.`,
                     lookBehind()
-            ));
+                )
+            );
         }
-        return makeStmt().map(body => new WhileStmt(condition, body, getTokens()));
+        return makeStmt().map(
+            (body) => new WhileStmt(condition, body, getTokens())
+        );
     });
 }
 
 function finishUntilStmt(): Result<Expr> {
-    return makeStmt().chain(condition => {
+    return makeStmt().chain((condition) => {
         if (atEnd()) {
-            return Left(ParseError(
-                `After until expected statement, but reached EOF.`,
-                lookBehind()
-            ));
+            return Left(
+                ParseError(
+                    `After until expected statement, but reached EOF.`,
+                    lookBehind()
+                )
+            );
         }
-        return makeStmt().chain(body => {
-            return Right(new WhileStmt(
-                new UnaryExpr(
-                    new Token(TokenType.NOT, null, null, null),
-                    condition,
+        return makeStmt().chain((body) => {
+            return Right(
+                new WhileStmt(
+                    new UnaryExpr(
+                        new Token(TokenType.NOT, null, null, null),
+                        condition,
+                        getTokens()
+                    ),
+                    body,
                     getTokens()
-                ),
-                body,
-                getTokens()
-            ));
+                )
+            );
         });
     });
 }
@@ -253,17 +291,19 @@ function backTrack(): void {
 
 function finishFunctionDeclaration(): Result<Expr> {
     if (!matchType(TokenType.IDENTIFIER)) {
-        return Left(ParseError(
-            `Expected an identifier; got "${lookAhead().lexeme}"`,
-            lookAhead()
-        ));
+        return Left(
+            ParseError(
+                `Expected an identifier; got "${lookAhead().lexeme}"`,
+                lookAhead()
+            )
+        );
     }
     const fnName = lookBehind().lexeme;
     // FIXME better error
     if (!matchType(TokenType.EQUAL))
         return Left(ParseError("Expected =", lookAhead()));
     eatNewlines();
-    return makeLambda().map(lambda => {
+    return makeLambda().map((lambda) => {
         return new FunctionDefinition(
             new VariableDeclarationStmt(fnName, true, lambda, getTokens()),
             getTokens()
@@ -279,7 +319,9 @@ function makeLambda(): Result<FunctionExpr> {
         args = finishFunctDecArgs().unsafeCoerce();
     } else {
         // FIXME better error
-        return Left(ParseError("Expected identifier or open paren", lookAhead()));
+        return Left(
+            ParseError("Expected identifier or open paren", lookAhead())
+        );
     }
     // FIXME better error
     if (!matchType(TokenType.RIGHT_SINGLE_ARROW))
@@ -296,10 +338,9 @@ function finishFunctDecArgs(): Result<string[]> {
         //FIXME checks are needed
     }
     if (!matchType(TokenType.CLOSE_PAREN)) {
-        return Left(ParseError(
-            `Expected ")"; got "${lookAhead().lexeme}"`,
-            lookAhead()
-        ));
+        return Left(
+            ParseError(`Expected ")"; got "${lookAhead().lexeme}"`, lookAhead())
+        );
     }
     return Right(args);
 }
@@ -309,10 +350,12 @@ function finishBlockStmt(): Result<BlockStmt> {
     eatNewlines();
     while (!matchType(TokenType.CLOSE_BRACE)) {
         if (atEnd()) {
-            return Left(ParseError(
-                "Encountered EOF before end of block statement.",
-                lookAhead()
-            ));
+            return Left(
+                ParseError(
+                    "Encountered EOF before end of block statement.",
+                    lookAhead()
+                )
+            );
         }
         stmts.push(makeStmt().unsafeCoerce());
         eatNewlines();
@@ -328,34 +371,58 @@ function finishIfStmt(): Result<Expr> {
     matchType(TokenType.THEN);
     eatNewlines();
     if (atEnd())
-        return Left(ParseError(
-            `After if expected statement, but reached EOF.`,
-            lookBehind()
-        ));
+        return Left(
+            ParseError(
+                `After if expected statement, but reached EOF.`,
+                lookBehind()
+            )
+        );
     const maybeBody: Result<Expr> = makeStmt();
     eatNewlines();
 
     if (matchType(TokenType.ELSE)) {
         if (atEnd())
-            return Left(ParseError(
-                `After if expected statement, but reached EOF.`,
-                lookBehind()
-            ));
-        return makeStmt().chain(elseBody => {
-            eatNewlines();
-            return Right(new IfStmt(condition.unsafeCoerce(), maybeBody.unsafeCoerce(), elseBody, getTokens()));
-        }).chainLeft(_ => {
-            return Left(ParseError(
-                `After else expected statement, but got ${lookAhead().lexeme}`,
-                lookAhead()
-            ));
-        });
+            return Left(
+                ParseError(
+                    `After if expected statement, but reached EOF.`,
+                    lookBehind()
+                )
+            );
+        return makeStmt()
+            .chain((elseBody) => {
+                eatNewlines();
+                return Right(
+                    new IfStmt(
+                        condition.unsafeCoerce(),
+                        maybeBody.unsafeCoerce(),
+                        elseBody,
+                        getTokens()
+                    )
+                );
+            })
+            .chainLeft((_) => {
+                return Left(
+                    ParseError(
+                        `After else expected statement, but got ${
+                            lookAhead().lexeme
+                        }`,
+                        lookAhead()
+                    )
+                );
+            });
     }
-    return Right(new IfStmt(condition.unsafeCoerce(), maybeBody.unsafeCoerce(), null, getTokens()));
+    return Right(
+        new IfStmt(
+            condition.unsafeCoerce(),
+            maybeBody.unsafeCoerce(),
+            null,
+            getTokens()
+        )
+    );
 }
 
 function finishPrintStmt(): Result<Expr> {
-    return makeStmt().map(stmt => new PrintStmt(stmt, getTokens()));
+    return makeStmt().map((stmt) => new PrintStmt(stmt, getTokens()));
 }
 
 function makeExpr(): Result<Expr> {
@@ -365,7 +432,9 @@ function makeExpr(): Result<Expr> {
 function finishAssignment(identifier: string): Result<Expr> {
     // TODO check if identifier has already been declared
     eatNewlines();
-    return makeStmt().map(right => new VariableAssignmentStmt(identifier, right, getTokens()));
+    return makeStmt().map(
+        (right) => new VariableAssignmentStmt(identifier, right, getTokens())
+    );
 }
 
 function makeBinaryLogical(): Result<Expr> {
@@ -382,7 +451,7 @@ function makeComparision(): Result<Expr> {
             TokenType.GREATER,
             TokenType.GREATER_EQUAL,
             TokenType.LESS,
-            TokenType.LESS_EQUAL
+            TokenType.LESS_EQUAL,
         ],
         makeConcat
     );
@@ -410,7 +479,9 @@ function makeMod(): Result<Expr> {
 function makeUnary(): Result<Expr> {
     if (matchType(TokenType.MINUS, TokenType.NOT)) {
         const operator = lookBehind();
-        return makeUnary().map(right => new UnaryExpr(operator, right, getTokens()));
+        return makeUnary().map(
+            (right) => new UnaryExpr(operator, right, getTokens())
+        );
     }
     return makeCall();
 }
@@ -425,7 +496,7 @@ function readCommaDelimitedList(): Result<Expr[]> {
 
 function makeCall() {
     const primary = makePrimary();
-    return primary.chain(primary => makeCall2(primary));
+    return primary.chain((primary) => makeCall2(primary));
 }
 
 function makeCall2(callee: Expr): Result<Expr> {
@@ -436,18 +507,21 @@ function makeCall2(callee: Expr): Result<Expr> {
     if (!matchType(TokenType.CLOSE_PAREN)) {
         args = readCommaDelimitedList();
         if (!matchType(TokenType.CLOSE_PAREN)) {
-            return Left(ParseError(
-                `Must terminate function call with ")"`,
-                lookAhead()
-           ));
+            return Left(
+                ParseError(`Must terminate function call with ")"`, lookAhead())
+            );
         }
     }
-    return args.map(goodArgs => new CallExpr(callee, goodArgs, getTokens())).chain(makeCall2);
+    return args
+        .map((goodArgs) => new CallExpr(callee, goodArgs, getTokens()))
+        .chain(makeCall2);
 }
 
 function makePrimary(): Result<Expr> {
-    if (matchType(TokenType.TRUE)) return Right(new PrimaryExpr(true, getTokens()));
-    if (matchType(TokenType.FALSE)) return Right(new PrimaryExpr(false, getTokens()));
+    if (matchType(TokenType.TRUE))
+        return Right(new PrimaryExpr(true, getTokens()));
+    if (matchType(TokenType.FALSE))
+        return Right(new PrimaryExpr(false, getTokens()));
     if (matchType(TokenType.NUMBER, TokenType.STRING))
         return Right(new PrimaryExpr(lookBehind().literal, getTokens()));
     if (matchType(TokenType.IDENTIFIER)) {
@@ -455,12 +529,14 @@ function makePrimary(): Result<Expr> {
         if (matchType(TokenType.RIGHT_SINGLE_ARROW)) {
             return finishLambda([lookBehind(2).lexeme]);
         } else if (matchType(TokenType.OPEN_BRACKET)) {
-            return makeExpr().chain(expr => {
+            return makeExpr().chain((expr) => {
                 if (!matchType(TokenType.CLOSE_BRACKET)) {
-                    return Left(ParseError(
-                        `Expected "]", got ${lookAhead().lexeme}`,
-                        lookAhead()
-                    ));
+                    return Left(
+                        ParseError(
+                            `Expected "]", got ${lookAhead().lexeme}`,
+                            lookAhead()
+                        )
+                    );
                 }
                 return Right(new IndexExpr(id, expr, getTokens()));
             });
@@ -476,10 +552,12 @@ function makePrimary(): Result<Expr> {
                 current -= 2;
                 const args: string[] = finishFunctDecArgs().unsafeCoerce();
                 if (!matchType(TokenType.RIGHT_SINGLE_ARROW)) {
-                    return Left(ParseError(
-                        `Expected "->", got "${lookAhead().lexeme}"`,
-                        lookAhead()
-                    ));
+                    return Left(
+                        ParseError(
+                            `Expected "->", got "${lookAhead().lexeme}"`,
+                            lookAhead()
+                        )
+                    );
                 }
                 return finishLambda(args);
             } else {
@@ -501,27 +579,31 @@ function makePrimary(): Result<Expr> {
     }
 
     // should be impossible to get here
-    return Left(ParseError(
-        `Expected a primary; got "${lookAhead().lexeme}"`,
-        lookAhead()
-    ));
+    return Left(
+        ParseError(
+            `Expected a primary; got "${lookAhead().lexeme}"`,
+            lookAhead()
+        )
+    );
 }
 
 function finishLambda(args: string[]): Result<FunctionExpr> {
     eatNewlines();
-    return makeStmt().map(body => new FunctionExpr(args, body, getTokens()));
+    return makeStmt().map((body) => new FunctionExpr(args, body, getTokens()));
     // TODO: add checks and nice error messages
 }
 
 function finishGrouping(): Result<Expr> {
-    return makeExpr().chain(expr => {
+    return makeExpr().chain((expr) => {
         if (matchType(TokenType.CLOSE_PAREN))
             return Right(new GroupingExpr(expr, getTokens()));
         else
-            return Left(ParseError(
-                `Expected ")", got "${lookAhead().lexeme}"`,
-                lookAhead()
-           ));
+            return Left(
+                ParseError(
+                    `Expected ")", got "${lookAhead().lexeme}"`,
+                    lookAhead()
+                )
+            );
     });
 }
 
@@ -543,7 +625,14 @@ function makeBinaryExpr(
     while (matchType(...matches)) {
         const operator = lookBehind();
         const right = higherPrecedenceOperation();
-        expr = Right(new BinaryExpr(expr.unsafeCoerce(), operator, right.unsafeCoerce(), getTokens()));
+        expr = Right(
+            new BinaryExpr(
+                expr.unsafeCoerce(),
+                operator,
+                right.unsafeCoerce(),
+                getTokens()
+            )
+        );
     }
     return expr;
 }

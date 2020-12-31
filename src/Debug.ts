@@ -92,10 +92,10 @@ export function printAst(ast: Ast) {
     let str = "";
     for (const expr of exprs) {
         str += nodeToString(expr);
-        str += "\n"
+        str += "\n";
     }
-    console.log(str.replace(/\t/g, "  "))
-};
+    console.log(str.replace(/\t/g, "  "));
+}
 
 function indent(s: string): string {
     return s.replace(/^/gm, "\t");
@@ -108,7 +108,9 @@ function nodeToString(expr: Expr): string {
     if (expr instanceof VariableExpr) {
         return `${expr.identifier}`;
     } else if (expr instanceof BinaryExpr) {
-        return `BinaryExpr ${t(expr.left)} ${expr.operator.lexeme} ${t(expr.right)}`;
+        return `BinaryExpr ${t(expr.left)} ${expr.operator.lexeme} ${t(
+            expr.right
+        )}`;
     } else if (expr instanceof PrimaryExpr) {
         return `Primary ${expr.literal}`;
     } else if (expr instanceof UnaryExpr) {
@@ -130,7 +132,10 @@ function nodeToString(expr: Expr): string {
     } else if (expr instanceof IfStmt) {
         return `IfStmt`;
     } else if (expr instanceof BlockStmt) {
-        return "{" + expr.exprs.reduce((acc, cur) => acc + "\n" + i(t(cur)) + "\n}", "");
+        return (
+            "{" +
+            expr.exprs.reduce((acc, cur) => acc + "\n" + i(t(cur)) + "\n}", "")
+        );
     } else if (expr instanceof WhileStmt) {
         return `WhileStmt`;
     } else if (expr instanceof ReturnStmt) {
@@ -138,7 +143,9 @@ function nodeToString(expr: Expr): string {
     } else if (expr instanceof MatchStmt) {
         return `MatchStmt`;
     } else if (expr instanceof FunctionDefinition) {
-        return `FnDef ${expr.definition.identifier} = ` + t(expr.definition.right);
+        return (
+            `FnDef ${expr.definition.identifier} = ` + t(expr.definition.right)
+        );
     } else if (expr instanceof IndexExpr) {
         return `IndexExpr`;
     } else if (expr instanceof ArrayLiteral) {

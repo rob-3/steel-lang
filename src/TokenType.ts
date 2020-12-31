@@ -55,7 +55,7 @@ enum TokenType {
 
     EOF,
 
-    PRINT
+    PRINT,
 }
 
 export default TokenType;

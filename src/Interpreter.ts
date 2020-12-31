@@ -135,7 +135,9 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
         if (maybeFn instanceof StlFunction) {
             return call(maybeFn, expr.args, newScope);
         } else {
-            throw RuntimePanic(`Can't call ${maybeFn} because it is not a function.`);
+            throw RuntimePanic(
+                `Can't call ${maybeFn} because it is not a function.`
+            );
         }
     } else if (expr instanceof FunctionExpr) {
         return [new StlFunction(expr), scope];
@@ -198,7 +200,9 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
         if (typeof index !== "number") {
             // FIXME we probably should throw every RuntimePanic since
             // TypeScript isn't smart enough to know we throw
-            throw RuntimePanic("Indexing expression must evaluate to a number!");
+            throw RuntimePanic(
+                "Indexing expression must evaluate to a number!"
+            );
         }
         const array = newScope.lookup(expr.arr);
         if (!Array.isArray(array)) {
@@ -218,7 +222,7 @@ function call(fn: StlFunction, args: Expr[], scope: Scope): Scoped<any> {
         argValues.push(value);
     }
     const value = fn.call(argValues);
-    return [value, scope]; 
+    return [value, scope];
 }
 
 /*
