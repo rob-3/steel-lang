@@ -101,48 +101,47 @@ function indent(s: string): string {
     return s.replace(/^/gm, "\t");
 }
 
+const commaDelimit = (first: string, second: string) => `${first}, ${second}`;
 function nodeToString(expr: Expr): string {
     const t = nodeToString;
     const i = indent;
-    let ret: string;
     if (expr instanceof VariableExpr) {
-        ret = `${expr.identifier}`;
+        return `${expr.identifier}`;
     } else if (expr instanceof BinaryExpr) {
-        ret = `BinaryExpr ${t(expr.left)} ${expr.operator.lexeme} ${t(expr.right)}`;
+        return `BinaryExpr ${t(expr.left)} ${expr.operator.lexeme} ${t(expr.right)}`;
     } else if (expr instanceof PrimaryExpr) {
-        ret = `Primary ${expr.literal}`;
+        return `Primary ${expr.literal}`;
     } else if (expr instanceof UnaryExpr) {
-        ret = `UnaryExpr ${expr.operator}${expr.right}`;
+        return `UnaryExpr ${expr.operator}${expr.right}`;
     } else if (expr instanceof GroupingExpr) {
-        ret = `GroupingExpr (${expr.expr})`;
+        return `GroupingExpr (${expr.expr})`;
     } else if (expr instanceof CallExpr) {
-        ret = `CallExpr ${t(expr.callee)}(${expr.args.map(t)})`;
+        return `CallExpr ${t(expr.callee)}(${expr.args.map(t)})`;
     } else if (expr instanceof FunctionExpr) {
-        ret = `FunctionExpr (${expr.args.reduce((acc, cur) => acc + ", " + cur, "")}) => ` + t(expr.body);
+        return `FunctionExpr (${expr.args.reduce(commaDelimit)}` + t(expr.body);
     } else if (expr instanceof UnderscoreExpr) {
-        ret = `UnderscoreExpr`;
+        return `UnderscoreExpr`;
     } else if (expr instanceof VariableDeclarationStmt) {
-        ret = `VariableDeclarationStmt`;
+        return `VariableDeclarationStmt`;
     } else if (expr instanceof PrintStmt) {
-        ret = `PrintStmt`;
+        return `PrintStmt`;
     } else if (expr instanceof VariableAssignmentStmt) {
-        ret = `VariableAssignmentStmt`;
+        return `VariableAssignmentStmt`;
     } else if (expr instanceof IfStmt) {
-        ret = `IfStmt`;
+        return `IfStmt`;
     } else if (expr instanceof BlockStmt) {
-        ret = "{" + expr.exprs.reduce((acc, cur) => acc + "\n" + i(t(cur)) + "\n}", "");
+        return "{" + expr.exprs.reduce((acc, cur) => acc + "\n" + i(t(cur)) + "\n}", "");
     } else if (expr instanceof WhileStmt) {
-        ret = `WhileStmt`;
+        return `WhileStmt`;
     } else if (expr instanceof ReturnStmt) {
-        ret = `ReturnStmt`;
+        return `ReturnStmt`;
     } else if (expr instanceof MatchStmt) {
-        ret = `MatchStmt`;
+        return `MatchStmt`;
     } else if (expr instanceof FunctionDefinition) {
-        ret = `FnDef ${expr.definition.identifier} = ` + t(expr.definition.right);
+        return `FnDef ${expr.definition.identifier} = ` + t(expr.definition.right);
     } else if (expr instanceof IndexExpr) {
-        ret = `IndexExpr`;
+        return `IndexExpr`;
     } else if (expr instanceof ArrayLiteral) {
-        ret = `ArrayLiteral`;
+        return `ArrayLiteral ${expr.exprs.map(t).reduce(commaDelimit)}]`;
     } else throw Error("not an expr type");
-    return ret;
 }
