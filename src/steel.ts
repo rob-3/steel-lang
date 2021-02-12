@@ -24,6 +24,7 @@ export function startRepl(rl: any) {
 }
 
 export function run(src: string, repl: boolean, scope: Scope): Scope {
+    let retScope: Scope = scope;
     try {
         source = src;
         setPrintFn(console.log);
@@ -31,13 +32,14 @@ export function run(src: string, repl: boolean, scope: Scope): Scope {
         const ast: Expr[] = parse(tokens);
         for (const stmt of ast) {
             const [val, newScope] = exprEval(stmt, scope);
-            scope = newScope;
+            retScope = newScope;
             if (repl && val !== undefined) {
                 console.log(val);
             }
         }
-        return scope;
+        return retScope;
     } catch (e) {
         console.log(e.message);
+        return scope;
     }
 }

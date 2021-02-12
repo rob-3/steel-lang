@@ -9,6 +9,7 @@ import chai = require("chai");
 import spies = require("chai-spies");
 chai.use(spies);
 const expect = chai.expect;
+import { run } from "../src/steel";
 
 const stlEval = (src: string, scope: Scope = new Scope()) => {
     return getVal(_stlEval(src, scope));
@@ -708,4 +709,8 @@ describe("debug", () => {
             `Variable "hi" is not defined.`
         );
     });
+
+    it("should return old scope if error occurs", () => {
+        expect(run("a", false, new Scope())).to.not.be.undefined;
+    })
 });
