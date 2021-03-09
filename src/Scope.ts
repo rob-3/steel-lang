@@ -11,15 +11,24 @@ export default class Scope {
     }
 
     get(identifier: string): Value {
+        const pair = this.getPair(identifier);
+        if (pair == null) {
+            return pair;
+        } else {
+            return pair[0];
+        }
+    }
+
+    getPair(identifier: string): [Value, boolean] {
         const value = this.bindings.get(identifier);
         if (value === undefined) {
             if (this.parentScope !== null) {
-                return this.parentScope.get(identifier);
+                return this.parentScope.getPair(identifier);
             } else {
                 return null;
             }
         } else {
-            return value[0];
+            return value;
         }
     }
 
@@ -40,7 +49,7 @@ export default class Scope {
     }
 
     assign(key: string, evaluatedExpr: Value): Scoped<Value> {
-        const variable = this.get(key);
+        const variable: [Value, boolean] = this.getPair(key);
         if (variable === null) {
             throw RuntimePanic(`Cannot assign to undefined variable "${key}".`);
         } else {

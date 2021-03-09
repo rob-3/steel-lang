@@ -712,5 +712,11 @@ describe("debug", () => {
 
     it("should return old scope if error occurs", () => {
         expect(run("a", false, new Scope())).to.not.be.undefined;
-    })
+    });
+
+    it("should not allow reassignment to an immutable variable", () => {
+        expect(() => stlEval("a = 5\na <- 6")).to.throw(
+            `Cannot assign to immutable variable "a".`
+        );
+    });
 });
