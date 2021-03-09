@@ -58,7 +58,7 @@ function execStmts(stmts: Expr[], scope: Scope): Scoped<Value> {
 }
 
 /*
- * String-based eval() for conflux.
+ * String-based eval() for steel.
  */
 export function stlEval(src: string, scope: Scope): Scoped<Value> {
     const ast = parse(tokenize(src));
@@ -69,7 +69,7 @@ export function stlEval(src: string, scope: Scope): Scoped<Value> {
 }
 
 /*
- * Ast-based eval() for conflux. Pass in any expression and get the evaluated result.
+ * Ast-based eval() for steel. Pass in any expression and get the evaluated result.
  */
 export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
     if (expr instanceof PrimaryExpr) {
