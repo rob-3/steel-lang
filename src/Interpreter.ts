@@ -57,8 +57,12 @@ function execStmts(stmts: Expr[], scope: Scope): Scoped<Value> {
     return [value, scope];
 }
 
-/*
- * String-based eval() for steel.
+/**
+ * Evaluates some given source code in the context of the given Scope.
+ *
+ * @param src string to eval
+ * @param scope Scope to evaluate src in
+ * @return pair of resultant Value and Scope
  */
 export function stlEval(src: string, scope: Scope): Scoped<Value> {
     const ast = parse(tokenize(src));
