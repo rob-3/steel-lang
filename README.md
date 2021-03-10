@@ -2,6 +2,8 @@
 
 Steel is an in-development programming language designed for ease of use.
 
+![Gif of Steel running some code]("./demo.gif")
+
 ## Installation
 
 To install Steel, run the following commands.
