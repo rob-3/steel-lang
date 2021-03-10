@@ -1,4 +1,5 @@
 # Steel
+Steel is an in-development programming language designed for ease of use.
 
 ## Installation
 To install Steel, run the following commands.
