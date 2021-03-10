@@ -7,6 +7,7 @@ const rl = require("readline").createInterface({
 import Scope from "./Scope";
 import { startRepl, run } from "./steel";
 
+// If no filename, start REPL
 if (process.argv.length === 2) {
     startRepl(rl);
 } else {
