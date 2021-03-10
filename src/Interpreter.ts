@@ -62,10 +62,14 @@ function execStmts(stmts: Expr[], scope: Scope): Scoped<Value> {
  */
 export function stlEval(src: string, scope: Scope): Scoped<Value> {
     const ast = parse(tokenize(src));
-    return ast.reduce<[Value, Scope]>(
-        (acc, cur) => exprEval(cur, getState(acc)),
-        [null, scope]
-    );
+    let currentScope: Scope = scope;
+    let currentValue: Value;
+    for (const expr of ast) {
+        const [value, newScope] = exprEval(expr, currentScope);
+        currentScope = newScope;
+        currentValue = value;
+    }
+    return [currentValue, currentScope];
 }
 
 /*

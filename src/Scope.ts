@@ -2,6 +2,13 @@ import { Value, StlFunction } from "./InterpreterHelpers";
 import { Scoped } from "./Interpreter";
 import { RuntimePanic } from "./Debug";
 
+/**
+ * A Scope represents a lexical scope in the program. Each Scope has a set of
+ * bindings from identifiers (names) to Value boolean pairs. Value represents
+ * any possible value a variable could have. The boolean is true if the value is
+ * immutable (can't be changed) and false if the value can be changed.
+ * Each Scope also has a parent Scope that it can use to resolve nonlocal variables.
+ */
 export default class Scope {
     bindings: Map<string, [Value, boolean]>;
     parentScope: Scope;
@@ -19,6 +26,14 @@ export default class Scope {
         }
     }
 
+    /**
+     * getPair looks up a identifier in the current Scope and returns the Value
+     * and whether it is immutable as a pair. If the identifier is invalid,
+     * returns null.
+     *
+     * @param identifier name to look up
+     * @return a pair containing the Value and immutability status, or null
+     */
     getPair(identifier: string): [Value, boolean] {
         const value = this.bindings.get(identifier);
         if (value === undefined) {
