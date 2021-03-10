@@ -2,7 +2,7 @@
 
 Steel is an in-development programming language designed for ease of use.
 
-![Gif of Steel running some code]("./demo.gif")
+![Gif of Steel running some code](./demo.gif)
 
 ## Installation
 
@@ -17,11 +17,13 @@ npm install
 ## Getting Started
 
 To use the REPL run:
+
 ```
 npm start
 ```
 
 To run a file use:
+
 ```
 npm start -- file.stl
 ```
