@@ -44,12 +44,16 @@ export default function parse(tokenList: Token[]): Expr[] {
         eatNewlines();
     }
     reset();
-    Either.lefts(parseTree).map((left) => console.log(left));
-    const exprs = Either.rights(parseTree);
-    return astTransforms.reduce(
-        (acc: Ast, cur: (expr: Expr) => Expr) => acc.map(cur),
-        new Ast(exprs)
-    ).exprs;
+    const exprs: Result<Expr[]> = Either.sequence(parseTree);
+    if (exprs.isLeft()) {
+        exprs.mapLeft((err) => console.log(err.message));
+        return [];
+    } else {
+        return astTransforms.reduce(
+            (acc: Ast, cur: (expr: Expr) => Expr) => acc.map(cur),
+            new Ast(exprs.unsafeCoerce())
+        ).exprs;
+    }
 }
 
 function matchType(...types: TokenType[]): boolean {
