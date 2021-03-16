@@ -44,6 +44,7 @@ export default function parse(tokenList: Token[]): Expr[] {
         eatNewlines();
     }
     reset();
+    Either.lefts(parseTree).map((left) => console.log(left));
     const exprs = Either.rights(parseTree);
     return astTransforms.reduce(
         (acc: Ast, cur: (expr: Expr) => Expr) => acc.map(cur),
@@ -494,8 +495,8 @@ function readCommaDelimitedList(): Result<Expr[]> {
     return Either.sequence(list);
 }
 
-function makeCall() {
-    const primary = makePrimary();
+function makeCall(): Result<Expr> {
+    const primary: Result<Expr> = makePrimary();
     return primary.chain((primary) => makeCall2(primary));
 }
 
@@ -579,12 +580,18 @@ function makePrimary(): Result<Expr> {
     }
 
     // should be impossible to get here
-    return Left(
-        ParseError(
-            `Expected a primary; got "${lookAhead().lexeme}"`,
-            lookAhead()
-        )
-    );
+    if (lookAhead().type === TokenType.EOF) {
+        return Left(
+            ParseError(`Reached EOF before reading a primary`, lookBehind())
+        );
+    } else {
+        return Left(
+            ParseError(
+                `Expected a primary; got "${lookAhead().lexeme}"`,
+                lookAhead()
+            )
+        );
+    }
 }
 
 function finishLambda(args: string[]): Result<FunctionExpr> {

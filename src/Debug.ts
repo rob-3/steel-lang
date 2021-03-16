@@ -58,8 +58,11 @@ export function ParseError(message: string, highlight: Token) {
     // calculate highlight string
     const startColumn = location.start[1];
     const endColumn = location.end[1];
+    /* FIXME highlighting is broken with EOF and probably should be reworked
+     * entirely
     const highlightString =
         " ".repeat(startColumn - 1) + "^".repeat(endColumn - startColumn);
+    */
 
     // FIXME handle EOF
     let lineNumber = 1;
@@ -73,7 +76,7 @@ export function ParseError(message: string, highlight: Token) {
     }
     const startIndex = index;
     let endIndex = index;
-    while (source[endIndex] !== "\n") {
+    while (source[endIndex] !== undefined && source[endIndex] !== "\n") {
         endIndex++;
     }
     const lineString = source.slice(startIndex, endIndex);
@@ -81,7 +84,7 @@ export function ParseError(message: string, highlight: Token) {
 ${" ".repeat(pad)}--> ${filename}:${line}:${column}
 ${" ".repeat(pad + 1)}|
 ${line.toString()} |    ${lineString}
-${" ".repeat(pad + 1)}|    ${highlightString}
+${" ".repeat(pad + 1)}|    ${" ".repeat(startColumn)}^
 `);
 }
 
