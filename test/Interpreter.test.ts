@@ -489,16 +489,18 @@ describe("exec()", () => {
             it("should be able to implement fib", () => {
                 let src = `
                 fun fib = (a) -> {
-                    if (a == 0 or a == 1) {
+                    if (a == 0) {
+                        0
+                    } else if (a == 1) {
                         1
                     } else {
                         fib(a-1) + fib(a-2)
                     }
                 }
 
-                fib(4)
+                fib(6)
                 `;
-                expect(stlEval(src)).to.equal(5);
+                expect(stlEval(src)).to.equal(8);
             });
 
             it("should be able to be passed into another function", () => {
