@@ -3,6 +3,7 @@ import { exprEval, setPrintFn } from "./Interpreter";
 import tokenize from "./Tokenizer";
 import parse from "./Parser";
 import { Expr } from "./Expr";
+import { StlFunction } from "./InterpreterHelpers";
 
 export let source: string;
 
@@ -56,7 +57,12 @@ export function run(src: string, repl: boolean, scope: Scope): Scope {
             retScope = newScope;
             // Print if using REPL and if the expression evaluates to a value
             if (repl && val !== undefined) {
-                console.log(val);
+                // Don't print the internal value of functions
+                if (val instanceof StlFunction) {
+                    console.log("<Function>");
+                } else {
+                    console.log(val);
+                }
             }
         }
         return retScope;
