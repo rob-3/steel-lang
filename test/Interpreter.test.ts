@@ -15,8 +15,8 @@ const stlEval = (src: string, scope: Scope = new Scope()) => {
     return getVal(_stlEval(src, scope));
 };
 
-const stlExec = (src: string, printfn = null) => {
-    if (printfn) setPrintFn(printfn);
+const stlExec = (src: string, printfn: ((a: any) => void) | null = null) => {
+    if (printfn !== null) setPrintFn(printfn);
     return _stlEval(src, new Scope());
 };
 

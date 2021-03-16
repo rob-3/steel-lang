@@ -5,11 +5,12 @@ import { Location } from "./TokenizerHelpers";
 export interface Expr {
     map(fn: (expr: Expr) => Expr): Expr;
     getDebugInfo(): Location;
+    tokens: Token[];
 }
 
-function getDebugInfo(): Location {
+function getDebugInfo(this: Expr): Location {
     const tokens = this.tokens;
-    const filename = tokens[0].location.filepath;
+    const filename = tokens[0].location.filename;
 
     const startSpot = tokens[0].location.start;
     const endSpot = tokens[tokens.length - 1].location.end;
@@ -29,7 +30,7 @@ export class BinaryExpr implements Expr {
         this.tokens = tokens;
     }
 
-    map(fn: (expr: Expr) => Expr) {
+    map(fn: (expr: Expr) => Expr): Expr {
         return fn(
             new BinaryExpr(
                 this.left.map(fn),
@@ -51,7 +52,7 @@ export class PrimaryExpr implements Expr {
         this.tokens = tokens;
     }
 
-    map(fn: (expr: Expr) => Expr) {
+    map(fn: (expr: Expr) => Expr): Expr {
         return fn(copy(this));
     }
 
@@ -85,7 +86,7 @@ export class GroupingExpr implements Expr {
         this.tokens = tokens;
     }
 
-    map(fn: (expr: Expr) => Expr) {
+    map(fn: (expr: Expr) => Expr): Expr {
         return fn(new GroupingExpr(this.expr.map(fn), this.tokens));
     }
 
@@ -100,7 +101,7 @@ export class VariableExpr implements Expr {
         this.tokens = tokens;
     }
 
-    map(fn: (expr: Expr) => Expr) {
+    map(fn: (expr: Expr) => Expr): Expr {
         return fn(copy(this));
     }
 
@@ -117,7 +118,7 @@ export class FunctionExpr implements Expr {
         this.tokens = tokens;
     }
 
-    map(fn: (expr: Expr) => Expr) {
+    map(fn: (expr: Expr) => Expr): Expr {
         return fn(new FunctionExpr(this.args, this.body.map(fn), this.tokens));
     }
 
@@ -134,7 +135,7 @@ export class CallExpr implements Expr {
         this.tokens = tokens;
     }
 
-    map(fn: (expr: Expr) => Expr) {
+    map(fn: (expr: Expr) => Expr): Expr {
         return fn(
             new CallExpr(this.callee.map(fn), this.args.map(fn), this.tokens)
         );
@@ -160,7 +161,7 @@ export class VariableDeclarationStmt implements Expr {
         this.tokens = tokens;
     }
 
-    map(fn: (expr: Expr) => Expr) {
+    map(fn: (expr: Expr) => Expr): Expr {
         return fn(
             new VariableDeclarationStmt(
                 this.identifier,
@@ -184,7 +185,7 @@ export class VariableAssignmentStmt implements Expr {
         this.tokens = tokens;
     }
 
-    map(fn: (expr: Expr) => Expr) {
+    map(fn: (expr: Expr) => Expr): Expr {
         return fn(
             new VariableAssignmentStmt(
                 this.identifier,
@@ -206,7 +207,7 @@ export class PrintStmt implements Expr {
         this.tokens = tokens;
     }
 
-    map(fn: (expr: Expr) => Expr) {
+    map(fn: (expr: Expr) => Expr): Expr {
         return fn(new PrintStmt(this.thingToPrint.map(fn), this.tokens));
     }
 
@@ -218,14 +219,19 @@ export class IfStmt implements Expr {
     body: Expr;
     elseBody: Expr | null;
     tokens: Token[];
-    constructor(condition: Expr, body: Expr, elseBody: Expr, tokens: Token[]) {
+    constructor(
+        condition: Expr,
+        body: Expr,
+        elseBody: Expr | null,
+        tokens: Token[]
+    ) {
         this.condition = condition;
         this.body = body;
         this.elseBody = elseBody;
         this.tokens = tokens;
     }
 
-    map(fn: (expr: Expr) => Expr) {
+    map(fn: (expr: Expr) => Expr): Expr {
         return fn(
             new IfStmt(
                 this.condition.map(fn),
@@ -247,7 +253,7 @@ export class BlockStmt implements Expr {
         this.tokens = tokens;
     }
 
-    map(fn: (expr: Expr) => Expr) {
+    map(fn: (expr: Expr) => Expr): Expr {
         return fn(new BlockStmt(this.exprs.map(fn), this.tokens));
     }
 
@@ -264,9 +270,32 @@ export class WhileStmt implements Expr {
         this.tokens = tokens;
     }
 
-    map(fn: (expr: Expr) => Expr) {
+    map(fn: (expr: Expr) => Expr): Expr {
         return fn(
             new WhileStmt(
+                this.condition.map(fn),
+                this.body.map(fn),
+                this.tokens
+            )
+        );
+    }
+
+    getDebugInfo = getDebugInfo;
+}
+
+export class UntilStmt implements Expr {
+    condition: Expr;
+    body: Expr;
+    tokens: Token[];
+    constructor(condition: Expr, body: Expr, tokens: Token[]) {
+        this.condition = condition;
+        this.body = body;
+        this.tokens = tokens;
+    }
+
+    map(fn: (expr: Expr) => Expr): Expr {
+        return fn(
+            new UntilStmt(
                 this.condition.map(fn),
                 this.body.map(fn),
                 this.tokens
@@ -285,7 +314,7 @@ export class ReturnStmt implements Expr {
         this.tokens = tokens;
     }
 
-    map(fn: (expr: Expr) => Expr) {
+    map(fn: (expr: Expr) => Expr): Expr {
         return fn(new ReturnStmt(this.value.map(fn), this.tokens));
     }
 
@@ -302,7 +331,7 @@ export class MatchStmt implements Expr {
         this.tokens = tokens;
     }
 
-    map(fn: (expr: Expr) => Expr) {
+    map(fn: (expr: Expr) => Expr): Expr {
         return fn(new MatchStmt(this.expr.map(fn), this.cases, this.tokens));
     }
 
@@ -325,7 +354,7 @@ export class UnderscoreExpr implements Expr {
     constructor(tokens: Token[]) {
         this.tokens = tokens;
     }
-    map(fn: (expr: Expr) => Expr) {
+    map(fn: (expr: Expr) => Expr): Expr {
         return fn(copy(this));
     }
 
@@ -341,7 +370,7 @@ export class FunctionDefinition implements Expr {
         this.tokens = tokens;
     }
 
-    map(fn: (expr: Expr) => Expr) {
+    map(fn: (expr: Expr) => Expr): Expr {
         return fn(new FunctionDefinition(copy(this.definition), this.tokens));
     }
 
@@ -359,7 +388,7 @@ export class IndexExpr implements Expr {
         this.tokens = tokens;
     }
 
-    map(fn: (expr: Expr) => Expr) {
+    map(fn: (expr: Expr) => Expr): Expr {
         return fn(new IndexExpr(copy(this.arr), this.index, copy(this.tokens)));
     }
 
@@ -385,6 +414,7 @@ export class ArrayLiteral implements Expr {
     getDebugInfo = getDebugInfo;
 }
 
+/*
 export class FailedParse implements Expr {
     map(_: (expr: Expr) => Expr) {
         return this;
@@ -392,3 +422,4 @@ export class FailedParse implements Expr {
 
     getDebugInfo = () => null;
 }
+*/

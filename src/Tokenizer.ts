@@ -7,11 +7,11 @@ let startIndex = 0;
 let currentIndex = 0;
 let startColumn = 1;
 let currentColumn = 1;
-let source: string;
+let source: string = "";
 let startLine = 1;
 let currentLine = 1;
 let commentNests = 0;
-let filename: string;
+let filename: string = "";
 
 export default function tokenize(
     src: string,
@@ -220,11 +220,11 @@ function reset() {
     currentIndex = 0;
     startColumn = 1;
     currentColumn = 1;
-    source = null;
+    source = "";
     startLine = 1;
     currentLine = 1;
     commentNests = 0;
-    filename = null;
+    filename = "";
 }
 
 function isAlphaNumeric(char: string): boolean {

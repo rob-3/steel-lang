@@ -11,13 +11,13 @@ import { RuntimePanic } from "./Debug";
  */
 export default class Scope {
     bindings: Map<string, [Value, boolean]>;
-    parentScope: Scope;
-    constructor(parentScope: Scope = null) {
+    parentScope: Scope | null;
+    constructor(parentScope: Scope | null = null) {
         this.bindings = new Map();
         this.parentScope = parentScope;
     }
 
-    get(identifier: string): Value {
+    get(identifier: string): Value | null {
         const pair = this.getPair(identifier);
         if (pair == null) {
             return pair;
@@ -34,7 +34,7 @@ export default class Scope {
      * @param identifier name to look up
      * @return a pair containing the Value and immutability status, or null
      */
-    getPair(identifier: string): [Value, boolean] {
+    getPair(identifier: string): [Value, boolean] | null {
         const value = this.bindings.get(identifier);
         if (value === undefined) {
             if (this.parentScope !== null) {
@@ -58,13 +58,17 @@ export default class Scope {
             if (this.parentScope !== null && this.parentScope.has(identifier)) {
                 this.parentScope.setLocal(identifier, [value, immutable]);
             } else {
-                this.parentScope.set(identifier, [value, immutable]);
+                if (this.parentScope) {
+                    this.parentScope.set(identifier, [value, immutable]);
+                } else {
+                    this.bindings.set(identifier, [value, immutable]);
+                }
             }
         }
     }
 
     assign(key: string, evaluatedExpr: Value): Scoped<Value> {
-        const variable: [Value, boolean] = this.getPair(key);
+        const variable: [Value, boolean] | null = this.getPair(key);
         if (variable === null) {
             throw RuntimePanic(
                 `Cannot assign to undefined variable "${key}". Did you forget to use the var keyword?`

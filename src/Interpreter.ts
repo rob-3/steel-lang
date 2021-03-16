@@ -14,6 +14,7 @@ import {
     IfStmt,
     BlockStmt,
     WhileStmt,
+    UntilStmt,
     ReturnStmt,
     MatchStmt,
     FunctionDefinition,
@@ -27,7 +28,7 @@ import parse from "./Parser";
 export type Scoped<T> = [T, Scope];
 export const getVal = (arr: [Value, Scope]) => arr[0];
 export const getState = (arr: [Value, Scope]) => arr[1];
-import { StlFunction, Value } from "./InterpreterHelpers";
+import { StlFunction, Value, NonNullValue } from "./InterpreterHelpers";
 import { RuntimePanic } from "./Debug";
 
 export let printfn = (thing: Value, scope: Scope): [Value, Scope] => {
@@ -44,7 +45,7 @@ export function setPrintFn(fn: (v: Value) => void): void {
 }
 
 function execStmts(stmts: Expr[], scope: Scope): Scoped<Value> {
-    let value: Value;
+    let value: Value = null;
     for (const stmt of stmts) {
         const pair = exprEval(stmt, scope);
         if (stmt instanceof ReturnStmt) {
@@ -67,7 +68,7 @@ function execStmts(stmts: Expr[], scope: Scope): Scoped<Value> {
 export function stlEval(src: string, scope: Scope): Scoped<Value> {
     const ast = parse(tokenize(src));
     let currentScope: Scope = scope;
-    let currentValue: Value;
+    let currentValue: Value = null;
     for (const expr of ast) {
         const [value, newScope] = exprEval(expr, currentScope);
         currentScope = newScope;
@@ -148,7 +149,7 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
             );
         }
     } else if (expr instanceof FunctionExpr) {
-        return [new StlFunction(expr), scope];
+        return [new StlFunction(expr, scope), scope];
     } else if (expr instanceof PrintStmt) {
         const [printValue, newScope] = exprEval(expr.thingToPrint, scope);
         return printfn(printValue, newScope);
@@ -173,14 +174,20 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
         }
     } else if (expr instanceof BlockStmt) {
         return execStmts(expr.exprs, scope);
-    } else if (expr instanceof WhileStmt) {
+    } else if (expr instanceof WhileStmt || expr instanceof UntilStmt) {
         let conditionValue = getVal(exprEval(expr.condition, scope));
-        let value: Value;
+        if (expr instanceof UntilStmt) {
+            conditionValue = !conditionValue;
+        }
+        let value: Value = null;
         while (assertBool(conditionValue) && conditionValue) {
             const pair = exprEval(expr.body, scope);
             scope = getState(pair);
             value = getVal(pair);
             conditionValue = getVal(exprEval(expr.condition, scope));
+            if (expr instanceof UntilStmt) {
+                conditionValue = !conditionValue;
+            }
         }
         return [value, scope];
     } else if (expr instanceof ReturnStmt) {
@@ -217,9 +224,8 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
             throw RuntimePanic(`${expr.arr} is not an array!`);
         }
         return [array[index], newScope];
-    } else {
-        throw RuntimePanic("Unhandled stmt or expr.");
     }
+    throw RuntimePanic("Unhandled stmt or expr.");
 }
 
 function call(fn: StlFunction, args: Expr[], scope: Scope): Scoped<any> {
@@ -328,10 +334,10 @@ function equal(left: Value, right: Value): boolean {
 function numberComparision(
     left: Value,
     right: Value,
-    operator: (left: Value, right: Value) => boolean,
+    operator: (left: NonNullValue, right: NonNullValue) => boolean,
     err: string
 ): boolean {
-    if (assertNumber(left, right)) {
+    if (assertNumber(left, right) && left !== null && right !== null) {
         return operator(left, right);
     } else throw RuntimePanic(`Operands of ${err} should be numbers.`);
 }

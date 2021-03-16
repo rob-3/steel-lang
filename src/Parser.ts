@@ -16,6 +16,7 @@ import {
     IfStmt,
     BlockStmt,
     WhileStmt,
+    UntilStmt,
     ReturnStmt,
     MatchStmt,
     MatchCase,
@@ -274,18 +275,8 @@ function finishUntilStmt(): Result<Expr> {
                 )
             );
         }
-        return makeStmt().chain((body) => {
-            return Right(
-                new WhileStmt(
-                    new UnaryExpr(
-                        new Token(TokenType.NOT, null, null, null),
-                        condition,
-                        getTokens()
-                    ),
-                    body,
-                    getTokens()
-                )
-            );
+        return makeStmt().map((body) => {
+            return new UntilStmt(condition, body, getTokens());
         });
     });
 }
@@ -651,7 +642,7 @@ function makeBinaryExpr(
 function reset() {
     start = 0;
     current = 0;
-    tokens = null;
+    tokens = [];
 }
 
 function getTokens(): Token[] {

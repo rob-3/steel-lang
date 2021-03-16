@@ -5,8 +5,9 @@ import Scope from "./Scope";
 export class StlFunction {
     funExpr: FunctionExpr;
     scope: Scope;
-    constructor(funExpr: FunctionExpr) {
+    constructor(funExpr: FunctionExpr, scope: Scope) {
         this.funExpr = funExpr;
+        this.scope = scope;
     }
 
     call(callArgs: Value[]): Value {
@@ -21,4 +22,5 @@ export class StlFunction {
     }
 }
 
-export type Value = number | boolean | string | StlFunction | Value[];
+export type Value = NonNullValue | null;
+export type NonNullValue = number | boolean | string | StlFunction | Value[];
