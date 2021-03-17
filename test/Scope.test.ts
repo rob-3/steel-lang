@@ -1,5 +1,6 @@
 import Scope from "../src/Scope";
 import { expect } from "chai";
+import { stlEval } from "../src/Interpreter";
 
 describe("class Scope", () => {
     it("should retrieve values with no parents", () => {
@@ -18,5 +19,17 @@ describe("class Scope", () => {
         let childScope = new Scope(parentScope);
         parentScope.setLocal("a", [49, false]);
         expect(childScope.get("a")).to.equal(49);
+    });
+
+    it("should throw an error when reassigning to an immutable value", () => {
+        const src: string = `
+        a = 5
+        b = 10
+        a = 6
+        `;
+        const scope = new Scope();
+        expect(() => stlEval(src, scope)).to.throw(
+            "Cannot redefine immutable variable a."
+        );
     });
 });

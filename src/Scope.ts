@@ -98,7 +98,7 @@ export default class Scope {
         if (this.has(key)) {
             throw RuntimePanic(`Cannot redefine immutable variable ${key}.`);
         } else {
-            const newScope = new Scope(this);
+            const newScope = new LocalScope(this);
             newScope.setLocal(key, [evaluatedExpr, immutable]);
             // Allow for recursive functions
             if (evaluatedExpr instanceof StlFunction) {
@@ -114,6 +114,18 @@ export default class Scope {
             throw RuntimePanic(`Variable "${identifier}" is not defined.`);
         } else {
             return val;
+        }
+    }
+}
+
+class LocalScope extends Scope {
+    has(key: string): boolean {
+        if (this.bindings.has(key)) {
+            return true;
+        } else if (this.parentScope !== null && this.parentScope.has(key)) {
+            return true;
+        } else {
+            return false;
         }
     }
 }
