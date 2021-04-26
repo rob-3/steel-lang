@@ -53,7 +53,7 @@ export function run(src: string, repl: boolean, scope: Scope): Scope {
         const tokens = tokenize(source);
         const ast: Expr[] = parse(tokens);
         for (const stmt of ast) {
-            const [val, newScope] = exprEval(stmt, scope);
+            const [val, newScope] = exprEval(stmt, retScope);
             retScope = newScope;
             // Print if using REPL and if the expression evaluates to a value
             if (repl && val !== undefined) {
