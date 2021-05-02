@@ -18,7 +18,7 @@ export function startRepl(rl: any) {
     rl.prompt();
     rl.on("line", (input: string) => {
         try {
-            scope = run(input + "\n", true, scope);
+            scope = run(input, true, scope);
         } catch (err) {
             console.log(err);
         }

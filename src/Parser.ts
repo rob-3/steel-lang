@@ -578,7 +578,7 @@ function makePrimary(): Result<Expr> {
     if (lookAhead().type === TokenType.EOF) {
         eatToken();
         return Left(
-            ParseError(`Reached EOF before reading a primary`, lookBehind(2))
+            ParseError(`Reached EOF before reading a primary`, lookBehind())
         );
     } else {
         eatToken();

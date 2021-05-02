@@ -107,8 +107,8 @@ function scanToken(): Maybe<Token> {
             startColumn = currentColumn;
             return Nothing;
         case "\n":
-            bumpLine();
             const token = Just(makeToken(TokenType.NEWLINE));
+            bumpLine();
             return token;
         case '"':
             return Just(makeString());
