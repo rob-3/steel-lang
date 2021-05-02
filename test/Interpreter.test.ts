@@ -721,4 +721,9 @@ describe("debug", () => {
             `Cannot assign to immutable variable "a".`
         );
     });
+
+    it("should not loop if parsing fails", () => {
+        // will hang if this test fails
+        stlEval(")");
+    });
 });

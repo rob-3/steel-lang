@@ -574,16 +574,18 @@ function makePrimary(): Result<Expr> {
         return finishArrayLiteral();
     }
 
-    // should be impossible to get here
+    // if we get here, it is an error
     if (lookAhead().type === TokenType.EOF) {
+        eatToken();
         return Left(
-            ParseError(`Reached EOF before reading a primary`, lookBehind())
+            ParseError(`Reached EOF before reading a primary`, lookBehind(2))
         );
     } else {
+        eatToken();
         return Left(
             ParseError(
-                `Expected a primary; got "${lookAhead().lexeme}"`,
-                lookAhead()
+                `Expected a primary; got "${lookBehind().lexeme}"`,
+                lookBehind()
             )
         );
     }

@@ -56,8 +56,8 @@ export function ParseError(message: string, highlight: Token) {
     const pad = line.toString().length;
 
     // calculate highlight string
-    const startColumn = location.start[1];
-    const endColumn = location.end[1];
+    const startColumn = location.start[1] - 1;
+    const endColumn = location.end[1] - 1;
     /* FIXME highlighting is broken with EOF and probably should be reworked
      * entirely
     const highlightString =
