@@ -2,7 +2,6 @@ import { Expr, ReturnStmt } from "./Expr";
 import Scope from "./Scope";
 import tokenize from "./Tokenizer";
 import parse from "./Parser";
-export type Scoped<T> = [T, Scope];
 export const getVal = (arr: [Value, Scope]) => arr[0];
 export const getState = (arr: [Value, Scope]) => arr[1];
 import { StlFunction, Value, NonNullValue } from "./InterpreterHelpers";
@@ -21,7 +20,7 @@ export function setPrintFn(fn: (v: Value) => void): void {
     };
 }
 
-export function execStmts(stmts: Expr[], scope: Scope): Scoped<Value> {
+export function execStmts(stmts: Expr[], scope: Scope): [Value, Scope] {
     let value: Value = null;
     for (const stmt of stmts) {
         const pair = exprEval(stmt, scope);
@@ -42,7 +41,7 @@ export function execStmts(stmts: Expr[], scope: Scope): Scoped<Value> {
  * @param scope Scope to evaluate src in
  * @return pair of resultant Value and Scope
  */
-export function stlEval(src: string, scope: Scope): Scoped<Value> {
+export function stlEval(src: string, scope: Scope): [Value, Scope] {
     const ast = parse(tokenize(src));
     let currentScope: Scope = scope;
     let currentValue: Value = null;
@@ -57,11 +56,15 @@ export function stlEval(src: string, scope: Scope): Scoped<Value> {
 /*
  * Ast-based eval() for steel. Pass in any expression and get the evaluated result.
  */
-export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
+export function exprEval(expr: Expr, scope: Scope): [Value, Scope] {
     return expr.eval(scope);
 }
 
-export function call(fn: StlFunction, args: Expr[], scope: Scope): Scoped<any> {
+export function call(
+    fn: StlFunction,
+    args: Expr[],
+    scope: Scope
+): [any, Scope] {
     const argValues: Value[] = [];
     for (const arg of args) {
         const [value, newScope] = exprEval(arg, scope);

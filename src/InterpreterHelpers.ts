@@ -1,4 +1,4 @@
-import { Scoped, exprEval, getVal } from "./Interpreter";
+import { exprEval, getVal } from "./Interpreter";
 import { FunctionExpr } from "./Expr";
 import Scope from "./Scope";
 
@@ -17,7 +17,7 @@ export class StlFunction {
             funScope.setLocal(this.funExpr.args[i], [callArgs[i], false]);
         }
 
-        const result: Scoped<Value> = exprEval(this.funExpr.body, funScope);
+        const result: [Value, Scope] = exprEval(this.funExpr.body, funScope);
         return getVal(result);
     }
 }

@@ -1,5 +1,4 @@
 import { Value, StlFunction } from "./InterpreterHelpers";
-import { Scoped } from "./Interpreter";
 import { RuntimePanic } from "./Debug";
 
 /**
@@ -67,7 +66,7 @@ export default class Scope {
         }
     }
 
-    assign(key: string, evaluatedExpr: Value): Scoped<Value> {
+    assign(key: string, evaluatedExpr: Value): [Value, Scope] {
         const variable: [Value, boolean] | null = this.getPair(key);
         if (variable === null) {
             throw RuntimePanic(
@@ -94,7 +93,7 @@ export default class Scope {
         key: string,
         evaluatedExpr: Value,
         immutable: boolean
-    ): Scoped<Value> {
+    ): [Value, Scope] {
         if (this.has(key)) {
             throw RuntimePanic(`Cannot redefine immutable variable ${key}.`);
         } else {
