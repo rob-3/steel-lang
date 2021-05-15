@@ -1,33 +1,29 @@
 import Token from "./Token";
 import TokenType from "./TokenType";
-import {
-    Expr,
-    GroupingExpr,
-    BinaryExpr,
-    PrimaryExpr,
-    UnaryExpr,
-    VariableExpr,
-    FunctionExpr,
-    CallExpr,
-    UnderscoreExpr,
-    PrintStmt,
-    VariableDeclarationStmt,
-    VariableAssignmentStmt,
-    IfStmt,
-    BlockStmt,
-    WhileStmt,
-    UntilStmt,
-    ReturnStmt,
-    MatchStmt,
-    MatchCase,
-    FunctionDefinition,
-    IndexExpr,
-    ArrayLiteral,
-} from "./Expr";
+import { Expr } from "./Expr";
 import Ast from "./Ast";
 import astTransforms from "./AstTransforms";
 import { ParseError } from "./Debug";
 import { Either, Left, Right } from "purify-ts";
+import { ArrayLiteral } from "./nodes/ArrayLiteral";
+import BinaryExpr from "./nodes/BinaryExpr";
+import { BlockStmt } from "./nodes/BlockStmt";
+import { CallExpr } from "./nodes/CallExpr";
+import { FunctionDefinition } from "./nodes/FunctionDefinition";
+import { FunctionExpr } from "./nodes/FunctionExpr";
+import { GroupingExpr } from "./nodes/GroupingExpr";
+import { IfStmt } from "./nodes/IfStmt";
+import { IndexExpr } from "./nodes/IndexExpr";
+import { MatchCase, MatchStmt, UnderscoreExpr } from "./nodes/MatchStmt";
+import { PrimaryExpr } from "./nodes/PrimaryExpr";
+import { PrintStmt } from "./nodes/PrintStmt";
+import ReturnStmt from "./nodes/ReturnStmt";
+import { UnaryExpr } from "./nodes/UnaryExpr";
+import { UntilStmt } from "./nodes/UntilStmt";
+import { VariableAssignmentStmt } from "./nodes/VariableAssignmentStmt";
+import { VariableDeclarationStmt } from "./nodes/VariableDeclarationStmt";
+import { VariableExpr } from "./nodes/VariableExpr";
+import { WhileStmt } from "./nodes/WhileStmt";
 
 type Result<T> = Either<Error, T>;
 

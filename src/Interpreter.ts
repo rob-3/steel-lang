@@ -1,4 +1,5 @@
-import { Expr, ReturnStmt } from "./Expr";
+import { Expr } from "./Expr";
+import ReturnStmt from "./nodes/ReturnStmt";
 import Scope from "./Scope";
 import tokenize from "./Tokenizer";
 import parse from "./Parser";

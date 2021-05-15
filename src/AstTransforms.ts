@@ -1,4 +1,6 @@
-import { Expr, BlockStmt, FunctionDefinition } from "./Expr";
+import { Expr } from "./Expr";
+import { BlockStmt } from "./nodes/BlockStmt";
+import { FunctionDefinition } from "./nodes/FunctionDefinition";
 
 const astTransforms: ((expr: Expr) => Expr)[] = [hoistFunctions];
 

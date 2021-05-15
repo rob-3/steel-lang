@@ -1,4 +1,5 @@
-import { Expr, BlockStmt } from "./Expr";
+import { Expr } from "./Expr";
+import { BlockStmt } from "./nodes/BlockStmt";
 
 export default class Ast {
     exprs: Expr[];

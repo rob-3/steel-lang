@@ -1,5 +1,5 @@
 import { exprEval, getVal } from "./Interpreter";
-import { FunctionExpr } from "./Expr";
+import { FunctionExpr } from "./nodes/FunctionExpr";
 import Scope from "./Scope";
 
 export class StlFunction {
