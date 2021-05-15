@@ -108,7 +108,6 @@ function scanToken(): Maybe<Token> {
             return Nothing;
         case "\n":
             const token = Just(makeToken(TokenType.NEWLINE));
-            bumpLine();
             return token;
         case '"':
             return Just(makeString());
@@ -259,6 +258,9 @@ function makeToken(type: TokenType, literal: any = null): Token {
             filename
         )
     );
+    if (type === TokenType.NEWLINE) {
+        bumpLine();
+    }
     // reset start for next token
     startIndex = currentIndex;
     startLine = currentLine;

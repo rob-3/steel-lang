@@ -86,7 +86,7 @@ describe("tokenize()", () => {
                 TokenType.NEWLINE,
                 "\n",
                 null,
-                new Location([1, 38], [2, 1], "<anonymous>")
+                new Location([1, 38], [1, 39], "<anonymous>")
             ),
             new Token(
                 TokenType.IDENTIFIER,
@@ -172,7 +172,7 @@ describe("tokenize()", () => {
                 TokenType.NEWLINE,
                 "\n",
                 null,
-                new Location([1, 7], [2, 1], "<anonymous>")
+                new Location([1, 7], [1, 8], "<anonymous>")
             ),
             new Token(
                 TokenType.VAR,
