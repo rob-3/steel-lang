@@ -44,7 +44,7 @@ export function setPrintFn(fn: (v: Value) => void): void {
     };
 }
 
-function execStmts(stmts: Expr[], scope: Scope): Scoped<Value> {
+export function execStmts(stmts: Expr[], scope: Scope): Scoped<Value> {
     let value: Value = null;
     for (const stmt of stmts) {
         const pair = exprEval(stmt, scope);
@@ -81,6 +81,8 @@ export function stlEval(src: string, scope: Scope): Scoped<Value> {
  * Ast-based eval() for steel. Pass in any expression and get the evaluated result.
  */
 export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
+    return expr.eval(scope);
+    /*
     if (expr instanceof PrimaryExpr) {
         return [expr.literal, scope];
     } else if (expr instanceof ArrayLiteral) {
@@ -226,9 +228,10 @@ export function exprEval(expr: Expr, scope: Scope): Scoped<Value> {
         return [array[index], newScope];
     }
     throw RuntimePanic("Unhandled stmt or expr.");
+    */
 }
 
-function call(fn: StlFunction, args: Expr[], scope: Scope): Scoped<any> {
+export function call(fn: StlFunction, args: Expr[], scope: Scope): Scoped<any> {
     const argValues: Value[] = [];
     for (const arg of args) {
         const [value, newScope] = exprEval(arg, scope);
@@ -243,48 +246,48 @@ function call(fn: StlFunction, args: Expr[], scope: Scope): Scoped<any> {
  * Returns the opposite of the expression. Throws if expr does not evaluate to a
  * number.
  */
-function opposite(right: Value): number {
+export function opposite(right: Value): number {
     if (assertNumber(right)) return -(<number>right);
     else throw RuntimePanic('"-" can only be used on a number');
 }
 
-function plus(left: Value, right: Value): number {
+export function plus(left: Value, right: Value): number {
     if (assertNumber(left, right)) {
         return <number>left + <number>right;
     } else throw RuntimePanic('Operands of "+" must be numbers.');
 }
 
-function minus(left: Value, right: Value): number {
+export function minus(left: Value, right: Value): number {
     if (assertNumber(left, right)) {
         return <number>left - <number>right;
     } else throw RuntimePanic('Operands of "-" must be numbers.');
 }
 
-function plusPlus(left: Value, right: Value): string {
+export function plusPlus(left: Value, right: Value): string {
     if (typeof left === "string" && typeof right === "string") {
         return left.concat(right);
     } else throw RuntimePanic('Operands of "++" must be strings.');
 }
 
-function star(left: Value, right: Value): number {
+export function star(left: Value, right: Value): number {
     if (assertNumber(left, right)) {
         return <number>left * <number>right;
     } else throw RuntimePanic('Operands of "*" must be numbers.');
 }
 
-function slash(left: Value, right: Value): number {
+export function slash(left: Value, right: Value): number {
     if (assertNumber(left, right)) {
         return <number>left / <number>right;
     } else throw RuntimePanic('Operands of "/" must be numbers.');
 }
 
-function and(left: Value, right: Value): boolean {
+export function and(left: Value, right: Value): boolean {
     if (assertBool(left, right)) {
         return <boolean>left && <boolean>right;
     } else throw RuntimePanic('Operands of "and" must be booleans.');
 }
 
-function or(left: Value, right: Value): boolean {
+export function or(left: Value, right: Value): boolean {
     if (assertBool(left, right)) {
         return <boolean>left || <boolean>right;
     } else {
@@ -292,42 +295,42 @@ function or(left: Value, right: Value): boolean {
     }
 }
 
-function assertNumber(...literals: any[]): boolean {
+export function assertNumber(...literals: any[]): boolean {
     for (const literal of literals) {
         if (typeof literal !== "number") return false;
     }
     return true;
 }
 
-function assertBool(...literals: any[]): boolean {
+export function assertBool(...literals: any[]): boolean {
     for (const literal of literals) {
         if (typeof literal !== "boolean") return false;
     }
     return true;
 }
 
-function not(right: Value): boolean {
+export function not(right: Value): boolean {
     if (assertBool(right)) return !right;
     else throw RuntimePanic('Operands of "not" should be booleans.');
 }
 
-function greaterEqual(left: Value, right: Value): boolean {
+export function greaterEqual(left: Value, right: Value): boolean {
     return numberComparision(left, right, (l, r) => l >= r, ">=");
 }
 
-function greater(left: Value, right: Value): boolean {
+export function greater(left: Value, right: Value): boolean {
     return numberComparision(left, right, (l, r) => l > r, ">");
 }
 
-function lessEqual(left: Value, right: Value): boolean {
+export function lessEqual(left: Value, right: Value): boolean {
     return numberComparision(left, right, (l, r) => l <= r, "<=");
 }
 
-function less(left: Value, right: Value): boolean {
+export function less(left: Value, right: Value): boolean {
     return numberComparision(left, right, (l, r) => l < r, "<");
 }
 
-function equal(left: Value, right: Value): boolean {
+export function equal(left: Value, right: Value): boolean {
     return left === right;
 }
 
@@ -342,7 +345,7 @@ function numberComparision(
     } else throw RuntimePanic(`Operands of ${err} should be numbers.`);
 }
 
-function mod(left: Value, right: Value): number {
+export function mod(left: Value, right: Value): number {
     if (typeof left === "number" && typeof right === "number") {
         return left % right;
     } else throw RuntimePanic(`Operands of % should be numbers.`);

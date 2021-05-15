@@ -1,10 +1,38 @@
 import Token from "./Token";
+import Scope from "./Scope";
+import TokenType from "./TokenType";
+import { Value, StlFunction } from "./InterpreterHelpers";
+import { RuntimePanic } from "./Debug";
 import { copy } from "copy-anything";
 import { Location } from "./TokenizerHelpers";
+import {
+    plus,
+    minus,
+    plusPlus,
+    star,
+    slash,
+    mod,
+    and,
+    or,
+    greaterEqual,
+    greater,
+    lessEqual,
+    less,
+    equal,
+    opposite,
+    not,
+    call,
+    printfn,
+    assertBool,
+    execStmts,
+    getVal,
+    getState,
+} from "./Interpreter";
 
 export interface Expr {
     map(fn: (expr: Expr) => Expr): Expr;
     getDebugInfo(): Location;
+    eval(scope: Scope): [Value, Scope];
     tokens: Token[];
 }
 
@@ -30,6 +58,44 @@ export class BinaryExpr implements Expr {
         this.tokens = tokens;
     }
 
+    eval(scope: Scope): [Value, Scope] {
+        // TODO: refactor in functional style
+        const [leftVal, newScope] = this.left.eval(scope);
+        const [rightVal, newScope2] = this.right.eval(newScope);
+        switch (this.operator.type) {
+            case TokenType.PLUS:
+                return [plus(leftVal, rightVal), newScope2];
+            case TokenType.MINUS:
+                return [minus(leftVal, rightVal), newScope2];
+            case TokenType.PLUS_PLUS:
+                return [plusPlus(leftVal, rightVal), newScope2];
+            case TokenType.STAR:
+                return [star(leftVal, rightVal), newScope2];
+            case TokenType.SLASH:
+                return [slash(leftVal, rightVal), newScope2];
+            case TokenType.MOD:
+                return [mod(leftVal, rightVal), newScope2];
+            case TokenType.AND:
+                return [and(leftVal, rightVal), newScope2];
+            case TokenType.OR:
+                return [or(leftVal, rightVal), newScope2];
+            case TokenType.GREATER_EQUAL:
+                return [greaterEqual(leftVal, rightVal), newScope2];
+            case TokenType.GREATER:
+                return [greater(leftVal, rightVal), newScope2];
+            case TokenType.LESS_EQUAL:
+                return [lessEqual(leftVal, rightVal), newScope2];
+            case TokenType.LESS:
+                return [less(leftVal, rightVal), newScope2];
+            case TokenType.EQUAL_EQUAL:
+                return [equal(leftVal, rightVal), newScope2];
+            default:
+                throw RuntimePanic(
+                    `FIXME: Unhandled operator type "${this.operator}"`
+                );
+        }
+    }
+
     map(fn: (expr: Expr) => Expr): Expr {
         return fn(
             new BinaryExpr(
@@ -52,6 +118,10 @@ export class PrimaryExpr implements Expr {
         this.tokens = tokens;
     }
 
+    eval(scope: Scope): [Value, Scope] {
+        return [this.literal, scope];
+    }
+
     map(fn: (expr: Expr) => Expr): Expr {
         return fn(copy(this));
     }
@@ -69,7 +139,18 @@ export class UnaryExpr implements Expr {
         this.tokens = tokens;
     }
 
-    map(fn: (expr: Expr) => Expr) {
+    eval(scope: Scope): [Value, Scope] {
+        const [value, newScope] = this.right.eval(scope);
+        switch (this.operator.type) {
+            case TokenType.MINUS:
+                return [opposite(value), newScope];
+            case TokenType.NOT:
+                return [not(value), newScope];
+        }
+        throw RuntimePanic("Unsupported operator type in UnaryExpr");
+    }
+
+    map(fn: (expr: Expr) => Expr): Expr {
         return fn(
             new UnaryExpr(this.operator, this.right.map(fn), this.tokens)
         );
@@ -86,6 +167,10 @@ export class GroupingExpr implements Expr {
         this.tokens = tokens;
     }
 
+    eval(scope: Scope) {
+        return this.expr.eval(scope);
+    }
+
     map(fn: (expr: Expr) => Expr): Expr {
         return fn(new GroupingExpr(this.expr.map(fn), this.tokens));
     }
@@ -99,6 +184,10 @@ export class VariableExpr implements Expr {
     constructor(identifier: string, tokens: Token[]) {
         this.identifier = identifier;
         this.tokens = tokens;
+    }
+
+    eval(scope: Scope): [Value, Scope] {
+        return [scope.lookup(this.identifier), scope];
     }
 
     map(fn: (expr: Expr) => Expr): Expr {
@@ -118,6 +207,10 @@ export class FunctionExpr implements Expr {
         this.tokens = tokens;
     }
 
+    eval(scope: Scope): [Value, Scope] {
+        return [new StlFunction(this, scope), scope];
+    }
+
     map(fn: (expr: Expr) => Expr): Expr {
         return fn(new FunctionExpr(this.args, this.body.map(fn), this.tokens));
     }
@@ -133,6 +226,17 @@ export class CallExpr implements Expr {
         this.callee = callee;
         this.args = args;
         this.tokens = tokens;
+    }
+
+    eval(scope: Scope) {
+        const [maybeFn, newScope] = this.callee.eval(scope);
+        if (maybeFn instanceof StlFunction) {
+            return call(maybeFn, this.args, newScope);
+        } else {
+            throw RuntimePanic(
+                `Can't call ${maybeFn} because it is not a function.`
+            );
+        }
     }
 
     map(fn: (expr: Expr) => Expr): Expr {
@@ -161,6 +265,11 @@ export class VariableDeclarationStmt implements Expr {
         this.tokens = tokens;
     }
 
+    eval(scope: Scope) {
+        const [rightVal, newScope] = this.right.eval(scope);
+        return newScope.define(this.identifier, rightVal, this.immutable);
+    }
+
     map(fn: (expr: Expr) => Expr): Expr {
         return fn(
             new VariableDeclarationStmt(
@@ -185,6 +294,11 @@ export class VariableAssignmentStmt implements Expr {
         this.tokens = tokens;
     }
 
+    eval(scope: Scope) {
+        const [rightVal, newScope] = this.right.eval(scope);
+        return newScope.assign(this.identifier, rightVal);
+    }
+
     map(fn: (expr: Expr) => Expr): Expr {
         return fn(
             new VariableAssignmentStmt(
@@ -205,6 +319,11 @@ export class PrintStmt implements Expr {
     constructor(thingToPrint: Expr, tokens: Token[]) {
         this.thingToPrint = thingToPrint;
         this.tokens = tokens;
+    }
+
+    eval(scope: Scope) {
+        const [printValue, newScope] = this.thingToPrint.eval(scope);
+        return printfn(printValue, newScope);
     }
 
     map(fn: (expr: Expr) => Expr): Expr {
@@ -231,6 +350,21 @@ export class IfStmt implements Expr {
         this.tokens = tokens;
     }
 
+    eval(scope: Scope): [Value, Scope] {
+        const [shouldBeBool, newScope] = this.condition.eval(scope);
+        if (!assertBool(shouldBeBool)) {
+            throw RuntimePanic("Condition doesn't evaluate to a boolean.");
+        }
+        if (shouldBeBool) {
+            return this.body.eval(newScope);
+        } else if (this.elseBody !== null) {
+            return this.elseBody.eval(newScope);
+        } else {
+            // FIXME: hack we need to address
+            return [null, newScope];
+        }
+    }
+
     map(fn: (expr: Expr) => Expr): Expr {
         return fn(
             new IfStmt(
@@ -253,6 +387,10 @@ export class BlockStmt implements Expr {
         this.tokens = tokens;
     }
 
+    eval(scope: Scope) {
+        return execStmts(this.exprs, scope);
+    }
+
     map(fn: (expr: Expr) => Expr): Expr {
         return fn(new BlockStmt(this.exprs.map(fn), this.tokens));
     }
@@ -268,6 +406,24 @@ export class WhileStmt implements Expr {
         this.condition = condition;
         this.body = body;
         this.tokens = tokens;
+    }
+
+    eval(scope: Scope): [Value, Scope] {
+        let conditionValue = getVal(this.condition.eval(scope));
+        if (this instanceof UntilStmt) {
+            conditionValue = !conditionValue;
+        }
+        let value: Value = null;
+        while (assertBool(conditionValue) && conditionValue) {
+            const pair = this.body.eval(scope);
+            scope = getState(pair);
+            value = getVal(pair);
+            conditionValue = getVal(this.condition.eval(scope));
+            if (this instanceof UntilStmt) {
+                conditionValue = !conditionValue;
+            }
+        }
+        return [value, scope];
     }
 
     map(fn: (expr: Expr) => Expr): Expr {
@@ -293,6 +449,24 @@ export class UntilStmt implements Expr {
         this.tokens = tokens;
     }
 
+    eval(scope: Scope): [Value, Scope] {
+        let conditionValue = getVal(this.condition.eval(scope));
+        if (this instanceof UntilStmt) {
+            conditionValue = !conditionValue;
+        }
+        let value: Value = null;
+        while (assertBool(conditionValue) && conditionValue) {
+            const pair = this.body.eval(scope);
+            scope = getState(pair);
+            value = getVal(pair);
+            conditionValue = getVal(this.condition.eval(scope));
+            if (this instanceof UntilStmt) {
+                conditionValue = !conditionValue;
+            }
+        }
+        return [value, scope];
+    }
+
     map(fn: (expr: Expr) => Expr): Expr {
         return fn(
             new UntilStmt(
@@ -314,6 +488,10 @@ export class ReturnStmt implements Expr {
         this.tokens = tokens;
     }
 
+    eval(scope: Scope) {
+        return this.value.eval(scope);
+    }
+
     map(fn: (expr: Expr) => Expr): Expr {
         return fn(new ReturnStmt(this.value.map(fn), this.tokens));
     }
@@ -329,6 +507,24 @@ export class MatchStmt implements Expr {
         this.expr = expr;
         this.cases = cases;
         this.tokens = tokens;
+    }
+
+    eval(scope: Scope) {
+        const rootExpr = this.expr;
+        let [matchExprValue, newScope] = rootExpr.eval(scope);
+        for (const matchCase of this.cases) {
+            if (matchCase.matchExpr instanceof UnderscoreExpr) {
+                return matchCase.expr.eval(newScope);
+            }
+            // FIXME decide if side effects are legal in a match expression
+            const arr = matchCase.matchExpr.eval(newScope);
+            const caseValue = getVal(arr);
+            newScope = getState(arr);
+            if (equal(caseValue, matchExprValue)) {
+                return matchCase.expr.eval(newScope);
+            }
+        }
+        throw RuntimePanic("Pattern match failed.");
     }
 
     map(fn: (expr: Expr) => Expr): Expr {
@@ -354,6 +550,12 @@ export class UnderscoreExpr implements Expr {
     constructor(tokens: Token[]) {
         this.tokens = tokens;
     }
+
+    eval(scope: Scope): [Value, Scope] {
+        // FIXME
+        throw RuntimePanic("Tried to evaluate an UnderscoreExpr");
+    }
+
     map(fn: (expr: Expr) => Expr): Expr {
         return fn(copy(this));
     }
@@ -368,6 +570,10 @@ export class FunctionDefinition implements Expr {
     constructor(definition: VariableDeclarationStmt, tokens: Token[]) {
         this.definition = definition;
         this.tokens = tokens;
+    }
+
+    eval(scope: Scope) {
+        return this.definition.eval(scope);
     }
 
     map(fn: (expr: Expr) => Expr): Expr {
@@ -388,6 +594,22 @@ export class IndexExpr implements Expr {
         this.tokens = tokens;
     }
 
+    eval(scope: Scope): [Value, Scope] {
+        const [index, newScope] = this.index.eval(scope);
+        if (typeof index !== "number") {
+            // FIXME we probably should throw every RuntimePanic since
+            // TypeScript isn't smart enough to know we throw
+            throw RuntimePanic(
+                "Indexing expression must evaluate to a number!"
+            );
+        }
+        const array = newScope.lookup(this.arr);
+        if (!Array.isArray(array)) {
+            throw RuntimePanic(`${this.arr} is not an array!`);
+        }
+        return [array[index], newScope];
+    }
+
     map(fn: (expr: Expr) => Expr): Expr {
         return fn(new IndexExpr(copy(this.arr), this.index, copy(this.tokens)));
     }
@@ -402,6 +624,16 @@ export class ArrayLiteral implements Expr {
     constructor(exprs: Expr[], tokens: Token[]) {
         this.exprs = exprs;
         this.tokens = tokens;
+    }
+
+    eval(scope: Scope): [Value, Scope] {
+        const resolved: Value[] = [];
+        const newScope = this.exprs.reduce((acc: Scope, cur: Expr) => {
+            const [val, scope]: [Value, Scope] = cur.eval(acc);
+            resolved.push(val);
+            return scope;
+        }, scope);
+        return [resolved, newScope];
     }
 
     map(fn: (expr: Expr) => Expr) {
