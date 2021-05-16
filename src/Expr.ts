@@ -1,7 +1,7 @@
 import Token from "./Token";
 import Scope from "./Scope";
-import { Value } from "./InterpreterHelpers";
 import { Location } from "./TokenizerHelpers";
+import { Value } from "./Value";
 export interface Expr {
     map(fn: (expr: Expr) => Expr): Expr;
     getDebugInfo(): Location;

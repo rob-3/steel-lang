@@ -5,8 +5,9 @@ import tokenize from "./Tokenizer";
 import parse from "./Parser";
 export const getVal = (arr: [Value, Scope]) => arr[0];
 export const getState = (arr: [Value, Scope]) => arr[1];
-import { StlFunction, Value, NonNullValue } from "./InterpreterHelpers";
 import { RuntimePanic } from "./Debug";
+import { Value, NonNullValue } from "./Value";
+import { StlFunction } from "./StlFunction";
 
 export let printfn = (thing: Value, scope: Scope): [Value, Scope] => {
     const text = String(thing);

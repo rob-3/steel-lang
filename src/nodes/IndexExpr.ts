@@ -3,7 +3,7 @@ import Token from "../Token";
 import Scope from "../Scope";
 import { copy } from "copy-anything";
 import { RuntimePanic } from "../Debug";
-import { Value } from "../InterpreterHelpers";
+import { Value } from "../Value";
 
 export class IndexExpr implements Expr {
     arr: string;

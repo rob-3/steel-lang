@@ -17,7 +17,7 @@ import {
 import Token from "../Token";
 import TokenType from "../TokenType";
 import Scope from "../Scope";
-import { Value } from "../InterpreterHelpers";
+import { Value } from "../Value";
 import { RuntimePanic } from "../Debug";
 
 export default class BinaryExpr implements Expr {

@@ -4,7 +4,7 @@ import TokenType from "../TokenType";
 import Scope from "../Scope";
 import { RuntimePanic } from "../Debug";
 import { opposite, not } from "../Interpreter";
-import { Value } from "../InterpreterHelpers";
+import { Value } from "../Value";
 
 export class UnaryExpr implements Expr {
     operator: Token;

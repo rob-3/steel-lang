@@ -1,7 +1,7 @@
 import { Expr, getDebugInfo } from "../Expr";
 import Token from "../Token";
 import Scope from "../Scope";
-import { Value } from "../InterpreterHelpers";
+import { Value } from "../Value";
 import { assertBool, getVal, getState } from "../Interpreter";
 
 export class UntilStmt implements Expr {

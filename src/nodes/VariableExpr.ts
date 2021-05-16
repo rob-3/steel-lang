@@ -2,7 +2,7 @@ import { Expr, getDebugInfo } from "../Expr";
 import Token from "../Token";
 import Scope from "../Scope";
 import { copy } from "copy-anything";
-import { Value } from "../InterpreterHelpers";
+import { Value } from "../Value";
 
 export class VariableExpr implements Expr {
     identifier: string;

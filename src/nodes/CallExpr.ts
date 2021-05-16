@@ -2,7 +2,7 @@ import { Expr, getDebugInfo } from "../Expr";
 import Token from "../Token";
 import Scope from "../Scope";
 import { RuntimePanic } from "../Debug";
-import { StlFunction } from "../InterpreterHelpers";
+import { StlFunction } from "../StlFunction";
 import { call } from "../Interpreter";
 
 export class CallExpr implements Expr {

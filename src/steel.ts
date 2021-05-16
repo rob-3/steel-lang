@@ -3,7 +3,7 @@ import { exprEval, setPrintFn } from "./Interpreter";
 import tokenize from "./Tokenizer";
 import parse from "./Parser";
 import { Expr } from "./Expr";
-import { StlFunction } from "./InterpreterHelpers";
+import { StlFunction } from "./StlFunction";
 
 export let source: string;
 

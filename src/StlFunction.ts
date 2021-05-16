@@ -1,6 +1,7 @@
 import { exprEval, getVal } from "./Interpreter";
 import { FunctionExpr } from "./nodes/FunctionExpr";
 import Scope from "./Scope";
+import { Value } from "./Value";
 
 export class StlFunction {
     funExpr: FunctionExpr;
@@ -21,6 +22,3 @@ export class StlFunction {
         return getVal(result);
     }
 }
-
-export type Value = NonNullValue | null;
-export type NonNullValue = number | boolean | string | StlFunction | Value[];

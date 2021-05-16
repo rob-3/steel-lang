@@ -4,7 +4,7 @@ import Scope from "../Scope";
 import { copy } from "copy-anything";
 import { equal, getState, getVal } from "../Interpreter";
 import { RuntimePanic } from "../Debug";
-import { Value } from "../InterpreterHelpers";
+import { Value } from "../Value";
 import { PrimaryExpr } from "./PrimaryExpr";
 
 export class MatchStmt implements Expr {
