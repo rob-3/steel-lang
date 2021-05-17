@@ -5,6 +5,9 @@ import spies = require("chai-spies");
 chai.use(spies);
 const expect = chai.expect;
 import { run } from "../src/steel";
+import tokenize from "../src/Tokenizer";
+import parse from "../src/Parser";
+import { Value } from "../src/Value";
 
 const stlEval = (src: string, scope: Scope = new Scope()) => {
     return _stlEval(src, scope)[0];
@@ -708,7 +711,7 @@ describe("debug", () => {
     });
 
     it("should return old scope if error occurs", () => {
-        expect(run("a", false, new Scope())).to.not.be.undefined;
+        expect(run("a", false, new Scope(), "<anonymous>")).to.not.be.undefined;
     });
 
     it("should not allow reassignment to an immutable variable", () => {
@@ -720,5 +723,18 @@ describe("debug", () => {
     it("should not loop if parsing fails", () => {
         // will hang if this test fails
         stlEval(")");
+    });
+
+    it("should show the correct filename on a test", () => {
+        let wasAnonymous = true;
+        const printfn = (v: Value) => {
+            console.log(v);
+            console.log((<string>v).includes("anonymous"));
+            wasAnonymous = (<string>v).includes("anonymous");
+        };
+        setPrintFn(printfn);
+        const tokens = tokenize("a = ", "filename");
+        const ast = parse(tokens);
+        expect(wasAnonymous).to.be.false;
     });
 });

@@ -24,6 +24,8 @@ import { VariableAssignmentStmt } from "./nodes/VariableAssignmentStmt";
 import { VariableDeclarationStmt } from "./nodes/VariableDeclarationStmt";
 import { VariableExpr } from "./nodes/VariableExpr";
 import { WhileStmt } from "./nodes/WhileStmt";
+import { printfn } from "./Interpreter";
+import Scope from "./Scope";
 
 type Result<T> = Either<Error, T>;
 
@@ -43,7 +45,7 @@ export default function parse(tokenList: Token[]): Expr[] {
     reset();
     const exprs: Result<Expr[]> = Either.sequence(parseTree);
     if (exprs.isLeft()) {
-        exprs.mapLeft((err) => console.log(err.message));
+        exprs.mapLeft((err) => printfn(err.message, new Scope()));
         return [];
     } else {
         return astTransforms.reduce(

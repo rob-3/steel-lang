@@ -20,7 +20,7 @@ if (process.argv.length === 2) {
                 console.log("There was a problem reading the file.");
                 process.exitCode = 1;
             } else {
-                run(contents, false, new Scope());
+                run(contents, false, new Scope(), filename);
             }
             rl.close();
         }

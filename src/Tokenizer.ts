@@ -15,7 +15,7 @@ let filename: string = "";
 
 export default function tokenize(
     src: string,
-    filepath = "<anonymous>"
+    filepath: string = "<anonymous>"
 ): Token[] {
     filename = filepath;
     const tokens = [];

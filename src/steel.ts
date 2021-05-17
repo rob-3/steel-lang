@@ -37,7 +37,12 @@ export function startRepl(rl: any) {
  * @param scope containing Scope for code to run
  * @return A scope after all code has been evaluated
  */
-export function run(src: string, repl: boolean, scope: Scope): Scope {
+export function run(
+    src: string,
+    repl: boolean,
+    scope: Scope,
+    filename: string = "<anonymous>"
+): Scope {
     let retScope: Scope = scope;
     try {
         source = src;
@@ -50,7 +55,7 @@ export function run(src: string, repl: boolean, scope: Scope): Scope {
          *
          * Last, we use the loop to run each statement sequentially.
          */
-        const tokens = tokenize(source);
+        const tokens = tokenize(source, filename);
         const ast: Expr[] = parse(tokens);
         for (const stmt of ast) {
             const [val, newScope] = exprEval(stmt, retScope);

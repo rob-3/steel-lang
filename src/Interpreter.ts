@@ -42,8 +42,12 @@ export function execStmts(stmts: Expr[], scope: Scope): [Value, Scope] {
  * @param scope Scope to evaluate src in
  * @return pair of resultant Value and Scope
  */
-export function stlEval(src: string, scope: Scope): [Value, Scope] {
-    const ast = parse(tokenize(src));
+export function stlEval(
+    src: string,
+    scope: Scope,
+    filename: string = "<anonymous>"
+): [Value, Scope] {
+    const ast = parse(tokenize(src, filename));
     let currentScope: Scope = scope;
     let currentValue: Value = null;
     for (const expr of ast) {
