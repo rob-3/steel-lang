@@ -3,8 +3,6 @@ import ReturnStmt from "./nodes/ReturnStmt";
 import Scope from "./Scope";
 import tokenize from "./Tokenizer";
 import parse from "./Parser";
-export const getVal = (arr: [Value, Scope]) => arr[0];
-export const getState = (arr: [Value, Scope]) => arr[1];
 import { RuntimePanic } from "./Debug";
 import { Value, NonNullValue } from "./Value";
 import { StlFunction } from "./StlFunction";
@@ -29,8 +27,9 @@ export function execStmts(stmts: Expr[], scope: Scope): [Value, Scope] {
         if (stmt instanceof ReturnStmt) {
             return pair;
         } else {
-            scope = getState(pair);
-            value = getVal(pair);
+            const [newValue, newScope] = pair;
+            scope = newScope;
+            value = newValue;
         }
     }
     return [value, scope];

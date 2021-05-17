@@ -2,7 +2,7 @@ import { Expr, getDebugInfo } from "../Expr";
 import Token from "../Token";
 import Scope from "../Scope";
 import { copy } from "copy-anything";
-import { equal, getState, getVal } from "../Interpreter";
+import { equal } from "../Interpreter";
 import { RuntimePanic } from "../Debug";
 import { Value } from "../Value";
 import { PrimaryExpr } from "./PrimaryExpr";
@@ -25,9 +25,8 @@ export class MatchStmt implements Expr {
                 return matchCase.expr.eval(newScope);
             }
             // FIXME decide if side effects are legal in a match expression
-            const arr = matchCase.matchExpr.eval(newScope);
-            const caseValue = getVal(arr);
-            newScope = getState(arr);
+            const [caseValue, newScope2] = matchCase.matchExpr.eval(newScope);
+            newScope = newScope2;
             if (equal(caseValue, matchExprValue)) {
                 return matchCase.expr.eval(newScope);
             }

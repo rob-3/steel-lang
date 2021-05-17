@@ -1,4 +1,4 @@
-import { exprEval, getVal } from "./Interpreter";
+import { exprEval } from "./Interpreter";
 import { FunctionExpr } from "./nodes/FunctionExpr";
 import Scope from "./Scope";
 import { Value } from "./Value";
@@ -18,7 +18,10 @@ export class StlFunction {
             funScope.setLocal(this.funExpr.args[i], [callArgs[i], false]);
         }
 
-        const result: [Value, Scope] = exprEval(this.funExpr.body, funScope);
-        return getVal(result);
+        const [val, scope]: [Value, Scope] = exprEval(
+            this.funExpr.body,
+            funScope
+        );
+        return val;
     }
 }

@@ -2,7 +2,7 @@ import { Expr, getDebugInfo } from "../Expr";
 import Token from "../Token";
 import Scope from "../Scope";
 import { Value } from "../Value";
-import { getVal, getState, assertBool } from "../Interpreter";
+import { assertBool } from "../Interpreter";
 
 export class WhileStmt implements Expr {
     condition: Expr;
@@ -15,13 +15,14 @@ export class WhileStmt implements Expr {
     }
 
     eval(scope: Scope): [Value, Scope] {
-        let conditionValue = getVal(this.condition.eval(scope));
+        let conditionValue = this.condition.eval(scope)[0];
         let value: Value = null;
         while (assertBool(conditionValue) && conditionValue) {
-            const pair = this.body.eval(scope);
-            scope = getState(pair);
-            value = getVal(pair);
-            conditionValue = getVal(this.condition.eval(scope));
+            const [newVal, newScope] = this.body.eval(scope);
+            scope = newScope;
+            value = newVal;
+            // FIXME is this a bug that it doesn't consider scope?
+            conditionValue = this.condition.eval(scope)[0];
         }
         return [value, scope];
     }

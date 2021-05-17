@@ -1,9 +1,4 @@
-import {
-    setPrintFn,
-    stlEval as _stlEval,
-    getState,
-    getVal,
-} from "../src/Interpreter";
+import { setPrintFn, stlEval as _stlEval } from "../src/Interpreter";
 import Scope from "../src/Scope";
 import chai = require("chai");
 import spies = require("chai-spies");
@@ -12,7 +7,7 @@ const expect = chai.expect;
 import { run } from "../src/steel";
 
 const stlEval = (src: string, scope: Scope = new Scope()) => {
-    return getVal(_stlEval(src, scope));
+    return _stlEval(src, scope)[0];
 };
 
 const stlExec = (src: string, printfn: ((a: any) => void) | null = null) => {
@@ -311,12 +306,12 @@ describe("exec()", () => {
     describe("variables", () => {
         it("should be able to access a variable", () => {
             let src = "var a <- 14";
-            let scope: Scope = getState(stlExec(src));
+            let scope: Scope = stlExec(src)[1];
             expect(stlEval("a", scope)).to.equal(14);
         });
 
         it("should be able to assign to a variable", () => {
-            let scope = getState(stlExec("var a <- 14\na <- 15"));
+            let scope = stlExec("var a <- 14\na <- 15")[1];
             expect(stlEval("a", scope)).to.equal(15);
         });
 
