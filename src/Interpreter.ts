@@ -6,6 +6,7 @@ import parse from "./Parser";
 import { RuntimePanic } from "./Debug";
 import { Value, NonNullValue } from "./Value";
 import { StlFunction } from "./StlFunction";
+import { Either } from "purify-ts";
 
 export let printfn = (thing: Value, scope: Scope): [Value, Scope] => {
     const text = String(thing);
@@ -46,16 +47,17 @@ export function stlEval(
     src: string,
     scope: Scope,
     filename: string = "<anonymous>"
-): [Value, Scope] {
+): Either<Error[], [Value, Scope]> {
     const ast = parse(tokenize(src, filename));
-    let currentScope: Scope = scope;
-    let currentValue: Value = null;
-    for (const expr of ast) {
-        const [value, newScope] = exprEval(expr, currentScope);
-        currentScope = newScope;
-        currentValue = value;
-    }
-    return [currentValue, currentScope];
+    return ast.map((goodAst: Expr[]) => {
+        return goodAst.reduce<[Value, Scope]>(
+            ([_, scope]: [Value, Scope], cur: Expr): [Value, Scope] => {
+                const [newVal, newScope]: [Value, Scope] = exprEval(cur, scope);
+                return [newVal, newScope];
+            },
+            [null, scope]
+        );
+    });
 }
 
 /*

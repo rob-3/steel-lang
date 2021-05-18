@@ -4,6 +4,7 @@ import tokenize from "./Tokenizer";
 import parse from "./Parser";
 import { Expr } from "./Expr";
 import { StlFunction } from "./StlFunction";
+import { Either } from "purify-ts";
 
 export let source: string;
 
@@ -43,7 +44,6 @@ export function run(
     scope: Scope,
     filename: string = "<anonymous>"
 ): Scope {
-    let retScope: Scope = scope;
     try {
         source = src;
         setPrintFn(console.log);
@@ -56,21 +56,29 @@ export function run(
          * Last, we use the loop to run each statement sequentially.
          */
         const tokens = tokenize(source, filename);
-        const ast: Expr[] = parse(tokens);
-        for (const stmt of ast) {
-            const [val, newScope] = exprEval(stmt, retScope);
-            retScope = newScope;
-            // Print if using REPL and if the expression evaluates to a value
-            if (repl && val !== undefined) {
-                // Don't print the internal value of functions
-                if (val instanceof StlFunction) {
-                    console.log("<Function>");
-                } else {
-                    console.log(val);
-                }
+        const ast: Either<Error[], Expr[]> = parse(tokens);
+        const finalScope: Scope = ast.either(
+            (badAst) => {
+                badAst.map((err) => console.log(err.message));
+                return scope;
+            },
+            (goodAst) => {
+                return goodAst.reduce<Scope>((scope: Scope, expr: Expr) => {
+                    const [val, newScope] = exprEval(expr, scope);
+                    // Print if using REPL and if the expression evaluates to a value
+                    if (repl && val !== undefined) {
+                        // Don't print the internal value of functions
+                        if (val instanceof StlFunction) {
+                            console.log("<Function>");
+                        } else {
+                            console.log(val);
+                        }
+                    }
+                    return newScope;
+                }, scope);
             }
-        }
-        return retScope;
+        );
+        return finalScope;
     } catch (e) {
         console.log(e.message);
         return scope;

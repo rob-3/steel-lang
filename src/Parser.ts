@@ -33,7 +33,7 @@ let tokens: Token[];
 let start = 0;
 let current = 0;
 
-export default function parse(tokenList: Token[]): Expr[] {
+export default function parse(tokenList: Token[]): Either<Error[], Expr[]> {
     tokens = tokenList;
     const parseTree: Result<Expr>[] = [];
 
@@ -43,7 +43,14 @@ export default function parse(tokenList: Token[]): Expr[] {
         eatNewlines();
     }
     reset();
-    const exprs: Result<Expr[]> = Either.sequence(parseTree);
+    const errors = Either.lefts(parseTree);
+    if (errors.length > 0) {
+        return Left(errors);
+    } else {
+        return Right(Either.rights(parseTree));
+    }
+    /*
+    const exprs: Either<Error[], Expr[]> = Either.sequence(parseTree);
     if (exprs.isLeft()) {
         exprs.mapLeft((err) => printfn(err.message, new Scope()));
         return [];
@@ -53,6 +60,7 @@ export default function parse(tokenList: Token[]): Expr[] {
             new Ast(exprs.unsafeCoerce())
         ).exprs;
     }
+    */
 }
 
 function matchType(...types: TokenType[]): boolean {
