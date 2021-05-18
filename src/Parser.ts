@@ -1,8 +1,6 @@
 import Token from "./Token";
 import TokenType from "./TokenType";
 import { Expr } from "./Expr";
-import Ast from "./Ast";
-import astTransforms from "./AstTransforms";
 import { ParseError } from "./Debug";
 import { Either, Left, Right } from "purify-ts";
 import { ArrayLiteral } from "./nodes/ArrayLiteral";
@@ -24,8 +22,6 @@ import { VariableAssignmentStmt } from "./nodes/VariableAssignmentStmt";
 import { VariableDeclarationStmt } from "./nodes/VariableDeclarationStmt";
 import { VariableExpr } from "./nodes/VariableExpr";
 import { WhileStmt } from "./nodes/WhileStmt";
-import { printfn } from "./Interpreter";
-import Scope from "./Scope";
 
 type Result<T> = Either<Error, T>;
 
