@@ -1,9 +1,9 @@
-import { Expr, getDebugInfo } from "../Expr";
-import Token from "../Token";
-import Scope from "../Scope";
 import { copy } from "copy-anything";
-import { equal } from "../Interpreter";
 import { RuntimePanic } from "../Debug";
+import { Expr, getDebugInfo } from "../Expr";
+import { equal } from "../Interpreter";
+import Scope from "../Scope";
+import Token from "../Token";
 import { Value } from "../Value";
 import { PrimaryExpr } from "./PrimaryExpr";
 

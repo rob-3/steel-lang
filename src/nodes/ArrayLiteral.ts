@@ -1,8 +1,8 @@
+import { copy } from "copy-anything";
 import { Expr, getDebugInfo } from "../Expr";
 import Scope from "../Scope";
 import Token from "../Token";
 import { Value } from "../Value";
-import { copy } from "copy-anything";
 
 export class ArrayLiteral implements Expr {
     exprs: Expr[];

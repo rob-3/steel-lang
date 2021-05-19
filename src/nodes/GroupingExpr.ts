@@ -1,6 +1,6 @@
 import { Expr, getDebugInfo } from "../Expr";
-import Token from "../Token";
 import Scope from "../Scope";
+import Token from "../Token";
 
 export class GroupingExpr implements Expr {
     expr: Expr;

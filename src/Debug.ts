@@ -1,5 +1,3 @@
-import Token from "./Token";
-import { source } from "./steel";
 import Ast from "./Ast";
 import { Expr } from "./Expr";
 import { ArrayLiteral } from "./nodes/ArrayLiteral";
@@ -11,7 +9,7 @@ import { FunctionExpr } from "./nodes/FunctionExpr";
 import { GroupingExpr } from "./nodes/GroupingExpr";
 import { IfStmt } from "./nodes/IfStmt";
 import { IndexExpr } from "./nodes/IndexExpr";
-import { UnderscoreExpr, MatchStmt } from "./nodes/MatchStmt";
+import { MatchStmt, UnderscoreExpr } from "./nodes/MatchStmt";
 import { PrimaryExpr } from "./nodes/PrimaryExpr";
 import { PrintStmt } from "./nodes/PrintStmt";
 import ReturnStmt from "./nodes/ReturnStmt";
@@ -20,6 +18,8 @@ import { VariableAssignmentStmt } from "./nodes/VariableAssignmentStmt";
 import { VariableDeclarationStmt } from "./nodes/VariableDeclarationStmt";
 import { VariableExpr } from "./nodes/VariableExpr";
 import { WhileStmt } from "./nodes/WhileStmt";
+import { source } from "./steel";
+import Token from "./Token";
 
 /*
  * The standard error format, shamelessly stolen from rust

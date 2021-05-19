@@ -4,9 +4,9 @@ const rl = require("readline").createInterface({
     output: process.stdout,
 });
 
-import Scope from "./Scope";
-import { startRepl, run } from "./steel";
 import { stlPrint } from "./Logger";
+import Scope from "./Scope";
+import { run, startRepl } from "./steel";
 
 // If no filename, start REPL
 if (process.argv.length === 2) {

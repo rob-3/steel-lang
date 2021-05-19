@@ -1,5 +1,5 @@
-import Token from "./Token";
 import Scope from "./Scope";
+import Token from "./Token";
 import { Location } from "./TokenizerHelpers";
 import { Value } from "./Value";
 export interface Expr {

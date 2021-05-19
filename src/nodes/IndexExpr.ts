@@ -1,8 +1,8 @@
-import { Expr, getDebugInfo } from "../Expr";
-import Token from "../Token";
-import Scope from "../Scope";
 import { copy } from "copy-anything";
 import { RuntimePanic } from "../Debug";
+import { Expr, getDebugInfo } from "../Expr";
+import Scope from "../Scope";
+import Token from "../Token";
 import { Value } from "../Value";
 
 export class IndexExpr implements Expr {

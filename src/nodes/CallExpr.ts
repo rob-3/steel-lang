@@ -1,9 +1,9 @@
-import { Expr, getDebugInfo } from "../Expr";
-import Token from "../Token";
-import Scope from "../Scope";
 import { RuntimePanic } from "../Debug";
-import { StlFunction } from "../StlFunction";
+import { Expr, getDebugInfo } from "../Expr";
 import { call } from "../Interpreter";
+import Scope from "../Scope";
+import { StlFunction } from "../StlFunction";
+import Token from "../Token";
 
 export class CallExpr implements Expr {
     callee: Expr;

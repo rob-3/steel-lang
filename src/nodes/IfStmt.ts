@@ -1,8 +1,8 @@
-import { Expr, getDebugInfo } from "../Expr";
-import Token from "../Token";
-import Scope from "../Scope";
 import { RuntimePanic } from "../Debug";
+import { Expr, getDebugInfo } from "../Expr";
 import { assertBool } from "../Interpreter";
+import Scope from "../Scope";
+import Token from "../Token";
 import { Value } from "../Value";
 
 export class IfStmt implements Expr {

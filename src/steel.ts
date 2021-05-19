@@ -1,11 +1,11 @@
-import Scope from "./Scope";
-import { exprEval } from "./Interpreter";
-import tokenize from "./Tokenizer";
-import parse from "./Parser";
-import { Expr } from "./Expr";
-import { StlFunction } from "./StlFunction";
 import { Either } from "purify-ts";
+import { Expr } from "./Expr";
+import { exprEval } from "./Interpreter";
 import { stlPrint } from "./Logger";
+import parse from "./Parser";
+import Scope from "./Scope";
+import { StlFunction } from "./StlFunction";
+import tokenize from "./Tokenizer";
 
 export let source: string;
 

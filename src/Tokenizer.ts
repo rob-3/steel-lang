@@ -1,7 +1,7 @@
-import TokenType from "./TokenType";
+import { Just, Maybe, Nothing } from "purify-ts";
 import Token from "./Token";
 import { Location } from "./TokenizerHelpers";
-import { Maybe, Just, Nothing } from "purify-ts";
+import TokenType from "./TokenType";
 
 let startIndex = 0;
 let currentIndex = 0;

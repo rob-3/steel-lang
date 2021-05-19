@@ -1,6 +1,6 @@
-import Scope from "../src/Scope";
 import { expect } from "chai";
 import { stlEval } from "../src/Interpreter";
+import Scope from "../src/Scope";
 
 describe("class Scope", () => {
     it("should retrieve values with no parents", () => {

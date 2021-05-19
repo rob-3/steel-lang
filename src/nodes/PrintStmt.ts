@@ -1,7 +1,7 @@
 import { Expr, getDebugInfo } from "../Expr";
-import Token from "../Token";
-import Scope from "../Scope";
 import { stlPrint } from "../Logger";
+import Scope from "../Scope";
+import Token from "../Token";
 import { Value } from "../Value";
 
 // TODO: library function

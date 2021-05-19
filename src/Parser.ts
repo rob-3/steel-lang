@@ -1,8 +1,6 @@
-import Token from "./Token";
-import TokenType from "./TokenType";
-import { Expr } from "./Expr";
-import { ParseError } from "./Debug";
 import { Either, Left, Right } from "purify-ts";
+import { ParseError } from "./Debug";
+import { Expr } from "./Expr";
 import { ArrayLiteral } from "./nodes/ArrayLiteral";
 import BinaryExpr from "./nodes/BinaryExpr";
 import { BlockStmt } from "./nodes/BlockStmt";
@@ -22,6 +20,8 @@ import { VariableAssignmentStmt } from "./nodes/VariableAssignmentStmt";
 import { VariableDeclarationStmt } from "./nodes/VariableDeclarationStmt";
 import { VariableExpr } from "./nodes/VariableExpr";
 import { WhileStmt } from "./nodes/WhileStmt";
+import Token from "./Token";
+import TokenType from "./TokenType";
 
 type Result<T> = Either<Error, T>;
 

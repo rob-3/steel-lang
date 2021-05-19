@@ -1,24 +1,24 @@
+import { RuntimePanic } from "../Debug";
 import { Expr, getDebugInfo } from "../Expr";
 import {
-    plus,
-    minus,
-    plusPlus,
-    star,
-    slash,
-    mod,
     and,
-    or,
-    greaterEqual,
-    greater,
-    lessEqual,
-    less,
     equal,
+    greater,
+    greaterEqual,
+    less,
+    lessEqual,
+    minus,
+    mod,
+    or,
+    plus,
+    plusPlus,
+    slash,
+    star,
 } from "../Interpreter";
+import Scope from "../Scope";
 import Token from "../Token";
 import TokenType from "../TokenType";
-import Scope from "../Scope";
 import { Value } from "../Value";
-import { RuntimePanic } from "../Debug";
 
 export default class BinaryExpr implements Expr {
     left: Expr;

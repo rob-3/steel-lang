@@ -1,8 +1,8 @@
 import { Expr, getDebugInfo } from "../Expr";
-import Token from "../Token";
 import Scope from "../Scope";
-import { Value } from "../Value";
 import { StlFunction } from "../StlFunction";
+import Token from "../Token";
+import { Value } from "../Value";
 
 export class FunctionExpr implements Expr {
     args: string[];

@@ -1,14 +1,13 @@
-import tokenize from "../src/Tokenizer";
-import Token from "../src/Token";
-import TokenType from "../src/TokenType";
-import { Location } from "../src/TokenizerHelpers";
-import {
-    isAlphaNumeric,
-    isAlpha,
-    isNumber,
-    isLegalIdentifierChar,
-} from "../src/Tokenizer";
 import { expect } from "chai";
+import Token from "../src/Token";
+import tokenize, {
+    isAlpha,
+    isAlphaNumeric,
+    isLegalIdentifierChar,
+    isNumber,
+} from "../src/Tokenizer";
+import { Location } from "../src/TokenizerHelpers";
+import TokenType from "../src/TokenType";
 
 describe("tokenize()", () => {
     it("should tokenize input", () => {

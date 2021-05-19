@@ -1,16 +1,16 @@
+import { Either } from "purify-ts";
+import { Expr } from "../src/Expr";
 import { stlEval as _stlEval } from "../src/Interpreter";
+import { setPrintFn } from "../src/Logger";
+import parse from "../src/Parser";
 import Scope from "../src/Scope";
+import { run } from "../src/steel";
+import tokenize from "../src/Tokenizer";
+import { Value } from "../src/Value";
 import chai = require("chai");
 import spies = require("chai-spies");
 chai.use(spies);
 const expect = chai.expect;
-import { run } from "../src/steel";
-import tokenize from "../src/Tokenizer";
-import parse from "../src/Parser";
-import { Value } from "../src/Value";
-import { Either } from "purify-ts";
-import { Expr } from "../src/Expr";
-import { setPrintFn } from "../src/Logger";
 
 const stlEval = (src: string, scope: Scope = new Scope()): Value => {
     return _stlEval(src, scope).unsafeCoerce()[0];

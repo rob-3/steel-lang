@@ -1,12 +1,12 @@
+import { Either } from "purify-ts";
+import { RuntimePanic } from "./Debug";
 import { Expr } from "./Expr";
 import ReturnStmt from "./nodes/ReturnStmt";
-import Scope from "./Scope";
-import tokenize from "./Tokenizer";
 import parse from "./Parser";
-import { RuntimePanic } from "./Debug";
-import { Value, NonNullValue } from "./Value";
+import Scope from "./Scope";
 import { StlFunction } from "./StlFunction";
-import { Either } from "purify-ts";
+import tokenize from "./Tokenizer";
+import { NonNullValue, Value } from "./Value";
 
 export function execStmts(stmts: Expr[], scope: Scope): [Value, Scope] {
     let value: Value = null;

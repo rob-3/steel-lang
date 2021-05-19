@@ -1,6 +1,6 @@
 import { RuntimePanic } from "./Debug";
-import { Value } from "./Value";
 import { StlFunction } from "./StlFunction";
+import { Value } from "./Value";
 
 /**
  * A Scope represents a lexical scope in the program. Each Scope has a set of

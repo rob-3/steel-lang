@@ -1,9 +1,9 @@
+import { RuntimePanic } from "../Debug";
 import { Expr, getDebugInfo } from "../Expr";
+import { not, opposite } from "../Interpreter";
+import Scope from "../Scope";
 import Token from "../Token";
 import TokenType from "../TokenType";
-import Scope from "../Scope";
-import { RuntimePanic } from "../Debug";
-import { opposite, not } from "../Interpreter";
 import { Value } from "../Value";
 
 export class UnaryExpr implements Expr {

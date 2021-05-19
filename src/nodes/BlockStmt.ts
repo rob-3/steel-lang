@@ -1,7 +1,7 @@
 import { Expr, getDebugInfo } from "../Expr";
-import Token from "../Token";
-import Scope from "../Scope";
 import { execStmts } from "../Interpreter";
+import Scope from "../Scope";
+import Token from "../Token";
 
 export class BlockStmt implements Expr {
     exprs: Expr[];
