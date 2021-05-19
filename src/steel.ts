@@ -1,10 +1,11 @@
 import Scope from "./Scope";
-import { exprEval, setPrintFn } from "./Interpreter";
+import { exprEval } from "./Interpreter";
 import tokenize from "./Tokenizer";
 import parse from "./Parser";
 import { Expr } from "./Expr";
 import { StlFunction } from "./StlFunction";
 import { Either } from "purify-ts";
+import { stlPrint } from "./Logger";
 
 export let source: string;
 
@@ -46,7 +47,6 @@ export function run(
 ): Scope {
     try {
         source = src;
-        setPrintFn(console.log);
         /*
          * First, we tokenize the source into token like "if", number literals,
          * and punctuation.
@@ -59,7 +59,7 @@ export function run(
         const ast: Either<Error[], Expr[]> = parse(tokens);
         const finalScope: Scope = ast.either(
             (badAst) => {
-                badAst.map((err) => console.log(err.message));
+                badAst.map((err) => stlPrint(err.message));
                 return scope;
             },
             (goodAst) => {
@@ -69,9 +69,9 @@ export function run(
                     if (repl && val !== undefined) {
                         // Don't print the internal value of functions
                         if (val instanceof StlFunction) {
-                            console.log("<Function>");
+                            stlPrint("<Function>");
                         } else {
-                            console.log(val);
+                            stlPrint(String(val));
                         }
                     }
                     return newScope;

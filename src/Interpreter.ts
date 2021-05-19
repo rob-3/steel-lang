@@ -8,19 +8,6 @@ import { Value, NonNullValue } from "./Value";
 import { StlFunction } from "./StlFunction";
 import { Either } from "purify-ts";
 
-export let printfn = (thing: Value, scope: Scope): [Value, Scope] => {
-    const text = String(thing);
-    console.log(text);
-    return [String(thing), scope];
-};
-
-export function setPrintFn(fn: (v: Value) => void): void {
-    printfn = (val: Value, scope: Scope) => {
-        fn(val);
-        return [val, scope];
-    };
-}
-
 export function execStmts(stmts: Expr[], scope: Scope): [Value, Scope] {
     let value: Value = null;
     for (const stmt of stmts) {

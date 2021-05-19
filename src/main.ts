@@ -6,6 +6,7 @@ const rl = require("readline").createInterface({
 
 import Scope from "./Scope";
 import { startRepl, run } from "./steel";
+import { stlPrint } from "./Logger";
 
 // If no filename, start REPL
 if (process.argv.length === 2) {
@@ -17,7 +18,7 @@ if (process.argv.length === 2) {
         { encoding: "utf-8" },
         (err: Error, contents: string) => {
             if (err) {
-                console.log("There was a problem reading the file.");
+                stlPrint("There was a problem reading the file.");
                 process.exitCode = 1;
             } else {
                 run(contents, false, new Scope(), filename);

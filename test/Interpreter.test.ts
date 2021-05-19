@@ -1,4 +1,4 @@
-import { setPrintFn, stlEval as _stlEval } from "../src/Interpreter";
+import { stlEval as _stlEval } from "../src/Interpreter";
 import Scope from "../src/Scope";
 import chai = require("chai");
 import spies = require("chai-spies");
@@ -10,6 +10,7 @@ import parse from "../src/Parser";
 import { Value } from "../src/Value";
 import { Either } from "purify-ts";
 import { Expr } from "../src/Expr";
+import { setPrintFn } from "../src/Logger";
 
 const stlEval = (src: string, scope: Scope = new Scope()): Value => {
     return _stlEval(src, scope).unsafeCoerce()[0];

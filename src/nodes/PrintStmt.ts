@@ -1,7 +1,8 @@
 import { Expr, getDebugInfo } from "../Expr";
 import Token from "../Token";
 import Scope from "../Scope";
-import { printfn } from "../Interpreter";
+import { stlPrint } from "../Logger";
+import { Value } from "../Value";
 
 // TODO: library function
 export class PrintStmt implements Expr {
@@ -12,9 +13,10 @@ export class PrintStmt implements Expr {
         this.tokens = tokens;
     }
 
-    eval(scope: Scope) {
+    eval(scope: Scope): [Value, Scope] {
         const [printValue, newScope] = this.thingToPrint.eval(scope);
-        return printfn(printValue, newScope);
+        stlPrint(printValue);
+        return [printValue, newScope];
     }
 
     map(fn: (expr: Expr) => Expr): Expr {
