@@ -19,8 +19,6 @@ export class IndexExpr implements Expr {
     eval(scope: Scope): [Value, Scope] {
         const [index, newScope] = this.index.eval(scope);
         if (typeof index !== "number") {
-            // FIXME we probably should throw every RuntimePanic since
-            // TypeScript isn't smart enough to know we throw
             throw RuntimePanic(
                 "Indexing expression must evaluate to a number!"
             );

@@ -33,7 +33,6 @@ export default class BinaryExpr implements Expr {
     }
 
     eval(scope: Scope): [Value, Scope] {
-        // TODO: refactor in functional style
         const [leftVal, newScope] = this.left.eval(scope);
         const [rightVal, newScope2] = this.right.eval(newScope);
         switch (this.operator.type) {
