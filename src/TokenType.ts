@@ -52,7 +52,6 @@ enum TokenType {
     NOT,
     MATCH,
     RETURN,
-    UNTIL,
 
     EOF,
 

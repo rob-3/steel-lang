@@ -15,7 +15,6 @@ import { PrimaryExpr } from "./nodes/PrimaryExpr";
 import { PrintStmt } from "./nodes/PrintStmt";
 import ReturnStmt from "./nodes/ReturnStmt";
 import { UnaryExpr } from "./nodes/UnaryExpr";
-import { UntilStmt } from "./nodes/UntilStmt";
 import { VariableAssignmentStmt } from "./nodes/VariableAssignmentStmt";
 import { VariableDeclarationStmt } from "./nodes/VariableDeclarationStmt";
 import { VariableExpr } from "./nodes/VariableExpr";
@@ -95,7 +94,6 @@ function makeStmt(): Result<Expr> {
     if (matchType(TokenType.PRINT)) return finishPrintStmt();
     if (matchType(TokenType.IF)) return finishIfStmt();
     if (matchType(TokenType.WHILE)) return finishWhileStmt();
-    if (matchType(TokenType.UNTIL)) return finishUntilStmt();
     if (matchType(TokenType.FUN)) return finishFunctionDeclaration();
     if (matchType(TokenType.MATCH)) return finishMatchStmt();
     if (matchType(TokenType.IDENTIFIER)) {
@@ -252,22 +250,6 @@ function finishWhileStmt(): Result<Expr> {
         return makeStmt().map(
             (body) => new WhileStmt(condition, body, getTokens())
         );
-    });
-}
-
-function finishUntilStmt(): Result<Expr> {
-    return makeStmt().chain((condition) => {
-        if (atEnd()) {
-            return Left(
-                ParseError(
-                    `After until expected statement, but reached EOF.`,
-                    lookBehind()
-                )
-            );
-        }
-        return makeStmt().map((body) => {
-            return new UntilStmt(condition, body, getTokens());
-        });
     });
 }
 

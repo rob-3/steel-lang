@@ -198,8 +198,6 @@ function makeIdentifierOrKeyword(): Token {
             return makeToken(TokenType.RETURN);
         case "match":
             return makeToken(TokenType.MATCH);
-        case "until":
-            return makeToken(TokenType.UNTIL);
         default:
             return makeToken(TokenType.IDENTIFIER);
     }

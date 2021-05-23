@@ -177,19 +177,6 @@ describe("stlEval()", () => {
                 )
             ).to.equal(5);
         });
-
-        it("should evalulate until stmts", () => {
-            expect(
-                stlEval(
-                    `
-                let ~a = 0
-                until ~a == 5 {
-                    ~a = ~a + 1
-                }
-                `
-                )
-            ).to.equal(5);
-        });
     });
 
     describe("arrays", () => {
