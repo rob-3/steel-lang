@@ -91,7 +91,7 @@ function makeStmt(): Result<Expr> {
     }
     if (matchType(TokenType.RETURN))
         return Right(new ReturnStmt(makeExpr().unsafeCoerce(), getTokens()));
-    if (matchType(TokenType.VAR)) return finishVariableDeclaration();
+    if (matchType(TokenType.LET)) return finishVariableDeclaration();
     if (matchType(TokenType.PRINT)) return finishPrintStmt();
     if (matchType(TokenType.IF)) return finishIfStmt();
     if (matchType(TokenType.WHILE)) return finishWhileStmt();
@@ -99,17 +99,16 @@ function makeStmt(): Result<Expr> {
     if (matchType(TokenType.FUN)) return finishFunctionDeclaration();
     if (matchType(TokenType.MATCH)) return finishMatchStmt();
     if (matchType(TokenType.IDENTIFIER)) {
-        if (matchType(TokenType.LEFT_SINGLE_ARROW)) {
+        if (matchType(TokenType.EQUAL)) {
             const identifier = lookBehind(2).lexeme;
             return finishAssignment(identifier);
-        } else if (matchType(TokenType.EQUAL)) {
-            const identifier = lookBehind(2).lexeme;
-            return finishImmutableDeclaration(identifier);
         } else {
             backTrack();
         }
     }
     if (matchType(TokenType.OPEN_BRACE)) return finishBlockStmt();
+    if (matchType(TokenType.LEFT_SINGLE_ARROW))
+        return Left(Error("Unexpected left single arrow!"));
     if (matchType(TokenType.NEWLINE))
         return Left(Error("Unexpected newline; parser bug."));
     return makeExpr();
@@ -137,30 +136,19 @@ function finishVariableDeclaration(): Result<Expr> {
         );
     }
     const identifier: string = lookBehind().lexeme;
-    if (!matchType(TokenType.LEFT_SINGLE_ARROW)) {
-        if (matchType(TokenType.EQUAL)) {
-            return Left(
-                ParseError(
-                    `Must use "<-" for variable declaration, not "=".`,
-                    lookBehind()
-                )
-            );
-        } else {
-            return Left(
-                ParseError(
-                    `Expected "<-", got "${lookAhead().lexeme}"`,
-                    lookAhead()
-                )
-            );
-        }
+    if (!matchType(TokenType.EQUAL)) {
+        return Left(
+            ParseError(`Expected "=", got "${lookAhead().lexeme}"`, lookAhead())
+        );
     }
     eatNewlines();
+    const isImmutable = identifier[0] !== "~";
     return makeStmt().chain((stmt) => {
         if (matchType(TokenType.NEWLINE) || atEnd()) {
             return Right(
                 new VariableDeclarationStmt(
                     identifier,
-                    false,
+                    isImmutable,
                     stmt,
                     getTokens()
                 )

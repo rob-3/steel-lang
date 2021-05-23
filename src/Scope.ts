@@ -71,7 +71,7 @@ export default class Scope {
         const variable: [Value, boolean] | null = this.getPair(key);
         if (variable === null) {
             throw RuntimePanic(
-                `Cannot assign to undefined variable "${key}". Did you forget to use the var keyword?`
+                `Cannot assign to undefined variable "${key}". Did you forget to use the let keyword?`
             );
         } else {
             const immutable = variable[1];

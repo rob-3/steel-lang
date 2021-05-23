@@ -17,6 +17,7 @@ enum TokenType {
     COMMA,
     MOD,
     UNDERSCORE,
+    TILDE,
 
     // double char
     EQUAL_EQUAL,
@@ -36,7 +37,7 @@ enum TokenType {
     NEWLINE,
 
     // keywords
-    VAR,
+    LET,
     IF,
     THEN,
     ELSE,

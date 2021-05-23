@@ -115,7 +115,7 @@ function scanToken(): Maybe<Token> {
         default:
             if (isNumber(char)) {
                 return Just(makeNumber());
-            } else if (isAlpha(char)) {
+            } else if (isAlpha(char) || char === "~") {
                 return Just(makeIdentifierOrKeyword());
             } else {
                 throw Error(
@@ -160,13 +160,14 @@ function makeNumber(): Token {
 }
 
 function makeIdentifierOrKeyword(): Token {
+    if (lookAhead() === "~") eatChar();
     while (!atEnd() && isLegalIdentifierChar(lookAhead())) {
         eatChar();
     }
     const lexeme = source.slice(startIndex, currentIndex);
     switch (lexeme) {
-        case "var":
-            return makeToken(TokenType.VAR);
+        case "let":
+            return makeToken(TokenType.LET);
         case "true":
             return makeToken(TokenType.TRUE, true);
         case "false":

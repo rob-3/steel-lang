@@ -146,8 +146,8 @@ describe("tokenize()", () => {
         ]);
     });
 
-    it("should use VAR TokenType and NEWLINE", () => {
-        let result = tokenize("a = 23\nvar b = 46");
+    it("should use LET TokenType and NEWLINE", () => {
+        let result = tokenize("a = 23\nlet b = 46");
         expect(result).to.deep.equal([
             new Token(
                 TokenType.IDENTIFIER,
@@ -174,8 +174,8 @@ describe("tokenize()", () => {
                 new Location([1, 7], [1, 8], "<anonymous>")
             ),
             new Token(
-                TokenType.VAR,
-                "var",
+                TokenType.LET,
+                "let",
                 null,
                 new Location([2, 1], [2, 4], "<anonymous>")
             ),

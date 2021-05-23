@@ -23,13 +23,13 @@ describe("class Scope", () => {
 
     it("should throw an error when reassigning to an immutable value", () => {
         const src: string = `
-        a = 5
-        b = 10
+        let a = 5
+        let b = 10
         a = 6
         `;
         const scope = new Scope();
         expect(() => stlEval(src, scope)).to.throw(
-            "Cannot redefine immutable variable a."
+            'Cannot assign to immutable variable "a".'
         );
     });
 });
