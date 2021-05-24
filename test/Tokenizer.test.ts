@@ -6,7 +6,7 @@ import tokenize, {
     isLegalIdentifierChar,
     isNumber,
 } from "../src/Tokenizer";
-import { Location } from "../src/TokenizerHelpers";
+import Location from "../src/Location";
 import TokenType from "../src/TokenType";
 
 describe("tokenize()", () => {

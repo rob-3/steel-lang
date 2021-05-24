@@ -1,4 +1,4 @@
-import { Location } from "./TokenizerHelpers";
+import Location from "./Location";
 import TokenType from "./TokenType";
 
 export default class Token {

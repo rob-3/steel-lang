@@ -1,6 +1,6 @@
 import Scope from "./Scope";
 import Token from "./Token";
-import { Location } from "./TokenizerHelpers";
+import Location from "./Location";
 import { Value } from "./Value";
 export interface Expr {
     map(fn: (expr: Expr) => Expr): Expr;
