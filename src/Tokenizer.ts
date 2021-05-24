@@ -100,6 +100,8 @@ function scanToken(): Maybe<Token> {
             return Just(makeToken(TokenType.COMMA));
         case "_":
             return Just(makeToken(TokenType.UNDERSCORE));
+        case ":":
+            return Just(makeToken(TokenType.COLON));
         case "\t":
         case " ":
             // move the start pointers forward and try again

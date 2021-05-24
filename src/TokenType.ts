@@ -18,6 +18,7 @@ enum TokenType {
     MOD,
     UNDERSCORE,
     TILDE,
+    COLON,
 
     // double char
     EQUAL_EQUAL,

@@ -350,6 +350,18 @@ describe("tokenize()", () => {
         ]);
     });
 
+    it("should tokenize colons", () => {
+        expect(tokenize(":")[0]).to.deep.equal(
+            new Token(
+                TokenType.COLON,
+                ":",
+                null,
+                new Location([1, 1], [1, 2], "<anonymous>")
+            )
+        );
+    });
+
+    // FIXME I don't think this actually works
     it("should not loop if there is a comment and no newline before EOF", function () {
         this.timeout(1000);
         tokenize(
