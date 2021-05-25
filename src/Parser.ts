@@ -314,7 +314,7 @@ function finishFunctDecArgs(): Result<string[]> {
 }
 
 function finishBlockStmt(): Result<BlockStmt> {
-    const stmts: Expr[] = [];
+    const stmts: Result<Expr>[] = [];
     eatNewlines();
     while (!matchType(TokenType.CLOSE_BRACE)) {
         if (atEnd()) {
@@ -325,10 +325,14 @@ function finishBlockStmt(): Result<BlockStmt> {
                 )
             );
         }
-        stmts.push(makeStmt().unsafeCoerce());
+        stmts.push(makeStmt());
         eatNewlines();
     }
-    return Right(new BlockStmt(stmts, getTokens()));
+    const maybeStmts: Result<Expr[]> = Either.sequence(stmts);
+    const maybeBlock: Result<BlockStmt> = maybeStmts.chain((stmts) =>
+        Right(new BlockStmt(stmts, getTokens()))
+    );
+    return maybeBlock;
 }
 
 function finishIfStmt(): Result<Expr> {
