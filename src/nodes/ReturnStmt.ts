@@ -1,4 +1,4 @@
-import { Expr, getDebugInfo } from "../Expr";
+import { Expr } from "../Expr";
 import Scope from "../Scope";
 import Token from "../Token";
 
@@ -17,6 +17,4 @@ export default class ReturnStmt implements Expr {
     map(fn: (expr: Expr) => Expr): Expr {
         return fn(new ReturnStmt(this.value.map(fn), this.tokens));
     }
-
-    getDebugInfo = getDebugInfo;
 }

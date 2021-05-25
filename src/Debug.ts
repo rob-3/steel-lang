@@ -18,7 +18,6 @@ import { VariableAssignmentStmt } from "./nodes/VariableAssignmentStmt";
 import { VariableDeclarationStmt } from "./nodes/VariableDeclarationStmt";
 import { VariableExpr } from "./nodes/VariableExpr";
 import { WhileStmt } from "./nodes/WhileStmt";
-import { source } from "./steel";
 import Token from "./Token";
 
 /*
@@ -46,9 +45,11 @@ export function RuntimePanic(message: string) {
  */
 export function ParseError(message: string, highlight: Token) {
     const location = highlight.location;
-    const line: number = location.start[0];
-    const column: number = location.start[1];
-    const filename = location.filename;
+    const {
+        start: [line, column],
+        filename,
+        source,
+    } = location;
 
     const pad = line.toString().length;
 

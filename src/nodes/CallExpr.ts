@@ -1,5 +1,5 @@
 import { RuntimePanic } from "../Debug";
-import { Expr, getDebugInfo } from "../Expr";
+import { Expr } from "../Expr";
 import { call } from "../Interpreter";
 import Scope from "../Scope";
 import { StlFunction } from "../StlFunction";
@@ -31,6 +31,4 @@ export class CallExpr implements Expr {
             new CallExpr(this.callee.map(fn), this.args.map(fn), this.tokens)
         );
     }
-
-    getDebugInfo = getDebugInfo;
 }

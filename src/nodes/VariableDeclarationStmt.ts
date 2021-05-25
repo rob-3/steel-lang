@@ -1,4 +1,4 @@
-import { Expr, getDebugInfo } from "../Expr";
+import { Expr } from "../Expr";
 import Scope from "../Scope";
 import Token from "../Token";
 
@@ -34,6 +34,4 @@ export class VariableDeclarationStmt implements Expr {
             )
         );
     }
-
-    getDebugInfo = getDebugInfo;
 }

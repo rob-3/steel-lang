@@ -1,5 +1,5 @@
 import { copy } from "copy-anything";
-import { Expr, getDebugInfo } from "../Expr";
+import { Expr } from "../Expr";
 import Scope from "../Scope";
 import Token from "../Token";
 import { Value } from "../Value";
@@ -29,6 +29,4 @@ export class ArrayLiteral implements Expr {
             copy(this.tokens)
         );
     }
-
-    getDebugInfo = getDebugInfo;
 }

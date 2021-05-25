@@ -1,4 +1,4 @@
-import { Expr, getDebugInfo } from "../Expr";
+import { Expr } from "../Expr";
 import { execStmts } from "../Interpreter";
 import Scope from "../Scope";
 import Token from "../Token";
@@ -18,6 +18,4 @@ export class BlockStmt implements Expr {
     map(fn: (expr: Expr) => Expr): Expr {
         return fn(new BlockStmt(this.exprs.map(fn), this.tokens));
     }
-
-    getDebugInfo = getDebugInfo;
 }

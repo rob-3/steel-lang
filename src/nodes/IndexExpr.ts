@@ -1,6 +1,6 @@
 import { copy } from "copy-anything";
 import { RuntimePanic } from "../Debug";
-import { Expr, getDebugInfo } from "../Expr";
+import { Expr } from "../Expr";
 import Scope from "../Scope";
 import Token from "../Token";
 import { Value } from "../Value";
@@ -33,6 +33,4 @@ export class IndexExpr implements Expr {
     map(fn: (expr: Expr) => Expr): Expr {
         return fn(new IndexExpr(copy(this.arr), this.index, copy(this.tokens)));
     }
-
-    getDebugInfo = getDebugInfo;
 }

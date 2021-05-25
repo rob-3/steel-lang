@@ -1,5 +1,5 @@
 import { RuntimePanic } from "../Debug";
-import { Expr, getDebugInfo } from "../Expr";
+import { Expr } from "../Expr";
 import {
     and,
     equal,
@@ -79,6 +79,4 @@ export default class BinaryExpr implements Expr {
             )
         );
     }
-
-    getDebugInfo = getDebugInfo;
 }

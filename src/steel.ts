@@ -7,8 +7,6 @@ import Scope from "./Scope";
 import { StlFunction } from "./StlFunction";
 import tokenize from "./Tokenizer";
 
-export let source: string;
-
 /**
  * This function uses the node.js readline api to set up a prompt for the REPL.
  *
@@ -46,7 +44,6 @@ export function run(
     filename: string = "<anonymous>"
 ): Scope {
     try {
-        source = src;
         /*
          * First, we tokenize the source into token like "if", number literals,
          * and punctuation.
@@ -55,7 +52,7 @@ export function run(
          *
          * Last, we use the loop to run each statement sequentially.
          */
-        const tokens = tokenize(source, filename);
+        const tokens = tokenize(src, filename);
         const ast: Either<Error[], Expr[]> = parse(tokens);
         const finalScope: Scope = ast.either(
             (badAst) => {

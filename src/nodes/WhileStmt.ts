@@ -1,4 +1,4 @@
-import { Expr, getDebugInfo } from "../Expr";
+import { Expr } from "../Expr";
 import { assertBool } from "../Interpreter";
 import Scope from "../Scope";
 import Token from "../Token";
@@ -36,6 +36,4 @@ export class WhileStmt implements Expr {
             )
         );
     }
-
-    getDebugInfo = getDebugInfo;
 }

@@ -1,6 +1,6 @@
 import { copy } from "copy-anything";
 import { RuntimePanic } from "../Debug";
-import { Expr, getDebugInfo } from "../Expr";
+import { Expr } from "../Expr";
 import { equal } from "../Interpreter";
 import Scope from "../Scope";
 import Token from "../Token";
@@ -37,8 +37,6 @@ export class MatchStmt implements Expr {
     map(fn: (expr: Expr) => Expr): Expr {
         return fn(new MatchStmt(this.expr.map(fn), this.cases, this.tokens));
     }
-
-    getDebugInfo = getDebugInfo;
 }
 
 export class MatchCase {
@@ -66,6 +64,4 @@ export class UnderscoreExpr implements Expr {
     map(fn: (expr: Expr) => Expr): Expr {
         return fn(copy(this));
     }
-
-    getDebugInfo = getDebugInfo;
 }

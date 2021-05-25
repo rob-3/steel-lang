@@ -1,5 +1,5 @@
 import { RuntimePanic } from "../Debug";
-import { Expr, getDebugInfo } from "../Expr";
+import { Expr } from "../Expr";
 import { not, opposite } from "../Interpreter";
 import Scope from "../Scope";
 import Token from "../Token";
@@ -32,6 +32,4 @@ export class UnaryExpr implements Expr {
             new UnaryExpr(this.operator, this.right.map(fn), this.tokens)
         );
     }
-
-    getDebugInfo = getDebugInfo;
 }

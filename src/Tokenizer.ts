@@ -32,7 +32,8 @@ export default function tokenize(
                 new Location(
                     [startLine, startColumn],
                     [startLine, startColumn], // EOF doesn't take up any space
-                    filename
+                    filename,
+                    source
                 )
             )
         );
@@ -256,7 +257,8 @@ function makeToken(type: TokenType, literal: any = null): Token {
         new Location(
             [startLine, startColumn],
             [currentLine, currentColumn],
-            filename
+            filename,
+            source
         )
     );
     if (type === TokenType.NEWLINE) {

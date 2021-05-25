@@ -1,4 +1,4 @@
-import { Expr, getDebugInfo } from "../Expr";
+import { Expr } from "../Expr";
 import Scope from "../Scope";
 import { StlFunction } from "../StlFunction";
 import Token from "../Token";
@@ -21,6 +21,4 @@ export class FunctionExpr implements Expr {
     map(fn: (expr: Expr) => Expr): Expr {
         return fn(new FunctionExpr(this.args, this.body.map(fn), this.tokens));
     }
-
-    getDebugInfo = getDebugInfo;
 }

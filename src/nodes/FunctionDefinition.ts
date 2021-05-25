@@ -1,5 +1,5 @@
 import { copy } from "copy-anything";
-import { Expr, getDebugInfo } from "../Expr";
+import { Expr } from "../Expr";
 import Scope from "../Scope";
 import Token from "../Token";
 import { VariableDeclarationStmt } from "./VariableDeclarationStmt";
@@ -20,6 +20,4 @@ export class FunctionDefinition implements Expr {
     map(fn: (expr: Expr) => Expr): Expr {
         return fn(new FunctionDefinition(copy(this.definition), this.tokens));
     }
-
-    getDebugInfo = getDebugInfo;
 }

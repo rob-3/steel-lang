@@ -1,5 +1,5 @@
 import { RuntimePanic } from "../Debug";
-import { Expr, getDebugInfo } from "../Expr";
+import { Expr } from "../Expr";
 import { assertBool } from "../Interpreter";
 import Scope from "../Scope";
 import Token from "../Token";
@@ -47,6 +47,4 @@ export class IfStmt implements Expr {
             )
         );
     }
-
-    getDebugInfo = getDebugInfo;
 }

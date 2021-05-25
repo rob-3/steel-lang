@@ -1,4 +1,4 @@
-import { Expr, getDebugInfo } from "../Expr";
+import { Expr } from "../Expr";
 import { stlPrint } from "../Logger";
 import Scope from "../Scope";
 import Token from "../Token";
@@ -22,6 +22,4 @@ export class PrintStmt implements Expr {
     map(fn: (expr: Expr) => Expr): Expr {
         return fn(new PrintStmt(this.thingToPrint.map(fn), this.tokens));
     }
-
-    getDebugInfo = getDebugInfo;
 }
