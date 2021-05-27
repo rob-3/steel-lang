@@ -13,7 +13,13 @@ chai.use(spies);
 const expect = chai.expect;
 
 const stlEval = (src: string, scope: Scope = new Scope()): Value => {
-    return _stlEval(src, scope).unsafeCoerce()[0];
+    const val = _stlEval(src, scope);
+    try {
+        return val.unsafeCoerce()[0];
+    } catch (e) {
+        console.log(val);
+        throw e;
+    }
 };
 
 const stlExec = (
@@ -694,6 +700,20 @@ describe("exec()", () => {
                 `
                 )
             ).to.equal("correct");
+        });
+    });
+
+    describe("objects", () => {
+        it("should not throw on definition", () => {
+            expect(() =>
+                stlEval(
+                    `
+                let obj = {
+                    a: 72
+                }
+                `
+                )
+            ).to.not.throw();
         });
     });
 });

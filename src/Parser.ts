@@ -21,6 +21,7 @@ import VariableExpr from "./nodes/VariableExpr";
 import WhileStmt from "./nodes/WhileStmt";
 import Token from "./Token";
 import TokenType from "./TokenType";
+import { ObjectLiteral } from "./nodes/ObjectLiteral";
 
 let tokens: Token[];
 let start = 0;
@@ -74,8 +75,8 @@ function atEnd(): boolean {
     }
 }
 
-function lookAhead(): Token {
-    return tokens[current];
+function lookAhead(count: number = 1): Token {
+    return tokens[current - 1 + count];
 }
 
 function eatNewlines(): void {
@@ -102,7 +103,8 @@ function makeStmt(): Either<Error, Expr> {
             backTrack();
         }
     }
-    if (matchType(TokenType.OPEN_BRACE)) return finishBlockStmt();
+    if (matchType(TokenType.OPEN_BRACE))
+        return finishBlockStmtOrObjectLiteral();
     if (matchType(TokenType.LEFT_SINGLE_ARROW))
         return Left(Error("Unexpected left single arrow!"));
     if (matchType(TokenType.NEWLINE))
@@ -311,26 +313,68 @@ function finishFunctDecArgs(): Either<Error, string[]> {
     return Right(args);
 }
 
-function finishBlockStmt(): Either<Error, BlockStmt> {
-    const stmts: Either<Error, Expr>[] = [];
+function finishBlockStmtOrObjectLiteral(): Either<
+    Error,
+    BlockStmt | ObjectLiteral
+> {
     eatNewlines();
-    while (!matchType(TokenType.CLOSE_BRACE)) {
-        if (atEnd()) {
-            return Left(
-                ParseError(
-                    "Encountered EOF before end of block statement.",
-                    lookAhead()
-                )
+    if (
+        lookAhead().type === TokenType.IDENTIFIER &&
+        lookAhead(2).type === TokenType.COLON
+    ) {
+        const object: Map<string, Expr> = new Map();
+        let failed = false;
+        while (
+            lookAhead().type === TokenType.IDENTIFIER &&
+            lookAhead(2).type === TokenType.COLON
+        ) {
+            const pair = makeStringExprPair();
+            pair.bimap(
+                (_: Error) => {
+                    failed = true;
+                },
+                ([key, value]) => {
+                    object.set(key, value);
+                    matchType(TokenType.COMMA);
+                }
             );
+            eatNewlines();
+            if (matchType(TokenType.CLOSE_BRACE)) {
+                return Right(new ObjectLiteral(object, getTokens()));
+            }
         }
-        stmts.push(makeStmt());
-        eatNewlines();
+        return Left(ParseError(`Unexpected token`, lookAhead()));
+    } else {
+        const stmts: Either<Error, Expr>[] = [];
+        while (!matchType(TokenType.CLOSE_BRACE)) {
+            if (atEnd()) {
+                return Left(
+                    ParseError(
+                        "Encountered EOF before end of block statement.",
+                        lookAhead()
+                    )
+                );
+            }
+            stmts.push(makeStmt());
+            eatNewlines();
+        }
+        const maybeStmts: Either<Error, Expr[]> = Either.sequence(stmts);
+        const maybeBlock: Either<Error, BlockStmt> = maybeStmts.chain((stmts) =>
+            Right(new BlockStmt(stmts, getTokens()))
+        );
+        return maybeBlock;
     }
-    const maybeStmts: Either<Error, Expr[]> = Either.sequence(stmts);
-    const maybeBlock: Either<Error, BlockStmt> = maybeStmts.chain((stmts) =>
-        Right(new BlockStmt(stmts, getTokens()))
-    );
-    return maybeBlock;
+}
+
+function makeStringExprPair(): Either<Error, [string, Expr]> {
+    if (!matchType(TokenType.IDENTIFIER)) {
+        return Left(ParseError("Expected an identifier here.", lookAhead()));
+    }
+    if (!matchType(TokenType.COLON)) {
+        return Left(ParseError('Expected a ":" here.', lookAhead()));
+    }
+    const identifier = lookBehind(2).lexeme;
+    return makeStmt().chain((e) => Right([identifier, e]));
 }
 
 function finishIfStmt(): Either<Error, Expr> {
