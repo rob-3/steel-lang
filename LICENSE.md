@@ -1,4 +1,4 @@
-Copyright (c) 2019-2020 Robert Boyd III
+Copyright (c) 2019-2021 Robert Boyd III
 
 Mozilla Public License Version 2.0
 ==================================
