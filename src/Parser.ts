@@ -22,15 +22,13 @@ import { WhileStmt } from "./nodes/WhileStmt";
 import Token from "./Token";
 import TokenType from "./TokenType";
 
-type Result<T> = Either<Error, T>;
-
 let tokens: Token[];
 let start = 0;
 let current = 0;
 
 export default function parse(tokenList: Token[]): Either<Error[], Expr[]> {
     tokens = tokenList;
-    const parseTree: Result<Expr>[] = [];
+    const parseTree: Either<Error, Expr>[] = [];
 
     eatNewlines();
     while (!atEnd()) {
@@ -84,7 +82,7 @@ function eatNewlines(): void {
     while (matchType(TokenType.NEWLINE)) continue;
 }
 
-function makeStmt(): Result<Expr> {
+function makeStmt(): Either<Error, Expr> {
     if (matchType(TokenType.OPEN_BRACKET)) {
         return finishArrayLiteral();
     }
@@ -112,10 +110,10 @@ function makeStmt(): Result<Expr> {
     return makeExpr();
 }
 
-function finishArrayLiteral(): Result<Expr> {
+function finishArrayLiteral(): Either<Error, Expr> {
     if (matchType(TokenType.CLOSE_BRACKET))
         return Right(new ArrayLiteral([], getTokens()));
-    const items: Result<Expr[]> = readCommaDelimitedList();
+    const items: Either<Error, Expr[]> = readCommaDelimitedList();
     if (!matchType(TokenType.CLOSE_BRACKET)) {
         return Left(
             ParseError(`Expected "]", got ${lookAhead().lexeme}`, lookAhead())
@@ -124,7 +122,7 @@ function finishArrayLiteral(): Result<Expr> {
     return items.map((items) => new ArrayLiteral(items, getTokens()));
 }
 
-function finishVariableDeclaration(): Result<Expr> {
+function finishVariableDeclaration(): Either<Error, Expr> {
     if (!matchType(TokenType.IDENTIFIER)) {
         return Left(
             ParseError(
@@ -157,7 +155,7 @@ function finishVariableDeclaration(): Result<Expr> {
     });
 }
 
-function finishImmutableDeclaration(identifier: string): Result<Expr> {
+function finishImmutableDeclaration(identifier: string): Either<Error, Expr> {
     eatNewlines();
     return makeStmt().chain((expr) => {
         if (
@@ -174,7 +172,7 @@ function finishImmutableDeclaration(identifier: string): Result<Expr> {
     });
 }
 
-function finishMatchStmt(): Result<Expr> {
+function finishMatchStmt(): Either<Error, Expr> {
     return makeExpr().chain((expr) => {
         if (!matchType(TokenType.OPEN_BRACE)) {
             return Left(
@@ -198,7 +196,7 @@ function finishMatchStmt(): Result<Expr> {
     });
 }
 
-function makeMatchCase(): Result<MatchCase> {
+function makeMatchCase(): Either<Error, MatchCase> {
     return makeMatchPrimary().chain((matchPrimary) => {
         if (!matchType(TokenType.RIGHT_DOUBLE_ARROW)) {
             return Left(
@@ -218,7 +216,7 @@ function makeMatchCase(): Result<MatchCase> {
     });
 }
 
-function makeMatchPrimary(): Result<PrimaryExpr | UnderscoreExpr> {
+function makeMatchPrimary(): Either<Error, PrimaryExpr | UnderscoreExpr> {
     if (matchType(TokenType.TRUE))
         return Right(new PrimaryExpr(true, getTokens()));
     if (matchType(TokenType.FALSE))
@@ -237,7 +235,7 @@ function makeMatchPrimary(): Result<PrimaryExpr | UnderscoreExpr> {
     );
 }
 
-function finishWhileStmt(): Result<Expr> {
+function finishWhileStmt(): Either<Error, Expr> {
     return makeStmt().chain((condition) => {
         if (atEnd()) {
             return Left(
@@ -257,7 +255,7 @@ function backTrack(): void {
     current -= 1;
 }
 
-function finishFunctionDeclaration(): Result<Expr> {
+function finishFunctionDeclaration(): Either<Error, Expr> {
     if (!matchType(TokenType.IDENTIFIER)) {
         return Left(
             ParseError(
@@ -279,7 +277,7 @@ function finishFunctionDeclaration(): Result<Expr> {
     });
 }
 
-function makeLambda(): Result<FunctionExpr> {
+function makeLambda(): Either<Error, FunctionExpr> {
     let args: string[];
     if (matchType(TokenType.IDENTIFIER)) {
         args = [lookBehind().lexeme];
@@ -297,7 +295,7 @@ function makeLambda(): Result<FunctionExpr> {
     return finishLambda(args);
 }
 
-function finishFunctDecArgs(): Result<string[]> {
+function finishFunctDecArgs(): Either<Error, string[]> {
     const args: string[] = [];
     while (matchType(TokenType.IDENTIFIER)) {
         args.push(lookBehind().lexeme);
@@ -313,8 +311,8 @@ function finishFunctDecArgs(): Result<string[]> {
     return Right(args);
 }
 
-function finishBlockStmt(): Result<BlockStmt> {
-    const stmts: Result<Expr>[] = [];
+function finishBlockStmt(): Either<Error, BlockStmt> {
+    const stmts: Either<Error, Expr>[] = [];
     eatNewlines();
     while (!matchType(TokenType.CLOSE_BRACE)) {
         if (atEnd()) {
@@ -328,16 +326,16 @@ function finishBlockStmt(): Result<BlockStmt> {
         stmts.push(makeStmt());
         eatNewlines();
     }
-    const maybeStmts: Result<Expr[]> = Either.sequence(stmts);
-    const maybeBlock: Result<BlockStmt> = maybeStmts.chain((stmts) =>
+    const maybeStmts: Either<Error, Expr[]> = Either.sequence(stmts);
+    const maybeBlock: Either<Error, BlockStmt> = maybeStmts.chain((stmts) =>
         Right(new BlockStmt(stmts, getTokens()))
     );
     return maybeBlock;
 }
 
-function finishIfStmt(): Result<Expr> {
+function finishIfStmt(): Either<Error, Expr> {
     eatNewlines();
-    const condition: Result<Expr> = makeExpr();
+    const condition: Either<Error, Expr> = makeExpr();
     eatNewlines();
     // optionally match then
     matchType(TokenType.THEN);
@@ -349,7 +347,7 @@ function finishIfStmt(): Result<Expr> {
                 lookBehind()
             )
         );
-    const maybeBody: Result<Expr> = makeStmt();
+    const maybeBody: Either<Error, Expr> = makeStmt();
     eatNewlines();
 
     if (matchType(TokenType.ELSE)) {
@@ -393,15 +391,15 @@ function finishIfStmt(): Result<Expr> {
     );
 }
 
-function finishPrintStmt(): Result<Expr> {
+function finishPrintStmt(): Either<Error, Expr> {
     return makeStmt().map((stmt) => new PrintStmt(stmt, getTokens()));
 }
 
-function makeExpr(): Result<Expr> {
+function makeExpr(): Either<Error, Expr> {
     return makeBinaryLogical();
 }
 
-function finishAssignment(identifier: string): Result<Expr> {
+function finishAssignment(identifier: string): Either<Error, Expr> {
     // TODO check if identifier has already been declared
     eatNewlines();
     return makeStmt().map(
@@ -409,15 +407,15 @@ function finishAssignment(identifier: string): Result<Expr> {
     );
 }
 
-function makeBinaryLogical(): Result<Expr> {
+function makeBinaryLogical(): Either<Error, Expr> {
     return makeBinaryExpr([TokenType.AND, TokenType.OR], makeEquality);
 }
 
-function makeEquality(): Result<Expr> {
+function makeEquality(): Either<Error, Expr> {
     return makeBinaryExpr([TokenType.EQUAL_EQUAL], makeComparision);
 }
 
-function makeComparision(): Result<Expr> {
+function makeComparision(): Either<Error, Expr> {
     return makeBinaryExpr(
         [
             TokenType.GREATER,
@@ -429,26 +427,26 @@ function makeComparision(): Result<Expr> {
     );
 }
 
-function makeConcat(): Result<Expr> {
+function makeConcat(): Either<Error, Expr> {
     return makeBinaryExpr([TokenType.PLUS_PLUS], makeAddition);
 }
 
-function makeAddition(): Result<Expr> {
+function makeAddition(): Either<Error, Expr> {
     return makeBinaryExpr(
         [TokenType.PLUS, TokenType.MINUS],
         makeMultiplication
     );
 }
 
-function makeMultiplication(): Result<Expr> {
+function makeMultiplication(): Either<Error, Expr> {
     return makeBinaryExpr([TokenType.STAR, TokenType.SLASH], makeMod);
 }
 
-function makeMod(): Result<Expr> {
+function makeMod(): Either<Error, Expr> {
     return makeBinaryExpr([TokenType.MOD], makeUnary);
 }
 
-function makeUnary(): Result<Expr> {
+function makeUnary(): Either<Error, Expr> {
     if (matchType(TokenType.MINUS, TokenType.NOT)) {
         const operator = lookBehind();
         return makeUnary().map(
@@ -458,24 +456,24 @@ function makeUnary(): Result<Expr> {
     return makeCall();
 }
 
-function readCommaDelimitedList(): Result<Expr[]> {
-    const list: Result<Expr>[] = [];
+function readCommaDelimitedList(): Either<Error, Expr[]> {
+    const list: Either<Error, Expr>[] = [];
     do {
         list.push(makeExpr());
     } while (matchType(TokenType.COMMA));
     return Either.sequence(list);
 }
 
-function makeCall(): Result<Expr> {
-    const primary: Result<Expr> = makePrimary();
+function makeCall(): Either<Error, Expr> {
+    const primary: Either<Error, Expr> = makePrimary();
     return primary.chain((primary) => makeCall2(primary));
 }
 
-function makeCall2(callee: Expr): Result<Expr> {
+function makeCall2(callee: Expr): Either<Error, Expr> {
     if (!matchType(TokenType.OPEN_PAREN)) {
         return Right(callee);
     }
-    let args: Result<Expr[]> = Right([]);
+    let args: Either<Error, Expr[]> = Right([]);
     if (!matchType(TokenType.CLOSE_PAREN)) {
         args = readCommaDelimitedList();
         if (!matchType(TokenType.CLOSE_PAREN)) {
@@ -489,7 +487,7 @@ function makeCall2(callee: Expr): Result<Expr> {
         .chain(makeCall2);
 }
 
-function makePrimary(): Result<Expr> {
+function makePrimary(): Either<Error, Expr> {
     if (matchType(TokenType.TRUE))
         return Right(new PrimaryExpr(true, getTokens()));
     if (matchType(TokenType.FALSE))
@@ -567,13 +565,13 @@ function makePrimary(): Result<Expr> {
     }
 }
 
-function finishLambda(args: string[]): Result<FunctionExpr> {
+function finishLambda(args: string[]): Either<Error, FunctionExpr> {
     eatNewlines();
     return makeStmt().map((body) => new FunctionExpr(args, body, getTokens()));
     // TODO: add checks and nice error messages
 }
 
-function finishGrouping(): Result<Expr> {
+function finishGrouping(): Either<Error, Expr> {
     return makeExpr().chain((expr) => {
         if (matchType(TokenType.CLOSE_PAREN))
             return Right(new GroupingExpr(expr, getTokens()));
@@ -598,9 +596,9 @@ function eatToken(): Token {
 
 function makeBinaryExpr(
     matches: TokenType[],
-    higherPrecedenceOperation: () => Result<Expr>
-): Result<Expr> {
-    let expr: Result<Expr> = higherPrecedenceOperation();
+    higherPrecedenceOperation: () => Either<Error, Expr>
+): Either<Error, Expr> {
+    let expr: Either<Error, Expr> = higherPrecedenceOperation();
 
     while (matchType(...matches)) {
         const operator = lookBehind();
