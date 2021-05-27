@@ -338,16 +338,16 @@ describe("exec()", () => {
         it("should allow nonlocal shadowing", () => {
             let spy = chai.spy();
             stlExec(
-                `
-                    let a = 4
-                    let b = 6
-                    let addTwo = (n) -> {
-                        let a = 2
-                        a + n
-                    }
-                    print addTwo(13)
-                    print a
-                    `,
+                ` 
+                let a = 4 
+                let b = 6
+                let addTwo = (n) -> {
+                    let a = 2
+                    a + n
+                }
+                print addTwo(13)
+                print a
+                `,
                 spy
             );
             expect(spy).to.have.been.called.twice;
