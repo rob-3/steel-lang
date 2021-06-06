@@ -1,9 +1,9 @@
 import { Value } from "./Value";
 
 export default class StlObject {
-    map: Map<string, Value>;
+    properties: Map<string, Value>;
 
-    constructor(map: Map<string, Value>) {
-        this.map = map;
+    constructor(properties: Map<string, Value>) {
+        this.properties = properties;
     }
 }

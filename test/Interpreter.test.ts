@@ -715,6 +715,70 @@ describe("exec()", () => {
                 )
             ).to.not.throw();
         });
+
+        it("should allow comma separated properties", () => {
+            expect(() =>
+                stlEval(
+                    `
+                let obj = {
+                    a: 72,
+                    b: 73
+                }
+                `
+                )
+            ).to.not.throw();
+        });
+
+        it("should allow trailing comma", () => {
+            expect(() =>
+                stlEval(
+                    `
+                let obj = {
+                    a: 72,
+                    b: 73,
+                }
+                `
+                )
+            ).to.not.throw();
+        });
+
+        it("should allow shadowed identifiers", () => {
+            expect(() =>
+                stlEval(
+                    `
+                let obj = {
+                    obj: 72
+                }
+                `
+                )
+            ).to.not.throw();
+        });
+
+        /*
+        it.only("should allow keyword identifiers", () => {
+            expect(() =>
+                stlEval(
+                    `
+                let obj = {
+                    let: 72
+                }
+                `
+                )
+            ).to.not.throw();
+        });
+        */
+        it("should allow dot notation with an identifier", () => {
+            expect(
+                stlEval(
+                    `
+                    let obj = {
+                        a: 72
+                    }
+                    obj.a
+                    `
+                )
+            ).to.equal(72);
+        });
     });
 });
 

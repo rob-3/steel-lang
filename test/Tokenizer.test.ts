@@ -50,12 +50,7 @@ describe("tokenize()", () => {
     it("should provide correct line numbers", () => {
         let result = tokenize("hi\n7.543\n92");
         expect(result.map((t) => t.location.start[0])).to.deep.equal([
-            1,
-            1,
-            2,
-            2,
-            3,
-            3,
+            1, 1, 2, 2, 3, 3,
         ]);
     });
 
@@ -365,6 +360,18 @@ describe("tokenize()", () => {
             new Token(
                 TokenType.COLON,
                 ":",
+                null,
+                new Location([1, 1], [1, 2], "<anonymous>", src)
+            )
+        );
+    });
+
+    it("should tokenize a dot", () => {
+        const src = ".";
+        expect(tokenize(src)[0]).to.deep.equal(
+            new Token(
+                TokenType.DOT,
+                ".",
                 null,
                 new Location([1, 1], [1, 2], "<anonymous>", src)
             )

@@ -22,6 +22,7 @@ import WhileStmt from "./nodes/WhileStmt";
 import Token from "./Token";
 import TokenType from "./TokenType";
 import { ObjectLiteral } from "./nodes/ObjectLiteral";
+import DotAccess from "./nodes/DotAccess";
 
 let tokens: Token[];
 let start = 0;
@@ -497,7 +498,7 @@ function makeUnary(): Either<Error, Expr> {
             (right) => new UnaryExpr(operator, right, getTokens())
         );
     }
-    return makeCall();
+    return makeCallOrDotAccess();
 }
 
 function readCommaDelimitedList(): Either<Error, Expr[]> {
@@ -508,27 +509,46 @@ function readCommaDelimitedList(): Either<Error, Expr[]> {
     return Either.sequence(list);
 }
 
-function makeCall(): Either<Error, Expr> {
+function makeCallOrDotAccess(): Either<Error, Expr> {
     const primary: Either<Error, Expr> = makePrimary();
-    return primary.chain((primary) => makeCall2(primary));
+    return primary.chain((primary) => makeCallOrDotAccessRecursive(primary));
 }
 
-function makeCall2(callee: Expr): Either<Error, Expr> {
-    if (!matchType(TokenType.OPEN_PAREN)) {
+function makeCallOrDotAccessRecursive(callee: Expr): Either<Error, Expr> {
+    if (!matchType(TokenType.OPEN_PAREN, TokenType.DOT)) {
         return Right(callee);
     }
-    let args: Either<Error, Expr[]> = Right([]);
-    if (!matchType(TokenType.CLOSE_PAREN)) {
-        args = readCommaDelimitedList();
-        if (!matchType(TokenType.CLOSE_PAREN)) {
+    // check for dot access
+    if (lookBehind().type === TokenType.DOT) {
+        if (!matchType(TokenType.IDENTIFIER)) {
             return Left(
-                ParseError(`Must terminate function call with ")"`, lookAhead())
+                ParseError(`Property name expected here after "."`, lookAhead())
             );
+        } else {
+            const propertyName = lookBehind().lexeme;
+            return Right(
+                new DotAccess(callee, propertyName, getTokens())
+            ).chain(makeCallOrDotAccessRecursive);
         }
     }
-    return args
-        .map((goodArgs) => new CallExpr(callee, goodArgs, getTokens()))
-        .chain(makeCall2);
+    // else we have a function call
+    else {
+        let args: Either<Error, Expr[]> = Right([]);
+        if (!matchType(TokenType.CLOSE_PAREN)) {
+            args = readCommaDelimitedList();
+            if (!matchType(TokenType.CLOSE_PAREN)) {
+                return Left(
+                    ParseError(
+                        `Must terminate function call with ")"`,
+                        lookAhead()
+                    )
+                );
+            }
+        }
+        return args
+            .map((goodArgs) => new CallExpr(callee, goodArgs, getTokens()))
+            .chain(makeCallOrDotAccessRecursive);
+    }
 }
 
 function makePrimary(): Either<Error, Expr> {
