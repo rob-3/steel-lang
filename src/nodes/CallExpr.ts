@@ -5,7 +5,7 @@ import Scope from "../Scope";
 import { StlFunction } from "../StlFunction";
 import Token from "../Token";
 
-export class CallExpr implements Expr {
+export default class CallExpr implements Expr {
     callee: Expr;
     args: Expr[];
     tokens: Token[];

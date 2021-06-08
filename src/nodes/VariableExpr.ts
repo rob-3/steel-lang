@@ -4,7 +4,7 @@ import Scope from "../Scope";
 import Token from "../Token";
 import { Value } from "../Value";
 
-export class VariableExpr implements Expr {
+export default class VariableExpr implements Expr {
     identifier: string;
     tokens: Token[];
     constructor(identifier: string, tokens: Token[]) {

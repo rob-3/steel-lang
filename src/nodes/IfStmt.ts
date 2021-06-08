@@ -5,7 +5,7 @@ import Scope from "../Scope";
 import Token from "../Token";
 import { Value } from "../Value";
 
-export class IfStmt implements Expr {
+export default class IfStmt implements Expr {
     condition: Expr;
     body: Expr;
     elseBody: Expr | null;

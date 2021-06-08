@@ -4,7 +4,7 @@ import { StlFunction } from "../StlFunction";
 import Token from "../Token";
 import { Value } from "../Value";
 
-export class FunctionExpr implements Expr {
+export default class FunctionExpr implements Expr {
     args: string[];
     body: Expr;
     tokens: Token[];

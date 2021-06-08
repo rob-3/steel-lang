@@ -2,7 +2,7 @@ import { Expr } from "../Expr";
 import Scope from "../Scope";
 import Token from "../Token";
 
-export class VariableAssignmentStmt implements Expr {
+export default class VariableAssignmentStmt implements Expr {
     identifier: string;
     right: Expr;
     tokens: Token[];

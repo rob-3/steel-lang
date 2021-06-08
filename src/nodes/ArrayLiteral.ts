@@ -4,7 +4,7 @@ import Scope from "../Scope";
 import Token from "../Token";
 import { Value } from "../Value";
 
-export class ArrayLiteral implements Expr {
+export default class ArrayLiteral implements Expr {
     exprs: Expr[];
     tokens: Token[];
 

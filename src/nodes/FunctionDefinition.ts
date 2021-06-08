@@ -2,9 +2,9 @@ import { copy } from "copy-anything";
 import { Expr } from "../Expr";
 import Scope from "../Scope";
 import Token from "../Token";
-import { VariableDeclarationStmt } from "./VariableDeclarationStmt";
+import VariableDeclarationStmt from "./VariableDeclarationStmt";
 
-export class FunctionDefinition implements Expr {
+export default class FunctionDefinition implements Expr {
     definition: VariableDeclarationStmt;
     tokens: Token[];
 

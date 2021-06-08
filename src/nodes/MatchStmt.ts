@@ -5,9 +5,9 @@ import { equal } from "../Interpreter";
 import Scope from "../Scope";
 import Token from "../Token";
 import { Value } from "../Value";
-import { PrimaryExpr } from "./PrimaryExpr";
+import PrimaryExpr from "./PrimaryExpr";
 
-export class MatchStmt implements Expr {
+export default class MatchStmt implements Expr {
     expr: Expr;
     cases: MatchCase[];
     tokens: Token[];

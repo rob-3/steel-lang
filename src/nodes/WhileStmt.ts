@@ -4,7 +4,7 @@ import Scope from "../Scope";
 import Token from "../Token";
 import { Value } from "../Value";
 
-export class WhileStmt implements Expr {
+export default class WhileStmt implements Expr {
     condition: Expr;
     body: Expr;
     tokens: Token[];

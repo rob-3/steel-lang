@@ -1,5 +1,5 @@
 import { exprEval } from "./Interpreter";
-import { FunctionExpr } from "./nodes/FunctionExpr";
+import FunctionExpr from "./nodes/FunctionExpr";
 import Scope from "./Scope";
 import { Value } from "./Value";
 

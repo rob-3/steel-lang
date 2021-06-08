@@ -2,7 +2,7 @@ import { Expr } from "../Expr";
 import Scope from "../Scope";
 import Token from "../Token";
 
-export class VariableDeclarationStmt implements Expr {
+export default class VariableDeclarationStmt implements Expr {
     immutable: boolean;
     identifier: string;
     right: Expr;

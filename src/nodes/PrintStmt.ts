@@ -5,7 +5,7 @@ import Token from "../Token";
 import { Value } from "../Value";
 
 // TODO: library function
-export class PrintStmt implements Expr {
+export default class PrintStmt implements Expr {
     thingToPrint: Expr;
     tokens: Token[];
     constructor(thingToPrint: Expr, tokens: Token[]) {

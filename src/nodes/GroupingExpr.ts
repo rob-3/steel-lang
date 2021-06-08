@@ -2,7 +2,7 @@ import { Expr } from "../Expr";
 import Scope from "../Scope";
 import Token from "../Token";
 
-export class GroupingExpr implements Expr {
+export default class GroupingExpr implements Expr {
     expr: Expr;
     tokens: Token[];
     constructor(expr: Expr, tokens: Token[]) {

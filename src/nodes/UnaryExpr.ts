@@ -6,7 +6,7 @@ import Token from "../Token";
 import TokenType from "../TokenType";
 import { Value } from "../Value";
 
-export class UnaryExpr implements Expr {
+export default class UnaryExpr implements Expr {
     operator: Token;
     right: Expr;
     tokens: Token[];

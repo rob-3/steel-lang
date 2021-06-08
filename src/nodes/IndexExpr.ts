@@ -5,7 +5,7 @@ import Scope from "../Scope";
 import Token from "../Token";
 import { Value } from "../Value";
 
-export class IndexExpr implements Expr {
+export default class IndexExpr implements Expr {
     arr: string;
     index: Expr;
     tokens: Token[];

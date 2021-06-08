@@ -4,7 +4,7 @@ import Scope from "../Scope";
 import Token from "../Token";
 import { Value } from "../Value";
 
-export class PrimaryExpr implements Expr {
+export default class PrimaryExpr implements Expr {
     literal: number | boolean | string;
     tokens: Token[];
     constructor(literal: number | boolean | string, tokens: Token[]) {
