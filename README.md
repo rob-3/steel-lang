@@ -1,7 +1,7 @@
 # Steel
 
 Steel is a programming language for teaching beginners best practices and
-functional programming patterns. Currently, it is a prototype; bugs and missive
+functional programming patterns. Currently, it is a prototype; bugs and missing
 features are expected.
 
 ## Installation
