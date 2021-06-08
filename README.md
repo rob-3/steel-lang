@@ -1,8 +1,10 @@
 # Steel
 
-Steel is an in-development programming language designed for ease of use.
+Steel is a programming language for teaching beginners best practices and
+functional programming patterns. Currently, it is a prototype; bugs and missive
+features are expected.
 
-![Gif of Steel running some code](./demo.gif)
+---
 
 ## Installation
 
