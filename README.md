@@ -8,7 +8,7 @@ features are expected.
 
 To install Steel, run the following commands.
 
-```
+```bash
 git clone https://github.com/rob-3/steel-lang.git
 cd steel-lang
 npm install
@@ -18,13 +18,13 @@ npm install
 
 To use the REPL run:
 
-```
+```bash
 npm start
 ```
 
 To run a file use:
 
-```
+```bash
 npm start -- file.stl
 ```
 
