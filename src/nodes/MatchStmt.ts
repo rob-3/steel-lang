@@ -33,10 +33,6 @@ export default class MatchStmt implements Expr {
         }
         throw RuntimePanic("Pattern match failed.");
     }
-
-    map(fn: (expr: Expr) => Expr): Expr {
-        return fn(new MatchStmt(this.expr.map(fn), this.cases, this.tokens));
-    }
 }
 
 export class MatchCase {
@@ -59,9 +55,5 @@ export class UnderscoreExpr implements Expr {
     eval(scope: Scope): [Value, Scope] {
         // FIXME
         throw RuntimePanic("Tried to evaluate an UnderscoreExpr");
-    }
-
-    map(fn: (expr: Expr) => Expr): Expr {
-        return fn(copy(this));
     }
 }

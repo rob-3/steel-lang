@@ -3,9 +3,7 @@ import { Expr } from "../Expr";
 import Scope from "../Scope";
 import Token from "../Token";
 import { Value } from "../Value";
-import { ObjectLiteral } from "./ObjectLiteral";
 import StlObject from "../StlObject";
-import { copy } from "copy-anything";
 
 export default class DotAccess implements Expr {
     left: Expr;
@@ -29,10 +27,6 @@ export default class DotAccess implements Expr {
             }
             return [value, newScope];
         }
-    }
-
-    map(fn: (expr: Expr) => Expr): Expr {
-        return fn(new DotAccess(copy(this.left), this.right, this.tokens));
     }
 }
 

@@ -23,15 +23,4 @@ export default class VariableDeclarationStmt implements Expr {
         const [rightVal, newScope] = this.right.eval(scope);
         return newScope.define(this.identifier, rightVal, this.immutable);
     }
-
-    map(fn: (expr: Expr) => Expr): Expr {
-        return fn(
-            new VariableDeclarationStmt(
-                this.identifier,
-                this.immutable,
-                this.right.map(fn),
-                this.tokens
-            )
-        );
-    }
 }

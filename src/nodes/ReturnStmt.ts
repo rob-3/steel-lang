@@ -13,8 +13,4 @@ export default class ReturnStmt implements Expr {
     eval(scope: Scope) {
         return this.value.eval(scope);
     }
-
-    map(fn: (expr: Expr) => Expr): Expr {
-        return fn(new ReturnStmt(this.value.map(fn), this.tokens));
-    }
 }

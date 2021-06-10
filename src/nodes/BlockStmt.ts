@@ -14,8 +14,4 @@ export default class BlockStmt implements Expr {
     eval(scope: Scope) {
         return execStmts(this.exprs, scope);
     }
-
-    map(fn: (expr: Expr) => Expr): Expr {
-        return fn(new BlockStmt(this.exprs.map(fn), this.tokens));
-    }
 }

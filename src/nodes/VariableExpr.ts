@@ -15,8 +15,4 @@ export default class VariableExpr implements Expr {
     eval(scope: Scope): [Value, Scope] {
         return [scope.lookup(this.identifier), scope];
     }
-
-    map(fn: (expr: Expr) => Expr): Expr {
-        return fn(copy(this));
-    }
 }

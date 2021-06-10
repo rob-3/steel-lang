@@ -1,4 +1,3 @@
-import { copy } from "copy-anything";
 import { Expr } from "../Expr";
 import Scope from "../Scope";
 import Token from "../Token";
@@ -21,12 +20,5 @@ export default class ArrayLiteral implements Expr {
             return scope;
         }, scope);
         return [resolved, newScope];
-    }
-
-    map(fn: (expr: Expr) => Expr) {
-        return new ArrayLiteral(
-            this.exprs.map((e) => e.map(fn)),
-            copy(this.tokens)
-        );
     }
 }

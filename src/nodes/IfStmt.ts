@@ -36,15 +36,4 @@ export default class IfStmt implements Expr {
             return [null, newScope];
         }
     }
-
-    map(fn: (expr: Expr) => Expr): Expr {
-        return fn(
-            new IfStmt(
-                this.condition.map(fn),
-                this.body.map(fn),
-                this.elseBody ? this.elseBody.map(fn) : null,
-                this.tokens
-            )
-        );
-    }
 }

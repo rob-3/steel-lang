@@ -24,8 +24,4 @@ export class ObjectLiteral implements Expr {
         }
         return [new StlObject(map), currentScope];
     }
-
-    map(fn: (expr: Expr) => Expr): Expr {
-        return fn(new ObjectLiteral(copy(this.properties), this.tokens));
-    }
 }

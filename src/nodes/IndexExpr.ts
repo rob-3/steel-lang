@@ -29,8 +29,4 @@ export default class IndexExpr implements Expr {
         }
         return [array[index], newScope];
     }
-
-    map(fn: (expr: Expr) => Expr): Expr {
-        return fn(new IndexExpr(copy(this.arr), this.index, copy(this.tokens)));
-    }
 }

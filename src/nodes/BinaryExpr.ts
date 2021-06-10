@@ -68,15 +68,4 @@ export default class BinaryExpr implements Expr {
                 );
         }
     }
-
-    map(fn: (expr: Expr) => Expr): Expr {
-        return fn(
-            new BinaryExpr(
-                this.left.map(fn),
-                this.operator,
-                this.right.map(fn),
-                this.tokens
-            )
-        );
-    }
 }

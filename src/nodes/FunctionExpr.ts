@@ -17,8 +17,4 @@ export default class FunctionExpr implements Expr {
     eval(scope: Scope): [Value, Scope] {
         return [new StlFunction(this, scope), scope];
     }
-
-    map(fn: (expr: Expr) => Expr): Expr {
-        return fn(new FunctionExpr(this.args, this.body.map(fn), this.tokens));
-    }
 }

@@ -26,10 +26,4 @@ export default class UnaryExpr implements Expr {
         }
         throw RuntimePanic("Unsupported operator type in UnaryExpr");
     }
-
-    map(fn: (expr: Expr) => Expr): Expr {
-        return fn(
-            new UnaryExpr(this.operator, this.right.map(fn), this.tokens)
-        );
-    }
 }

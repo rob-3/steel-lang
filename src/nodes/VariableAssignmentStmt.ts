@@ -16,14 +16,4 @@ export default class VariableAssignmentStmt implements Expr {
         const [rightVal, newScope] = this.right.eval(scope);
         return newScope.assign(this.identifier, rightVal);
     }
-
-    map(fn: (expr: Expr) => Expr): Expr {
-        return fn(
-            new VariableAssignmentStmt(
-                this.identifier,
-                this.right.map(fn),
-                this.tokens
-            )
-        );
-    }
 }

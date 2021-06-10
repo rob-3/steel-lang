@@ -25,10 +25,4 @@ export default class CallExpr implements Expr {
             );
         }
     }
-
-    map(fn: (expr: Expr) => Expr): Expr {
-        return fn(
-            new CallExpr(this.callee.map(fn), this.args.map(fn), this.tokens)
-        );
-    }
 }

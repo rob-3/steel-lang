@@ -15,8 +15,4 @@ export default class PrimaryExpr implements Expr {
     eval(scope: Scope): [Value, Scope] {
         return [this.literal, scope];
     }
-
-    map(fn: (expr: Expr) => Expr): Expr {
-        return fn(copy(this));
-    }
 }

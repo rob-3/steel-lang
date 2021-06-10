@@ -18,8 +18,4 @@ export default class PrintStmt implements Expr {
         stlPrint(printValue);
         return [printValue, newScope];
     }
-
-    map(fn: (expr: Expr) => Expr): Expr {
-        return fn(new PrintStmt(this.thingToPrint.map(fn), this.tokens));
-    }
 }

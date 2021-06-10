@@ -26,14 +26,4 @@ export default class WhileStmt implements Expr {
         }
         return [value, scope];
     }
-
-    map(fn: (expr: Expr) => Expr): Expr {
-        return fn(
-            new WhileStmt(
-                this.condition.map(fn),
-                this.body.map(fn),
-                this.tokens
-            )
-        );
-    }
 }

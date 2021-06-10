@@ -13,8 +13,4 @@ export default class GroupingExpr implements Expr {
     eval(scope: Scope) {
         return this.expr.eval(scope);
     }
-
-    map(fn: (expr: Expr) => Expr): Expr {
-        return fn(new GroupingExpr(this.expr.map(fn), this.tokens));
-    }
 }
