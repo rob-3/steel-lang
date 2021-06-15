@@ -227,7 +227,7 @@ describe("stlEval()", () => {
 describe("exec()", () => {
     describe("if statements", () => {
         it("should execute an if stmt with true condition", () => {
-            let src = "if (true) {\nprint 5\n}";
+            let src = "if (true) {\nprint(5)\n}";
             let spy = chai.spy();
             stlExec(src, spy);
             expect(spy).to.have.been.called.with(5);
@@ -236,7 +236,7 @@ describe("exec()", () => {
         it("should not execute an if stmt with a false condition", () => {
             let src = `
             if (false) {
-                print 5
+                print(5)
             }
             `;
             let spy = chai.spy();
@@ -247,9 +247,9 @@ describe("exec()", () => {
         it("should execute the else body stmt with a false condition", () => {
             let src = `
             if (false) {
-                print 5
+                print(5)
             } else {
-                print 6
+                print(6)
             }
             `;
             let spy = chai.spy();
@@ -261,9 +261,9 @@ describe("exec()", () => {
         it("should not execute the if body with a false condition", () => {
             let src = `
             if (false) {
-                print 5
+                print(5)
             } else {
-                print 6
+                print(6)
             }
             `;
             let spy = chai.spy();
@@ -274,9 +274,9 @@ describe("exec()", () => {
         it("should support no parentheses", () => {
             let src = `
             if false {
-                print 5
+                print(5)
             } else {
-                print 6
+                print(6)
             }
             `;
             let spy = chai.spy();
@@ -300,7 +300,7 @@ describe("exec()", () => {
         let src = `
         let ~a = 0
         while (~a < 10) {
-            print ~a
+            print(~a)
             ~a = ~a + 1
         }
         `;
@@ -357,8 +357,8 @@ describe("exec()", () => {
                     let a = 2
                     a + n
                 }
-                print addTwo(13)
-                print a
+                print(addTwo(13))
+                print(a)
                 `,
                 spy
             );
@@ -383,7 +383,7 @@ describe("exec()", () => {
         describe("argless functions", () => {
             let src = `
             fun a = () -> {
-                print 5
+                print(5)
             }
             `;
             it("should not throw on function definition", () => {
@@ -429,7 +429,7 @@ describe("exec()", () => {
                 expect(() =>
                     stlEval(
                         `
-                    let print_a = () -> print a
+                    let print_a = () -> print(a)
                     let a = 4
                     print_a()
                     `
@@ -440,7 +440,7 @@ describe("exec()", () => {
         describe("functions with arguments", () => {
             let src = `
            fun a = (a, b) -> {
-                print a + b
+                print(a + b)
            }
            `;
             it("should not throw on function definition", () => {
@@ -669,11 +669,11 @@ describe("exec()", () => {
                 let a = 4
                 let b = a - 2
                 let c = a/b
-                print match c {
+                print(match c {
                     3 => "nope"
                     4 => "def nope"
                     _ => "yep"
-                }
+                })
                 `,
                 spy
             );
@@ -817,7 +817,7 @@ describe("exec()", () => {
 
 describe("debug", () => {
     it("should print an error correctly", () => {
-        expect(() => stlEval("print hi")).to.throw(
+        expect(() => stlEval("print(hi)")).to.throw(
             `Variable "hi" is not defined.`
         );
     });

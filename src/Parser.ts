@@ -12,7 +12,6 @@ import IfStmt from "./nodes/IfStmt";
 import IndexExpr from "./nodes/IndexExpr";
 import MatchStmt, { MatchCase, UnderscoreExpr } from "./nodes/MatchStmt";
 import PrimaryExpr from "./nodes/PrimaryExpr";
-import PrintStmt from "./nodes/PrintStmt";
 import ReturnStmt from "./nodes/ReturnStmt";
 import UnaryExpr from "./nodes/UnaryExpr";
 import VariableAssignmentStmt, {
@@ -93,7 +92,6 @@ function makeStmt(): Either<Error, Expr> {
     if (matchType(TokenType.RETURN))
         return Right(new ReturnStmt(makeExpr().unsafeCoerce(), getTokens()));
     if (matchType(TokenType.LET)) return finishVariableDeclaration();
-    if (matchType(TokenType.PRINT)) return finishPrintStmt();
     if (matchType(TokenType.IF)) return finishIfStmt();
     if (matchType(TokenType.WHILE)) return finishWhileStmt();
     if (matchType(TokenType.FUN)) return finishFunctionDeclaration();
@@ -438,10 +436,6 @@ function finishIfStmt(): Either<Error, Expr> {
     );
 }
 
-function finishPrintStmt(): Either<Error, Expr> {
-    return makeStmt().map((stmt) => new PrintStmt(stmt, getTokens()));
-}
-
 function makeExpr(): Either<Error, Expr> {
     const expr = makeBinaryLogical();
     return expr.chain((e) => {
@@ -513,7 +507,7 @@ function makeUnary(): Either<Error, Expr> {
 function readCommaDelimitedList(): Either<Error, Expr[]> {
     const list: Either<Error, Expr>[] = [];
     do {
-        list.push(makeExpr());
+        list.push(makeStmt());
     } while (matchType(TokenType.COMMA));
     return Either.sequence(list);
 }
