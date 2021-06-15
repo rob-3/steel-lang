@@ -18,7 +18,7 @@ export default class DotAccess implements Expr {
 
     eval(scope: Scope): [Value, Scope] {
         const [object, newScope]: [Value, Scope] = this.left.eval(scope);
-        if (!assertStlObject(object)) {
+        if (!(object instanceof StlObject)) {
             throw RuntimePanic(`${this.left} is not an object!`);
         } else {
             const value: Value | undefined = object.properties.get(this.right);
@@ -28,10 +28,4 @@ export default class DotAccess implements Expr {
             return [value, newScope];
         }
     }
-}
-
-function assertStlObject(
-    maybeSteelObject: Value
-): maybeSteelObject is StlObject {
-    return maybeSteelObject instanceof StlObject;
 }

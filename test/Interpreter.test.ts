@@ -779,6 +779,33 @@ describe("exec()", () => {
                 )
             ).to.equal(72);
         });
+
+        it("should not allow assignment to an immutable object's properties", () => {
+            expect(() =>
+                stlEval(
+                    `
+                    let obj = {
+                        a: 42
+                    }
+                    obj.a = 43
+                    `
+                )
+            ).to.throw();
+        });
+
+        it("should allow assignment to a mutable object's properties", () => {
+            expect(
+                stlEval(
+                    `
+                    let ~obj = {
+                        a: 42
+                    }
+                    ~obj.a = 43
+                    ~obj.a
+                    `
+                )
+            ).to.equal(43);
+        });
     });
 });
 

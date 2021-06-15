@@ -15,7 +15,9 @@ import PrimaryExpr from "./nodes/PrimaryExpr";
 import PrintStmt from "./nodes/PrintStmt";
 import ReturnStmt from "./nodes/ReturnStmt";
 import UnaryExpr from "./nodes/UnaryExpr";
-import VariableAssignmentStmt from "./nodes/VariableAssignmentStmt";
+import VariableAssignmentStmt, {
+    isAssignmentLeft,
+} from "./nodes/VariableAssignmentStmt";
 import VariableDeclarationStmt from "./nodes/VariableDeclarationStmt";
 import VariableExpr from "./nodes/VariableExpr";
 import WhileStmt from "./nodes/WhileStmt";
@@ -99,7 +101,7 @@ function makeStmt(): Either<Error, Expr> {
     if (matchType(TokenType.IDENTIFIER)) {
         if (matchType(TokenType.EQUAL)) {
             const identifier = lookBehind(2).lexeme;
-            return finishAssignment(identifier);
+            return finishAssignment(new VariableExpr(identifier, getTokens()));
         } else {
             backTrack();
         }
@@ -441,14 +443,21 @@ function finishPrintStmt(): Either<Error, Expr> {
 }
 
 function makeExpr(): Either<Error, Expr> {
-    return makeBinaryLogical();
+    const expr = makeBinaryLogical();
+    return expr.chain((e) => {
+        // FIXME add error messages for invalid assignments
+        if (isAssignmentLeft(e) && matchType(TokenType.EQUAL)) {
+            return finishAssignment(e);
+        }
+        return expr;
+    });
 }
 
-function finishAssignment(identifier: string): Either<Error, Expr> {
+function finishAssignment(left: VariableExpr | DotAccess): Either<Error, Expr> {
     // TODO check if identifier has already been declared
     eatNewlines();
     return makeStmt().map(
-        (right) => new VariableAssignmentStmt(identifier, right, getTokens())
+        (right) => new VariableAssignmentStmt(left, right, getTokens())
     );
 }
 
