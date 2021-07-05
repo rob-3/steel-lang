@@ -1,6 +1,9 @@
 import { RuntimePanic } from "./Debug";
 import { StlFunction } from "./StlFunction";
 import { Value } from "./Value";
+import FunctionExpr from "./nodes/FunctionExpr";
+import PrintStmt from "./nodes/PrintStmt";
+import VariableExpr from "./nodes/VariableExpr";
 
 /**
  * A Scope represents a lexical scope in the program. Each Scope has a set of
@@ -11,10 +14,21 @@ import { Value } from "./Value";
  */
 export default class Scope {
     bindings: Map<string, [Value, boolean]>;
-    parentScope: Scope | null;
-    constructor(parentScope: Scope | null = null) {
+    parent: Scope | null;
+    constructor(parent: Scope | null = null) {
         this.bindings = new Map();
-        this.parentScope = parentScope;
+        this.parent = parent;
+        // library print function
+        // FIXME null token lists
+        const print = new StlFunction(
+            new FunctionExpr(
+                ["value"],
+                new PrintStmt(new VariableExpr("value", []), []),
+                []
+            ),
+            this
+        );
+        this.bindings.set("print", [print, false]);
     }
 
     get(identifier: string): Value | null {
@@ -37,8 +51,8 @@ export default class Scope {
     getPair(identifier: string): [Value, boolean] | null {
         const value = this.bindings.get(identifier);
         if (value === undefined) {
-            if (this.parentScope !== null) {
-                return this.parentScope.getPair(identifier);
+            if (this.parent !== null) {
+                return this.parent.getPair(identifier);
             } else {
                 return null;
             }
@@ -55,11 +69,11 @@ export default class Scope {
         if (this.bindings.has(identifier)) {
             this.setLocal(identifier, [value, immutable]);
         } else {
-            if (this.parentScope !== null && this.parentScope.has(identifier)) {
-                this.parentScope.setLocal(identifier, [value, immutable]);
+            if (this.parent !== null && this.parent.has(identifier)) {
+                this.parent.setLocal(identifier, [value, immutable]);
             } else {
-                if (this.parentScope) {
-                    this.parentScope.set(identifier, [value, immutable]);
+                if (this.parent) {
+                    this.parent.set(identifier, [value, immutable]);
                 } else {
                     this.bindings.set(identifier, [value, immutable]);
                 }
@@ -122,7 +136,7 @@ class LocalScope extends Scope {
     has(key: string): boolean {
         if (this.bindings.has(key)) {
             return true;
-        } else if (this.parentScope !== null && this.parentScope.has(key)) {
+        } else if (this.parent !== null && this.parent.has(key)) {
             return true;
         } else {
             return false;
