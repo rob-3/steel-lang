@@ -27,7 +27,13 @@ const stlExec = (
     printfn: ((a: any) => void) | null = null
 ): [Value, Scope] => {
     if (printfn !== null) setPrintFn(printfn);
-    return _stlEval(src, new Scope()).unsafeCoerce();
+    const val = _stlEval(src, new Scope());
+    try {
+        return val.unsafeCoerce();
+    } catch (e) {
+        console.log(val);
+        throw e;
+    }
 };
 
 describe("stlEval()", () => {
