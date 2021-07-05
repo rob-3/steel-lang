@@ -13,6 +13,7 @@ import VariableExpr from "./nodes/VariableExpr";
  * Each Scope also has a parent Scope that it can use to resolve nonlocal variables.
  */
 export default class Scope {
+    // FIXME this should probably be two separate hashmaps
     bindings: Map<string, [Value, boolean]>;
     parent: Scope | null;
     constructor(parent: Scope | null = null) {
