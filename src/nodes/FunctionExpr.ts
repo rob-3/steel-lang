@@ -2,7 +2,7 @@ import { Expr } from "../Expr";
 import Scope from "../Scope";
 import { StlFunction } from "../StlFunction";
 import Token from "../Token";
-import { Value } from "../Value";
+import { Value, Box } from "../Value";
 
 export default class FunctionExpr implements Expr {
     args: string[];
@@ -15,6 +15,6 @@ export default class FunctionExpr implements Expr {
     }
 
     eval(scope: Scope): [Value, Scope] {
-        return [new StlFunction(this, scope), scope];
+        return [new Box(new StlFunction(this, scope)), scope];
     }
 }

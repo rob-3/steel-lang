@@ -6,16 +6,19 @@ import parse from "../src/Parser";
 import Scope from "../src/Scope";
 import { run } from "../src/steel";
 import tokenize from "../src/Tokenizer";
-import { Value } from "../src/Value";
+import { Value, UnboxedValue } from "../src/Value";
 import chai = require("chai");
 import spies = require("chai-spies");
 chai.use(spies);
 const expect = chai.expect;
 
-const stlEval = (src: string, scope: Scope = new Scope()): Value | null => {
+const stlEval = (
+    src: string,
+    scope: Scope = new Scope()
+): UnboxedValue | undefined => {
     const val = _stlEval(src, scope);
     try {
-        return val.unsafeCoerce()[0];
+        return val.unsafeCoerce()[0]?.value;
     } catch (e) {
         console.log(val);
         throw e;
@@ -812,6 +815,30 @@ describe("exec()", () => {
                 )
             ).to.equal(43);
         });
+    });
+
+    describe("pass by reference semantics", () => {
+        it("should properly handle assignment within a function", () => {
+            expect(
+                stlEval(`
+                    let ~val = 5
+                    let addTwo = ~a -> ~a = ~a + 2
+                    addTwo(~val)
+                    ~val
+               `)
+            ).to.equal(7);
+        });
+
+        it("should not allow assignment to an immutable argument", () => {
+            expect(() =>
+                stlEval(`
+                    let ~val = 5
+                    let addTwo = a -> a = a + 2
+                    addTwo(~val)
+                    ~val
+               `)
+            ).to.throw(`Cannot assign to immutable variable "a"`);
+        })
     });
 });
 

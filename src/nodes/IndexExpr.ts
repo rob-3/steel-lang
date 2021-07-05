@@ -17,13 +17,14 @@ export default class IndexExpr implements Expr {
     }
 
     eval(scope: Scope): [Value, Scope] {
-        const [index, newScope] = this.index.eval(scope);
+        const [boxedIndex, newScope] = this.index.eval(scope);
+        const index = boxedIndex?.value;
         if (typeof index !== "number") {
             throw RuntimePanic(
                 "Indexing expression must evaluate to a number!"
             );
         }
-        const array = newScope.lookup(this.arr);
+        const array = newScope.lookup(this.arr).value;
         if (!Array.isArray(array)) {
             throw RuntimePanic(`${this.arr} is not an array!`);
         }

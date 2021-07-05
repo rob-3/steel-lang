@@ -1,6 +1,6 @@
 import { RuntimePanic } from "./Debug";
 import { StlFunction } from "./StlFunction";
-import { Value } from "./Value";
+import { Value, Box } from "./Value";
 import FunctionExpr from "./nodes/FunctionExpr";
 import PrintStmt from "./nodes/PrintStmt";
 import VariableExpr from "./nodes/VariableExpr";
@@ -29,12 +29,12 @@ export default class Scope {
             ),
             this
         );
-        this.bindings.set("print", [print, false]);
+        this.bindings.set("print", [new Box(print), false]);
     }
 
     get(identifier: string): Value | null {
         const pair = this.getPair(identifier);
-        if (pair == null) {
+        if (pair === null) {
             return pair;
         } else {
             return pair[0];
@@ -91,7 +91,7 @@ export default class Scope {
         } else {
             const immutable = variable[1];
             if (!immutable) {
-                this.set(key, [evaluatedExpr, false]);
+                variable[0].value = evaluatedExpr.value;
                 return [evaluatedExpr, this];
             } else {
                 throw RuntimePanic(
@@ -116,8 +116,8 @@ export default class Scope {
             const newScope = new LocalScope(this);
             newScope.setLocal(key, [evaluatedExpr, immutable]);
             // Allow for recursive functions
-            if (evaluatedExpr instanceof StlFunction) {
-                evaluatedExpr.scope = newScope;
+            if (evaluatedExpr.value instanceof StlFunction) {
+                evaluatedExpr.value.scope = newScope;
             }
             return [evaluatedExpr, newScope];
         }

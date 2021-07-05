@@ -2,7 +2,7 @@ import { copy } from "copy-anything";
 import { Expr } from "../Expr";
 import Scope from "../Scope";
 import Token from "../Token";
-import { Value } from "../Value";
+import { Value, Box } from "../Value";
 
 export default class PrimaryExpr implements Expr {
     literal: number | boolean | string;
@@ -13,6 +13,6 @@ export default class PrimaryExpr implements Expr {
     }
 
     eval(scope: Scope): [Value, Scope] {
-        return [this.literal, scope];
+        return [new Box(this.literal), scope];
     }
 }

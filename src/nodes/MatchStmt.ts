@@ -1,4 +1,3 @@
-import { copy } from "copy-anything";
 import { RuntimePanic } from "../Debug";
 import { Expr } from "../Expr";
 import { equal } from "../Interpreter";
@@ -30,7 +29,7 @@ export default class MatchStmt implements Expr {
             // FIXME decide if side effects are legal in a match expression
             const [caseValue, newScope2] = matchCase.matchExpr.eval(newScope);
             newScope = newScope2;
-            if (equal(caseValue, matchExprValue)) {
+            if (equal(caseValue, matchExprValue).value) {
                 return matchCase.expr.eval(newScope);
             }
         }

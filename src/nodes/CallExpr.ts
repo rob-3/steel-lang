@@ -18,11 +18,11 @@ export default class CallExpr implements Expr {
 
     eval(scope: Scope): [Value, Scope] {
         const [maybeFn, newScope] = this.callee.eval(scope);
-        if (maybeFn instanceof StlFunction) {
-            return call(maybeFn, this.args, newScope);
+        if (maybeFn?.value instanceof StlFunction) {
+            return call(maybeFn.value, this.args, newScope);
         } else {
             throw RuntimePanic(
-                `Can't call ${maybeFn} because it is not a function.`
+                `Can't call ${maybeFn?.value} because it is not a function.`
             );
         }
     }

@@ -23,7 +23,8 @@ export default class IfStmt implements Expr {
     }
 
     eval(scope: Scope): [Value | null, Scope] {
-        const [shouldBeBool, newScope] = this.condition.eval(scope);
+        const [boxedMaybeBool, newScope] = this.condition.eval(scope);
+        const shouldBeBool = boxedMaybeBool?.value;
         if (!assertBool(shouldBeBool)) {
             throw RuntimePanic("Condition doesn't evaluate to a boolean.");
         }

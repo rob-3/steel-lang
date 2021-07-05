@@ -69,7 +69,7 @@ export function run(
                             stlPrint("<Function>");
                         } else {
                             if (val !== null) {
-                                stlPrint(val);
+                                stlPrint(val.value);
                             }
                         }
                     }

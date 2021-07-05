@@ -6,7 +6,7 @@ import parse from "./Parser";
 import Scope from "./Scope";
 import { StlFunction } from "./StlFunction";
 import tokenize from "./Tokenizer";
-import { Value } from "./Value";
+import { Value, Box } from "./Value";
 
 export function execStmts(stmts: Expr[], scope: Scope): [Value, Scope] {
     let value: Value | null = null;
@@ -68,7 +68,7 @@ export function call(
 ): [any, Scope] {
     const argValues: Value[] = [];
     for (const arg of args) {
-        const [value, newScope] = exprEval(arg, scope);
+        const [value, newScope]: [Value | null, Scope] = exprEval(arg, scope);
         scope = newScope;
         if (value === null) {
             throw RuntimePanic("Argument cannot evaluate to nothing!");
@@ -83,50 +83,50 @@ export function call(
  * Returns the opposite of the expression. Throws if expr does not evaluate to a
  * number.
  */
-export function opposite(right: Value): number {
-    if (assertNumber(right)) return -(<number>right);
+export function opposite(right: Value): Box<number> {
+    if (assertNumber(right.value)) return new Box(-(<number>right.value));
     else throw RuntimePanic('"-" can only be used on a number');
 }
 
-export function plus(left: Value, right: Value): number {
-    if (assertNumber(left, right)) {
-        return <number>left + <number>right;
+export function plus(left: Value, right: Value): Box<number> {
+    if (assertNumber(left.value, right.value)) {
+        return new Box(<number>left.value + <number>right.value);
     } else throw RuntimePanic('Operands of "+" must be numbers.');
 }
 
-export function minus(left: Value, right: Value): number {
-    if (assertNumber(left, right)) {
-        return <number>left - <number>right;
+export function minus(left: Value, right: Value): Box<number> {
+    if (assertNumber(left.value, right.value)) {
+        return new Box(<number>left.value - <number>right.value);
     } else throw RuntimePanic('Operands of "-" must be numbers.');
 }
 
-export function plusPlus(left: Value, right: Value): string {
-    if (typeof left === "string" && typeof right === "string") {
-        return left.concat(right);
+export function plusPlus(left: Value, right: Value): Box<string> {
+    if (typeof left.value === "string" && typeof right.value === "string") {
+        return new Box(left.value.concat(right.value));
     } else throw RuntimePanic('Operands of "++" must be strings.');
 }
 
-export function star(left: Value, right: Value): number {
-    if (assertNumber(left, right)) {
-        return <number>left * <number>right;
+export function star(left: Value, right: Value): Box<number> {
+    if (assertNumber(left.value, right.value)) {
+        return new Box(<number>left.value * <number>right.value);
     } else throw RuntimePanic('Operands of "*" must be numbers.');
 }
 
-export function slash(left: Value, right: Value): number {
-    if (assertNumber(left, right)) {
-        return <number>left / <number>right;
+export function slash(left: Value, right: Value): Box<number> {
+    if (assertNumber(left.value, right.value)) {
+        return new Box(<number>left.value / <number>right.value);
     } else throw RuntimePanic('Operands of "/" must be numbers.');
 }
 
-export function and(left: Value, right: Value): boolean {
-    if (assertBool(left, right)) {
-        return <boolean>left && <boolean>right;
+export function and(left: Value, right: Value): Box<boolean> {
+    if (assertBool(left.value, right.value)) {
+        return new Box(<boolean>left.value && <boolean>right.value);
     } else throw RuntimePanic('Operands of "and" must be booleans.');
 }
 
-export function or(left: Value, right: Value): boolean {
-    if (assertBool(left, right)) {
-        return <boolean>left || <boolean>right;
+export function or(left: Value, right: Value): Box<boolean> {
+    if (assertBool(left.value, right.value)) {
+        return new Box(<boolean>left.value || <boolean>right.value);
     } else {
         throw RuntimePanic('Operands of "or" must be booleans.');
     }
@@ -146,44 +146,51 @@ export function assertBool(...literals: any[]): boolean {
     return true;
 }
 
-export function not(right: Value): boolean {
-    if (assertBool(right)) return !right;
+export function not(right: Value): Box<boolean> {
+    if (assertBool(right.value)) return new Box(!right.value);
     else throw RuntimePanic('Operands of "not" should be booleans.');
 }
 
-export function greaterEqual(left: Value, right: Value): boolean {
+export function greaterEqual(left: Value, right: Value): Box<boolean> {
     return numberComparision(left, right, (l, r) => l >= r, ">=");
 }
 
-export function greater(left: Value, right: Value): boolean {
+export function greater(left: Value, right: Value): Box<boolean> {
     return numberComparision(left, right, (l, r) => l > r, ">");
 }
 
-export function lessEqual(left: Value, right: Value): boolean {
+export function lessEqual(left: Value, right: Value): Box<boolean> {
     return numberComparision(left, right, (l, r) => l <= r, "<=");
 }
 
-export function less(left: Value, right: Value): boolean {
+export function less(left: Value, right: Value): Box<boolean> {
     return numberComparision(left, right, (l, r) => l < r, "<");
 }
 
-export function equal(left: Value, right: Value): boolean {
-    return left === right;
+export function equal(left: Value, right: Value): Box<boolean> {
+    return new Box(left.value === right.value);
 }
 
 function numberComparision(
     left: Value,
     right: Value,
-    operator: (left: Value, right: Value) => boolean,
+    operator: (left: number, right: number) => boolean,
     err: string
-): boolean {
-    if (assertNumber(left, right) && left !== null && right !== null) {
-        return operator(left, right);
+): Box<boolean> {
+    const unboxedLeft = left.value;
+    const unboxedRight = right.value;
+    if (
+        typeof unboxedLeft === "number" &&
+        typeof unboxedRight === "number" &&
+        unboxedLeft !== null &&
+        unboxedRight !== null
+    ) {
+        return new Box(operator(unboxedLeft, unboxedRight));
     } else throw RuntimePanic(`Operands of ${err} should be numbers.`);
 }
 
-export function mod(left: Value, right: Value): number {
-    if (typeof left === "number" && typeof right === "number") {
-        return left % right;
+export function mod(left: Value, right: Value): Box<number> {
+    if (typeof left.value === "number" && typeof right.value === "number") {
+        return new Box(left.value % right.value);
     } else throw RuntimePanic(`Operands of % should be numbers.`);
 }

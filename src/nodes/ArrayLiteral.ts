@@ -1,7 +1,7 @@
 import { Expr } from "../Expr";
 import Scope from "../Scope";
 import Token from "../Token";
-import { Value } from "../Value";
+import { Value, Box } from "../Value";
 import { RuntimePanic } from "../Debug";
 
 export default class ArrayLiteral implements Expr {
@@ -23,6 +23,6 @@ export default class ArrayLiteral implements Expr {
             resolved.push(val);
             return scope;
         }, scope);
-        return [resolved, newScope];
+        return [new Box(resolved), newScope];
     }
 }

@@ -19,7 +19,7 @@ export default class PrintStmt implements Expr {
         if (printValue === null) {
             throw RuntimePanic("Can't print nothing!");
         }
-        stlPrint(printValue);
+        stlPrint(printValue.value);
         return [printValue, newScope];
     }
 }

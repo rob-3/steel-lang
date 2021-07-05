@@ -1,7 +1,7 @@
 import { Expr } from "../Expr";
 import Token from "../Token";
 import Scope from "../Scope";
-import { Value } from "../Value";
+import { Value, Box } from "../Value";
 import { copy } from "copy-anything";
 import StlObject from "../StlObject";
 import { RuntimePanic } from "../Debug";
@@ -15,7 +15,7 @@ export class ObjectLiteral implements Expr {
         this.tokens = tokens;
     }
 
-    eval(scope: Scope): [StlObject, Scope] {
+    eval(scope: Scope): [Box<StlObject>, Scope] {
         const map = new Map<string, Value>();
         let currentScope = scope;
         for (const [key, value] of this.properties.entries()) {
@@ -27,6 +27,6 @@ export class ObjectLiteral implements Expr {
             }
             map.set(key, result);
         }
-        return [new StlObject(map), currentScope];
+        return [new Box(new StlObject(map)), currentScope];
     }
 }

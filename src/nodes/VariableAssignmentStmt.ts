@@ -35,7 +35,8 @@ export default class VariableAssignmentStmt implements Expr {
             if (!(dotAccess.left instanceof VariableExpr)) {
                 throw RuntimePanic("Invalid left hand side of assignment!");
             }
-            const [object, newNewScope] = dotAccess.left.eval(newScope);
+            const [boxedObject, newNewScope] = dotAccess.left.eval(newScope);
+            const object = boxedObject.value;
             if (!(object instanceof StlObject)) {
                 throw RuntimePanic(`${object} is not an object!`);
             } else {

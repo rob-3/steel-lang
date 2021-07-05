@@ -17,7 +17,9 @@ export default class DotAccess implements Expr {
     }
 
     eval(scope: Scope): [Value, Scope] {
-        const [object, newScope]: [Value | null, Scope] = this.left.eval(scope);
+        const [boxedObject, newScope]: [Value | null, Scope] =
+            this.left.eval(scope);
+        const object = boxedObject?.value;
         if (object === null) {
             throw RuntimePanic(
                 "Left side of dot operator cannot evaluate to nothing!"
