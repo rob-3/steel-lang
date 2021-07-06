@@ -6,7 +6,7 @@ import parse from "./Parser";
 import Scope from "./Scope";
 import { StlFunction } from "./StlFunction";
 import tokenize from "./Tokenizer";
-import { NonNullValue, Value } from "./Value";
+import { Value } from "./Value";
 
 export function execStmts(stmts: Expr[], scope: Scope): [Value, Scope] {
     let value: Value | null = null;
@@ -174,7 +174,7 @@ export function equal(left: Value, right: Value): boolean {
 function numberComparision(
     left: Value,
     right: Value,
-    operator: (left: NonNullValue, right: NonNullValue) => boolean,
+    operator: (left: Value, right: Value) => boolean,
     err: string
 ): boolean {
     if (assertNumber(left, right) && left !== null && right !== null) {
