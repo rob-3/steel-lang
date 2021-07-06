@@ -22,7 +22,7 @@ export default class IfStmt implements Expr {
         this.tokens = tokens;
     }
 
-    eval(scope: Scope): [Value, Scope] {
+    eval(scope: Scope): [Value | null, Scope] {
         const [shouldBeBool, newScope] = this.condition.eval(scope);
         if (!assertBool(shouldBeBool)) {
             throw RuntimePanic("Condition doesn't evaluate to a boolean.");

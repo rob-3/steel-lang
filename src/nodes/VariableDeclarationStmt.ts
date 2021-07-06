@@ -1,6 +1,7 @@
 import { Expr } from "../Expr";
 import Scope from "../Scope";
 import Token from "../Token";
+import { RuntimePanic } from "../Debug";
 
 export default class VariableDeclarationStmt implements Expr {
     immutable: boolean;
@@ -21,6 +22,11 @@ export default class VariableDeclarationStmt implements Expr {
 
     eval(scope: Scope) {
         const [rightVal, newScope] = this.right.eval(scope);
+        if (rightVal === null) {
+            throw RuntimePanic(
+                "Right side of variable declaration should not be nothing!"
+            );
+        }
         return newScope.define(this.identifier, rightVal, this.immutable);
     }
 }

@@ -20,6 +20,9 @@ export default class MatchStmt implements Expr {
     eval(scope: Scope) {
         const rootExpr = this.expr;
         let [matchExprValue, newScope] = rootExpr.eval(scope);
+        if (matchExprValue === null) {
+            throw RuntimePanic("MatchExpr cannot be nothing!");
+        }
         for (const matchCase of this.cases) {
             if (matchCase.matchExpr instanceof UnderscoreExpr) {
                 return matchCase.expr.eval(newScope);

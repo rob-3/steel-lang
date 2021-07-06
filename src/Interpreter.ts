@@ -9,16 +9,21 @@ import tokenize from "./Tokenizer";
 import { NonNullValue, Value } from "./Value";
 
 export function execStmts(stmts: Expr[], scope: Scope): [Value, Scope] {
-    let value: Value = null;
+    let value: Value | null = null;
     for (const stmt of stmts) {
-        const pair = exprEval(stmt, scope);
+        const [newValue, newScope] = exprEval(stmt, scope);
         if (stmt instanceof ReturnStmt) {
-            return pair;
+            if (newValue === null) {
+                throw RuntimePanic("Return value cannot be nothing");
+            }
+            return [newValue, newScope];
         } else {
-            const [newValue, newScope] = pair;
             scope = newScope;
             value = newValue;
         }
+    }
+    if (value === null) {
+        throw RuntimePanic("Unexpected null");
     }
     return [value, scope];
 }
@@ -34,23 +39,25 @@ export function stlEval(
     src: string,
     scope: Scope,
     filename: string = "<anonymous>"
-): Either<Error[], [Value, Scope]> {
+): Either<Error[], [Value | null, Scope]> {
     const ast = parse(tokenize(src, filename));
     return ast.map((goodAst: Expr[]) => {
-        return goodAst.reduce<[Value, Scope]>(
-            ([_, scope]: [Value, Scope], cur: Expr): [Value, Scope] => {
-                const [newVal, newScope]: [Value, Scope] = exprEval(cur, scope);
-                return [newVal, newScope];
-            },
-            [null, scope]
-        );
+        let value: Value | null = null;
+        let curScope = scope;
+        for (const stmt of goodAst) {
+            const [newVal, newScope] = stmt.eval(curScope);
+            value = newVal;
+            curScope = newScope;
+        }
+        const pair: [Value | null, Scope] = [value, curScope];
+        return pair;
     });
 }
 
 /*
  * Ast-based eval() for steel. Pass in any expression and get the evaluated result.
  */
-export function exprEval(expr: Expr, scope: Scope): [Value, Scope] {
+export function exprEval(expr: Expr, scope: Scope): [Value | null, Scope] {
     return expr.eval(scope);
 }
 
@@ -63,6 +70,9 @@ export function call(
     for (const arg of args) {
         const [value, newScope] = exprEval(arg, scope);
         scope = newScope;
+        if (value === null) {
+            throw RuntimePanic("Argument cannot evaluate to nothing!");
+        }
         argValues.push(value);
     }
     const value = fn.call(argValues);

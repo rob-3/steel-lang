@@ -25,6 +25,9 @@ export default class VariableAssignmentStmt implements Expr {
 
     eval(scope: Scope): [Value, Scope] {
         const [rightVal, newScope] = this.right.eval(scope);
+        if (rightVal === null) {
+            throw RuntimePanic("Right side of assignment cannot be nothing!");
+        }
         if (this.left instanceof VariableExpr) {
             return newScope.assign(this.left.identifier, rightVal);
         } else if (this.left instanceof DotAccess) {

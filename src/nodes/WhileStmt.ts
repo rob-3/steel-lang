@@ -14,9 +14,9 @@ export default class WhileStmt implements Expr {
         this.tokens = tokens;
     }
 
-    eval(scope: Scope): [Value, Scope] {
+    eval(scope: Scope): [Value | null, Scope] {
         let conditionValue = this.condition.eval(scope)[0];
-        let value: Value = null;
+        let value: Value | null = null;
         while (assertBool(conditionValue) && conditionValue) {
             const [newVal, newScope] = this.body.eval(scope);
             scope = newScope;

@@ -18,6 +18,9 @@ export default class UnaryExpr implements Expr {
 
     eval(scope: Scope): [Value, Scope] {
         const [value, newScope] = this.right.eval(scope);
+        if (value === null) {
+            throw RuntimePanic("Operand cannot be nothing!");
+        }
         switch (this.operator.type) {
             case TokenType.MINUS:
                 return [opposite(value), newScope];

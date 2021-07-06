@@ -17,7 +17,12 @@ export default class DotAccess implements Expr {
     }
 
     eval(scope: Scope): [Value, Scope] {
-        const [object, newScope]: [Value, Scope] = this.left.eval(scope);
+        const [object, newScope]: [Value | null, Scope] = this.left.eval(scope);
+        if (object === null) {
+            throw RuntimePanic(
+                "Left side of dot operator cannot evaluate to nothing!"
+            );
+        }
         if (!(object instanceof StlObject)) {
             throw RuntimePanic(`${this.left} is not an object!`);
         } else {

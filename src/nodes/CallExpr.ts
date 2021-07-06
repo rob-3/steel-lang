@@ -4,6 +4,7 @@ import { call } from "../Interpreter";
 import Scope from "../Scope";
 import { StlFunction } from "../StlFunction";
 import Token from "../Token";
+import { Value } from "../Value";
 
 export default class CallExpr implements Expr {
     callee: Expr;
@@ -15,7 +16,7 @@ export default class CallExpr implements Expr {
         this.tokens = tokens;
     }
 
-    eval(scope: Scope) {
+    eval(scope: Scope): [Value, Scope] {
         const [maybeFn, newScope] = this.callee.eval(scope);
         if (maybeFn instanceof StlFunction) {
             return call(maybeFn, this.args, newScope);

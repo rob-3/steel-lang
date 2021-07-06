@@ -12,7 +12,7 @@ import spies = require("chai-spies");
 chai.use(spies);
 const expect = chai.expect;
 
-const stlEval = (src: string, scope: Scope = new Scope()): Value => {
+const stlEval = (src: string, scope: Scope = new Scope()): Value | null => {
     const val = _stlEval(src, scope);
     try {
         return val.unsafeCoerce()[0];
@@ -25,7 +25,7 @@ const stlEval = (src: string, scope: Scope = new Scope()): Value => {
 const stlExec = (
     src: string,
     printfn: ((a: any) => void) | null = null
-): [Value, Scope] => {
+): [Value | null, Scope] => {
     if (printfn !== null) setPrintFn(printfn);
     const val = _stlEval(src, new Scope());
     try {

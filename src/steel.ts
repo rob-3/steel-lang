@@ -68,7 +68,9 @@ export function run(
                         if (val instanceof StlFunction) {
                             stlPrint("<Function>");
                         } else {
-                            stlPrint(val);
+                            if (val !== null) {
+                                stlPrint(val);
+                            }
                         }
                     }
                     return newScope;

@@ -11,17 +11,13 @@ export class StlFunction {
         this.scope = scope;
     }
 
-    call(callArgs: Value[]): Value {
+    call(callArgs: Value[]): Value | null {
         const funScope = new Scope(this.scope);
         for (let i = 0; i < this.funExpr.args.length; i++) {
             // FIXME typecheck args
             funScope.setLocal(this.funExpr.args[i], [callArgs[i], false]);
         }
 
-        const [val, scope]: [Value, Scope] = exprEval(
-            this.funExpr.body,
-            funScope
-        );
-        return val;
+        return exprEval(this.funExpr.body, funScope)[0];
     }
 }

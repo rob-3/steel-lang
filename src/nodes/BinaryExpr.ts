@@ -35,6 +35,9 @@ export default class BinaryExpr implements Expr {
     eval(scope: Scope): [Value, Scope] {
         const [leftVal, newScope] = this.left.eval(scope);
         const [rightVal, newScope2] = this.right.eval(newScope);
+        if (leftVal === null || rightVal === null) {
+            throw RuntimePanic("Operand cannot evaluate to nothing");
+        }
         switch (this.operator.type) {
             case TokenType.PLUS:
                 return [plus(leftVal, rightVal), newScope2];
