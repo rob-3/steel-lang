@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import Token from "../src/Token";
-import tokenize, {
+import _tokenize, {
     isAlpha,
     isAlphaNumeric,
     isLegalIdentifierChar,
@@ -8,6 +8,10 @@ import tokenize, {
 } from "../src/Tokenizer";
 import Location from "../src/Location";
 import TokenType from "../src/TokenType";
+
+const tokenize = (src: string) => _tokenize(src).unsafeCoerce();
+
+const toStringArray = (errors: Error[]) => errors.map((err) => err.message);
 
 describe("tokenize()", () => {
     it("should tokenize input", () => {
@@ -389,12 +393,16 @@ describe("tokenize()", () => {
 
     it("should throw if there is an unterminated string literal", () => {
         let source = '"23';
-        expect(() => tokenize(source)).to.throw("Unterminated string literal.");
+        expect(_tokenize(source).mapLeft(toStringArray).extract()).to.eql([
+            "Unterminated string literal.",
+        ]);
     });
 
     it("should throw if there is an unexpected character", () => {
         let source = "\\";
-        expect(() => tokenize(source)).to.throw('Unrecognized character "\\"');
+        expect(_tokenize(source).mapLeft(toStringArray).extract()).to.eql([
+            'Unrecognized character "\\". Perhaps you intended to put this in a string?',
+        ]);
     });
 
     it("should tokenize a unary not", () => {

@@ -57,6 +57,9 @@ enum TokenType {
     EOF,
 
     PRINT,
+
+    WHITESPACE,
+    COMMENT,
 }
 
 export default TokenType;

@@ -838,7 +838,7 @@ describe("exec()", () => {
                     ~val
                `)
             ).to.throw(`Cannot assign to immutable variable "a"`);
-        })
+        });
     });
 });
 
@@ -877,7 +877,7 @@ describe("debug", () => {
         setPrintFn(printfn);
         */
         const tokens = tokenize("a = ", "filename");
-        const ast: Either<Error[], Expr[]> = parse(tokens);
+        const ast: Either<Error[], Expr[]> = tokens.chain(parse);
         expect(ast.isLeft()).to.be.true;
         expect(
             ast.mapLeft((errs) =>

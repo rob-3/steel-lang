@@ -40,7 +40,7 @@ export function stlEval(
     scope: Scope,
     filename: string = "<anonymous>"
 ): Either<Error[], [Value | null, Scope]> {
-    const ast = parse(tokenize(src, filename));
+    const ast = tokenize(src, filename).chain(parse);
     return ast.map((goodAst: Expr[]) => {
         let value: Value | null = null;
         let curScope = scope;

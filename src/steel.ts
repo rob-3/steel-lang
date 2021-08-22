@@ -53,7 +53,7 @@ export function run(
          * Last, we use the loop to run each statement sequentially.
          */
         const tokens = tokenize(src, filename);
-        const ast: Either<Error[], Expr[]> = parse(tokens);
+        const ast: Either<Error[], Expr[]> = tokens.chain(parse);
         const finalScope: Scope = ast.either(
             (badAst) => {
                 badAst.map((err) => stlPrint(err.message));

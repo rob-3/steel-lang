@@ -1,4 +1,4 @@
-import { Just, Maybe, Nothing } from "purify-ts";
+import { Either, Right, Left } from "purify-ts";
 import Token from "./Token";
 import Location from "./Location";
 import TokenType from "./TokenType";
@@ -16,113 +16,128 @@ let filename: string = "";
 export default function tokenize(
     src: string,
     filepath: string = "<anonymous>"
-): Token[] {
+): Either<Error[], Token[]> {
     filename = filepath;
-    const tokens = [];
+    const fullTokens: Either<Error, Token>[] = [];
+    let tokens;
     try {
         source = src;
         while (!atEnd()) {
-            scanToken().map((t) => tokens.push(t));
+            fullTokens.push(scanToken());
         }
+        tokens = fullTokens.filter((t) =>
+            t.either(
+                (_) => true,
+                (token) =>
+                    token.type !== TokenType.WHITESPACE &&
+                    token.type !== TokenType.COMMENT
+            )
+        );
         tokens.push(
-            new Token(
-                TokenType.EOF,
-                "",
-                null,
-                new Location(
-                    [startLine, startColumn],
-                    [startLine, startColumn], // EOF doesn't take up any space
-                    filename,
-                    source
+            Right(
+                new Token(
+                    TokenType.EOF,
+                    "",
+                    null,
+                    new Location(
+                        [startLine, startColumn],
+                        [startLine, startColumn], // EOF doesn't take up any space
+                        filename,
+                        source
+                    )
                 )
             )
         );
     } finally {
         reset();
     }
-    return tokens;
+    const errors = Either.lefts(tokens);
+    if (errors.length > 0) {
+        return Left(errors);
+    }
+    return Right(Either.rights(tokens));
 }
 
-function scanToken(): Maybe<Token> {
+function scanToken(): Either<Error, Token> {
     const char = eatChar();
     switch (char) {
         case "(":
-            return Just(makeToken(TokenType.OPEN_PAREN));
+            return Right(makeToken(TokenType.OPEN_PAREN));
         case ")":
-            return Just(makeToken(TokenType.CLOSE_PAREN));
+            return Right(makeToken(TokenType.CLOSE_PAREN));
         case "[":
-            return Just(makeToken(TokenType.OPEN_BRACKET));
+            return Right(makeToken(TokenType.OPEN_BRACKET));
         case "]":
-            return Just(makeToken(TokenType.CLOSE_BRACKET));
+            return Right(makeToken(TokenType.CLOSE_BRACKET));
         case "{":
-            return Just(makeToken(TokenType.OPEN_BRACE));
+            return Right(makeToken(TokenType.OPEN_BRACE));
         case "}":
-            return Just(makeToken(TokenType.CLOSE_BRACE));
+            return Right(makeToken(TokenType.CLOSE_BRACE));
         case ".":
-            return Just(makeToken(TokenType.DOT));
+            return Right(makeToken(TokenType.DOT));
         case "%":
-            return Just(makeToken(TokenType.MOD));
+            return Right(makeToken(TokenType.MOD));
         case "*":
-            return Just(makeToken(TokenType.STAR));
+            return Right(makeToken(TokenType.STAR));
         case "/":
             if (match("/")) {
                 eatLineComment();
             } else if (match("*")) {
                 eatMultiLineComment();
             } else {
-                return Just(makeToken(TokenType.SLASH));
+                return Right(makeToken(TokenType.SLASH));
             }
-            return Nothing;
+            return Right(makeToken(TokenType.COMMENT));
         case "+":
             return match("+")
-                ? Just(makeToken(TokenType.PLUS_PLUS))
-                : Just(makeToken(TokenType.PLUS));
+                ? Right(makeToken(TokenType.PLUS_PLUS))
+                : Right(makeToken(TokenType.PLUS));
         case "-":
             return match(">")
-                ? Just(makeToken(TokenType.RIGHT_SINGLE_ARROW))
-                : Just(makeToken(TokenType.MINUS));
+                ? Right(makeToken(TokenType.RIGHT_SINGLE_ARROW))
+                : Right(makeToken(TokenType.MINUS));
         case "=":
             return match("=")
-                ? Just(makeToken(TokenType.EQUAL_EQUAL))
+                ? Right(makeToken(TokenType.EQUAL_EQUAL))
                 : match(">")
-                ? Just(makeToken(TokenType.RIGHT_DOUBLE_ARROW))
-                : Just(makeToken(TokenType.EQUAL));
+                ? Right(makeToken(TokenType.RIGHT_DOUBLE_ARROW))
+                : Right(makeToken(TokenType.EQUAL));
         case ">":
             return match("=")
-                ? Just(makeToken(TokenType.GREATER_EQUAL))
-                : Just(makeToken(TokenType.GREATER));
+                ? Right(makeToken(TokenType.GREATER_EQUAL))
+                : Right(makeToken(TokenType.GREATER));
         case "<":
             return match("=")
-                ? Just(makeToken(TokenType.LESS_EQUAL))
+                ? Right(makeToken(TokenType.LESS_EQUAL))
                 : match("-")
-                ? Just(makeToken(TokenType.LEFT_SINGLE_ARROW))
-                : Just(makeToken(TokenType.LESS));
+                ? Right(makeToken(TokenType.LEFT_SINGLE_ARROW))
+                : Right(makeToken(TokenType.LESS));
         case ",":
-            return Just(makeToken(TokenType.COMMA));
+            return Right(makeToken(TokenType.COMMA));
         case "_":
-            return Just(makeToken(TokenType.UNDERSCORE));
+            return Right(makeToken(TokenType.UNDERSCORE));
         case ":":
-            return Just(makeToken(TokenType.COLON));
+            return Right(makeToken(TokenType.COLON));
         case "\t":
         case " ":
             // move the start pointers forward and try again
-            startIndex = currentIndex;
-            startColumn = currentColumn;
-            return Nothing;
+            return Right(makeToken(TokenType.WHITESPACE));
         case "\n":
-            const token = Just(makeToken(TokenType.NEWLINE));
+            const token = Right(makeToken(TokenType.NEWLINE));
             return token;
         case '"':
-            return Just(makeString());
+            return makeString();
         //case "\'": return stringInterpolation();
         default:
             if (isNumber(char)) {
-                return Just(makeNumber());
+                return Right(makeNumber());
             } else if (isAlpha(char) || char === "~") {
-                return Just(makeIdentifierOrKeyword());
+                return Right(makeIdentifierOrKeyword());
             } else {
-                throw Error(
-                    `Unrecognized character "${char}". Perhaps you intended to put this in a string?`
+                return Left(
+                    new Error(
+                        `Unrecognized character "${char}". Perhaps you intended to put this in a string?`
+                    )
                 );
             }
     }
@@ -130,19 +145,21 @@ function scanToken(): Maybe<Token> {
 
 // literal makers
 
-function makeString(): Token {
+function makeString(): Either<Error, Token> {
     let cache = lookAhead();
     while (cache !== '"') {
         if (cache === "\n" || atEnd()) {
-            throw Error("Unterminated string literal.");
+            return Left(new Error("Unterminated string literal."));
         }
         eatChar();
         cache = lookAhead();
     }
     eatChar();
-    return makeToken(
-        TokenType.STRING,
-        source.slice(startIndex + 1, currentIndex - 1)
+    return Right(
+        makeToken(
+            TokenType.STRING,
+            source.slice(startIndex + 1, currentIndex - 1)
+        )
     );
 }
 
