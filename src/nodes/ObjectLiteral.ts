@@ -2,7 +2,6 @@ import { Expr } from "../Expr";
 import Token from "../Token";
 import Scope from "../Scope";
 import { Value, Box } from "../Value";
-import { copy } from "copy-anything";
 import StlObject from "../StlObject";
 import { RuntimePanic } from "../Debug";
 

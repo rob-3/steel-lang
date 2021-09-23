@@ -1,4 +1,3 @@
-import { copy } from "copy-anything";
 import { RuntimePanic } from "../Debug";
 import { Expr } from "../Expr";
 import Scope from "../Scope";

@@ -1,4 +1,3 @@
-import { copy } from "copy-anything";
 import { Expr } from "../Expr";
 import Scope from "../Scope";
 import Token from "../Token";

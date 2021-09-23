@@ -23,7 +23,6 @@
 	"dependencies": {
 		"@types/chai-spies": "^1.0.3",
 		"chai-spies": "^1.0.0",
-		"copy-anything": "^2.0.3",
 		"purify-ts": "^0.16.3",
 		"tslib": "^2.2.0"
 	}
