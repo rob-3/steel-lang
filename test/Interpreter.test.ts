@@ -101,6 +101,10 @@ describe("stlEval()", () => {
             expect(stlEval("5 % 4")).to.equal(1);
             expect(stlEval("5 % 2")).to.equal(1);
         });
+
+        it("should not fall victim to floating point errors", () => {
+            expect(stlEval("0.1 + 0.2")).to.equal(0.3)
+        });
     });
 
     describe("comparisions", () => {
