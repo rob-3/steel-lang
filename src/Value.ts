@@ -1,5 +1,6 @@
 import { StlFunction } from "./StlFunction";
 import StlObject from "./StlObject";
+import StlNumber from './StlNumber';
 
 export class Box<T> {
     value: T;
@@ -9,7 +10,7 @@ export class Box<T> {
 }
 
 export type Value =
-    | Box<number>
+    | Box<StlNumber>
     | Box<boolean>
     | Box<string>
     | Box<StlFunction>
@@ -17,7 +18,7 @@ export type Value =
     | Box<StlObject>;
 
 export type UnboxedValue =
-    | number
+    | StlNumber
     | boolean
     | string
     | StlFunction
