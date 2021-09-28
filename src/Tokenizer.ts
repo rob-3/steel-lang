@@ -2,6 +2,7 @@ import { Either, Right, Left } from "purify-ts";
 import Token from "./Token";
 import Location from "./Location";
 import TokenType from "./TokenType";
+import StlNumber from "./StlNumber";
 
 let startIndex = 0;
 let currentIndex = 0;
@@ -175,7 +176,7 @@ function makeNumber(): Token {
     }
     return makeToken(
         TokenType.NUMBER,
-        Number(source.slice(startIndex, currentIndex))
+        new StlNumber(BigInt(source.slice(startIndex, currentIndex)))
     );
 }
 
