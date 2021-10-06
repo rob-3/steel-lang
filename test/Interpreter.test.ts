@@ -88,7 +88,7 @@ describe("stlEval()", () => {
         it("should do floating point division correctly", () => {
             let src = "5 / 2";
             let result = stlEval(src);
-            expect(result).to.eql(new StlNumber(2.5n));
+            expect(result).to.eql(StlNumber.of("2.5"));
         });
 
         it("should follow order of operations", () => {
@@ -104,7 +104,7 @@ describe("stlEval()", () => {
         });
 
         it("should not fall victim to floating point errors", () => {
-            expect(stlEval("0.1 + 0.2")).to.eql(new StlNumber(0.3n))
+            expect(stlEval("0.1 + 0.2")).to.eql(StlNumber.of("0.3"))
         });
     });
 
@@ -339,7 +339,7 @@ describe("exec()", () => {
                     42 + 13 + 3
                 `
                 )
-            ).to.eql(new StlNumber(42 + 13 + 3));
+            ).to.eql(StlNumber.of(42 + 13 + 3));
         });
 
         it("should allow assignment to spill over lines", () => {

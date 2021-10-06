@@ -5,6 +5,19 @@
 export default class StlNumber {
     constructor(public top: bigint, public bottom: bigint = 1n) {}
 
+    static of(real: number | string) {
+        if (typeof real === "number") {
+            return new StlNumber(BigInt(real));
+        } else {
+            const decimalIndex = real.indexOf(".");
+            if (decimalIndex === -1) {
+                return new StlNumber(BigInt(real));
+            }
+            const decimalPlaces: bigint = BigInt(real.length - decimalIndex - 1);
+            return new StlNumber(BigInt(real.slice(0, decimalIndex) + real.slice(decimalIndex + 1)), BigInt(10)**decimalPlaces);
+        }
+    }
+
     add(n: StlNumber) {
         if (this.bottom === n.bottom) {
             return new StlNumber(this.top + n.top, this.bottom);

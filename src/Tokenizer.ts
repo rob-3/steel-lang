@@ -176,7 +176,7 @@ function makeNumber(): Token {
     }
     return makeToken(
         TokenType.NUMBER,
-        new StlNumber(BigInt(source.slice(startIndex, currentIndex)))
+        StlNumber.of(source.slice(startIndex, currentIndex))
     );
 }
 
