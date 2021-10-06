@@ -7,6 +7,7 @@ import Scope from "./Scope";
 import { StlFunction } from "./StlFunction";
 import tokenize from "./Tokenizer";
 import { Value, Box } from "./Value";
+import StlNumber from "./StlNumber";
 
 export function execStmts(stmts: Expr[], scope: Scope): [Value, Scope] {
     let value: Value | null = null;
@@ -83,20 +84,21 @@ export function call(
  * Returns the opposite of the expression. Throws if expr does not evaluate to a
  * number.
  */
-export function opposite(right: Value): Box<number> {
-    if (assertNumber(right.value)) return new Box(-(<number>right.value));
+export function opposite(right: Value): Box<StlNumber> {
+    if (right.value instanceof StlNumber)
+        return new Box(right.value.opposite());
     else throw RuntimePanic('"-" can only be used on a number');
 }
 
-export function plus(left: Value, right: Value): Box<number> {
-    if (assertNumber(left.value, right.value)) {
-        return new Box(<number>left.value + <number>right.value);
+export function plus(left: Value, right: Value): Box<StlNumber> {
+    if (left.value instanceof StlNumber && right.value instanceof StlNumber) {
+        return new Box(left.value.add(right.value));
     } else throw RuntimePanic('Operands of "+" must be numbers.');
 }
 
-export function minus(left: Value, right: Value): Box<number> {
-    if (assertNumber(left.value, right.value)) {
-        return new Box(<number>left.value - <number>right.value);
+export function minus(left: Value, right: Value): Box<StlNumber> {
+    if (left.value instanceof StlNumber && right.value instanceof StlNumber) {
+        return new Box(left.value.subtract(right.value));
     } else throw RuntimePanic('Operands of "-" must be numbers.');
 }
 
@@ -106,15 +108,15 @@ export function plusPlus(left: Value, right: Value): Box<string> {
     } else throw RuntimePanic('Operands of "++" must be strings.');
 }
 
-export function star(left: Value, right: Value): Box<number> {
-    if (assertNumber(left.value, right.value)) {
-        return new Box(<number>left.value * <number>right.value);
+export function star(left: Value, right: Value): Box<StlNumber> {
+    if (left.value instanceof StlNumber && right.value instanceof StlNumber) {
+        return new Box(left.value.multiply(right.value));
     } else throw RuntimePanic('Operands of "*" must be numbers.');
 }
 
-export function slash(left: Value, right: Value): Box<number> {
-    if (assertNumber(left.value, right.value)) {
-        return new Box(<number>left.value / <number>right.value);
+export function slash(left: Value, right: Value): Box<StlNumber> {
+    if (left.value instanceof StlNumber && right.value instanceof StlNumber) {
+        return new Box(left.value.divide(right.value));
     } else throw RuntimePanic('Operands of "/" must be numbers.');
 }
 
@@ -130,13 +132,6 @@ export function or(left: Value, right: Value): Box<boolean> {
     } else {
         throw RuntimePanic('Operands of "or" must be booleans.');
     }
-}
-
-export function assertNumber(...literals: any[]): boolean {
-    for (const literal of literals) {
-        if (typeof literal !== "number") return false;
-    }
-    return true;
 }
 
 export function assertBool(...literals: any[]): boolean {
@@ -189,8 +184,8 @@ function numberComparision(
     } else throw RuntimePanic(`Operands of ${err} should be numbers.`);
 }
 
-export function mod(left: Value, right: Value): Box<number> {
-    if (typeof left.value === "number" && typeof right.value === "number") {
-        return new Box(left.value % right.value);
+export function mod(left: Value, right: Value): Box<StlNumber> {
+    if (left.value instanceof StlNumber && right.value instanceof StlNumber) {
+        return new Box(left.value.mod(right.value));
     } else throw RuntimePanic(`Operands of % should be numbers.`);
 }

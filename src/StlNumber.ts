@@ -27,6 +27,14 @@ export default class StlNumber {
         return new StlNumber(this.top * n.bottom, this.bottom * n.top);
     }
 
+    opposite() {
+        return new StlNumber(-this.top, this.bottom);
+    }
+
+    mod(n: StlNumber): StlNumber {
+        throw Error("Can't do mod for now!");
+    }
+
     toString() {
         if (this.bottom === 1n) {
             return this.top.toString();

@@ -9,6 +9,7 @@ import tokenize from "../src/Tokenizer";
 import { Value, UnboxedValue } from "../src/Value";
 import chai = require("chai");
 import spies = require("chai-spies");
+import StlNumber from '../src/StlNumber';
 chai.use(spies);
 const expect = chai.expect;
 
@@ -42,8 +43,8 @@ const stlExec = (
 describe("stlEval()", () => {
     describe("literals", () => {
         it("should evaluate number literals", () => {
-            expect(stlEval("2")).to.equal(2);
-            expect(stlEval("-2")).to.equal(-2);
+            expect(stlEval("2")).to.eql(new StlNumber(2n));
+            expect(stlEval("-2")).to.eql(new StlNumber(-2n));
         });
 
         it("should evaluate string literals", () => {
@@ -63,47 +64,47 @@ describe("stlEval()", () => {
         it("should do addition correctly", () => {
             let src = "2 + 2";
             let result = stlEval(src);
-            expect(result).to.equal(4);
+            expect(result).to.eql(new StlNumber(4n));
         });
 
         it("should do subtraction correctly", () => {
             let src = "2 - 2";
             let result = stlEval(src);
-            expect(result).to.equal(0);
+            expect(result).to.eql(new StlNumber(0n));
         });
 
         it("should do multiplication correctly", () => {
             let src = "2 * 5";
             let result = stlEval(src);
-            expect(result).to.equal(10);
+            expect(result).to.eql(new StlNumber(10n));
         });
 
         it("should do division correctly", () => {
             let src = "2 / 2";
             let result = stlEval(src);
-            expect(result).to.equal(1);
+            expect(result).to.eql(new StlNumber(1n));
         });
 
         it("should do floating point division correctly", () => {
             let src = "5 / 2";
             let result = stlEval(src);
-            expect(result).to.equal(2.5);
+            expect(result).to.eql(new StlNumber(2.5n));
         });
 
         it("should follow order of operations", () => {
             let src = "5 / 5 + 3 * 2";
             let result = stlEval(src);
-            expect(result).to.equal(7);
+            expect(result).to.eql(new StlNumber(7n));
         });
 
         it("should evaluate a modulus correctly", () => {
-            expect(stlEval("5 % 5")).to.equal(0);
-            expect(stlEval("5 % 4")).to.equal(1);
-            expect(stlEval("5 % 2")).to.equal(1);
+            expect(stlEval("5 % 5")).to.eql(new StlNumber(0n));
+            expect(stlEval("5 % 4")).to.eql(new StlNumber(1n));
+            expect(stlEval("5 % 2")).to.eql(new StlNumber(1n));
         });
 
         it("should not fall victim to floating point errors", () => {
-            expect(stlEval("0.1 + 0.2")).to.equal(0.3)
+            expect(stlEval("0.1 + 0.2")).to.eql(new StlNumber(0.3n))
         });
     });
 
@@ -166,7 +167,7 @@ describe("stlEval()", () => {
                 a + b
             }
             `;
-            expect(stlEval(src)).to.equal(2);
+            expect(stlEval(src)).to.eql(new StlNumber(2n));
         });
 
         it("should evaluate if stmts", () => {
@@ -181,7 +182,7 @@ describe("stlEval()", () => {
                 }
                 `
                 )
-            ).to.equal(6);
+            ).to.eql(new StlNumber(6n));
         });
 
         it("should evaluate while stmts", () => {
@@ -194,7 +195,7 @@ describe("stlEval()", () => {
                 }
                 `
                 )
-            ).to.equal(5);
+            ).to.eql(new StlNumber(5n));
         });
     });
 
@@ -215,7 +216,7 @@ describe("stlEval()", () => {
                 a[0]
                 `
                 )
-            ).to.equal(1);
+            ).to.eql(new StlNumber(1n));
         });
 
         it("should allow indexing arrays with nonzero values", () => {
@@ -226,7 +227,7 @@ describe("stlEval()", () => {
                 a[2]
                 `
                 )
-            ).to.equal(3);
+            ).to.eql(new StlNumber(3n));
         });
     });
 });
@@ -299,7 +300,7 @@ describe("exec()", () => {
                 let a = if false then 5 else 6
                 `
                 )
-            ).to.equal(6);
+            ).to.eql(new StlNumber(6n));
         });
     });
 
@@ -322,12 +323,12 @@ describe("exec()", () => {
         it("should be able to access a variable", () => {
             let src = "let ~a = 14";
             let scope: Scope = stlExec(src)[1];
-            expect(stlEval("~a", scope)).to.equal(14);
+            expect(stlEval("~a", scope)).to.eql(new StlNumber(14n));
         });
 
         it("should be able to assign to a variable", () => {
             let scope = stlExec("let ~a = 14\n~a = 15")[1];
-            expect(stlEval("~a", scope)).to.equal(15);
+            expect(stlEval("~a", scope)).to.eql(new StlNumber(15n));
         });
 
         it("should allow a variable declaration to spill over lines", () => {
@@ -338,7 +339,7 @@ describe("exec()", () => {
                     42 + 13 + 3
                 `
                 )
-            ).to.equal(42 + 13 + 3);
+            ).to.eql(new StlNumber(42 + 13 + 3));
         });
 
         it("should allow assignment to spill over lines", () => {
@@ -351,7 +352,7 @@ describe("exec()", () => {
                     ~x
                     `
                 )
-            ).to.equal(6);
+            ).to.eql(new StlNumber(6n));
         });
 
         it("should allow nonlocal shadowing", () => {
@@ -417,7 +418,7 @@ describe("exec()", () => {
 
                 a()
                 `;
-                expect(stlEval(src)).to.equal(5);
+                expect(stlEval(src)).to.eql(new StlNumber(5n));
             });
 
             it("should allow early returns", () => {
@@ -429,7 +430,7 @@ describe("exec()", () => {
 
                 a()
                 `;
-                expect(stlEval(src)).to.equal(5);
+                expect(stlEval(src)).to.eql(new StlNumber(5n));
             });
 
             it("should not be able to access variable declared after", () => {
@@ -478,7 +479,7 @@ describe("exec()", () => {
 
                 sum(4, 7)
                 `;
-                expect(stlEval(src)).to.equal(11);
+                expect(stlEval(src)).to.eql(new StlNumber(11n));
             });
 
             it("should allow recursion", () => {
@@ -493,7 +494,7 @@ describe("exec()", () => {
 
                 fac(4)
                 `;
-                expect(stlEval(src)).to.equal(24);
+                expect(stlEval(src)).to.eql(new StlNumber(24n));
             });
 
             it("should be able to implement fib", () => {
@@ -510,7 +511,7 @@ describe("exec()", () => {
 
                 fib(6)
                 `;
-                expect(stlEval(src)).to.equal(8);
+                expect(stlEval(src)).to.eql(new StlNumber(8n));
             });
 
             it("should be able to be passed into another function", () => {
@@ -525,7 +526,7 @@ describe("exec()", () => {
 
                 b(a, 4, 5)
                 `;
-                expect(stlEval(src)).to.equal(9);
+                expect(stlEval(src)).to.eql(new StlNumber(9n));
             });
         });
 
@@ -538,7 +539,7 @@ describe("exec()", () => {
 
                a(5, 6)
                `;
-                expect(stlEval(src)).to.equal(30);
+                expect(stlEval(src)).to.eql(new StlNumber(30n));
             });
 
             it("should allow a zero argument lambda", () => {
@@ -550,7 +551,7 @@ describe("exec()", () => {
                     getA()
                     `
                     )
-                ).to.equal(4);
+                ).to.eql(new StlNumber(4n));
             });
 
             it("should allow anonymous functions to be passed inline", () => {
@@ -561,7 +562,7 @@ describe("exec()", () => {
 
                 math(a -> { a + 3 }, 2, 3)
                 `;
-                expect(stlEval(src)).to.equal(15);
+                expect(stlEval(src)).to.eql(new StlNumber(15n));
             });
 
             it("should allow short lambda syntax without parentheses", () => {
@@ -573,7 +574,7 @@ describe("exec()", () => {
                 double(2)
                 `
                     )
-                ).to.equal(4);
+                ).to.eql(new StlNumber(4n));
             });
 
             it("should allow short lambda syntax with parentheses", () => {
@@ -585,7 +586,7 @@ describe("exec()", () => {
                 double(2)
                 `
                     )
-                ).to.equal(4);
+                ).to.eql(new StlNumber(4n));
             });
 
             it("should allow short lambda syntax with parentheses and multiple args", () => {
@@ -597,7 +598,7 @@ describe("exec()", () => {
                 sum(2, 6)
                 `
                     )
-                ).to.equal(8);
+                ).to.eql(new StlNumber(8n));
             });
 
             it("should allow a returned function to be called", () => {
@@ -613,7 +614,7 @@ describe("exec()", () => {
                     a()()
                     `
                     )
-                ).to.equal(5);
+                ).to.eql(new StlNumber(5n));
             });
 
             it("should throw if a noncallable object is called", () => {
@@ -634,7 +635,7 @@ describe("exec()", () => {
                     fun getFive = () -> 5
                     `
                     )
-                ).to.equal(5);
+                ).to.eql(new StlNumber(5n));
             });
         });
         */
@@ -790,7 +791,7 @@ describe("exec()", () => {
                     obj.a
                     `
                 )
-            ).to.equal(72);
+            ).to.eql(new StlNumber(72n));
         });
 
         it("should not allow assignment to an immutable object's properties", () => {
@@ -817,7 +818,7 @@ describe("exec()", () => {
                     ~obj.a
                     `
                 )
-            ).to.equal(43);
+            ).to.eql(new StlNumber(43n));
         });
     });
 
@@ -830,7 +831,7 @@ describe("exec()", () => {
                     addTwo(~val)
                     ~val
                `)
-            ).to.equal(7);
+            ).to.eql(new StlNumber(7n));
         });
 
         it("should not allow assignment to an immutable argument", () => {
