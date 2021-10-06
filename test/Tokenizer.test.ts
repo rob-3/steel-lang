@@ -8,6 +8,7 @@ import _tokenize, {
 } from "../src/Tokenizer";
 import Location from "../src/Location";
 import TokenType from "../src/TokenType";
+import StlNumber from '../src/StlNumber';
 
 const tokenize = (src: string) => _tokenize(src).unsafeCoerce();
 
@@ -21,7 +22,7 @@ describe("tokenize()", () => {
             new Token(
                 TokenType.NUMBER,
                 "2",
-                2,
+                new StlNumber(2n),
                 new Location([1, 1], [1, 2], "<anonymous>", src)
             ),
             new Token(
@@ -33,7 +34,7 @@ describe("tokenize()", () => {
             new Token(
                 TokenType.NUMBER,
                 "6.04",
-                6.04,
+                new StlNumber(604n, 100n),
                 new Location([1, 11], [1, 15], "<anonymous>", src)
             ),
             new Token(
@@ -78,7 +79,7 @@ describe("tokenize()", () => {
             new Token(
                 TokenType.NUMBER,
                 "4.3",
-                4.3,
+                new StlNumber(43n, 10n),
                 new Location([1, 9], [1, 12], "<anonymous>", src)
             ),
             new Token(
@@ -114,7 +115,7 @@ describe("tokenize()", () => {
             new Token(
                 TokenType.NUMBER,
                 "3",
-                3,
+                new StlNumber(3n),
                 new Location([2, 20], [2, 21], "<anonymous>", src)
             ),
             new Token(
@@ -165,7 +166,7 @@ describe("tokenize()", () => {
             new Token(
                 TokenType.NUMBER,
                 "23",
-                23,
+                new StlNumber(23n),
                 new Location([1, 5], [1, 7], "<anonymous>", src)
             ),
             new Token(
@@ -195,7 +196,7 @@ describe("tokenize()", () => {
             new Token(
                 TokenType.NUMBER,
                 "46",
-                46,
+                new StlNumber(46n),
                 new Location([2, 9], [2, 11], "<anonymous>", src)
             ),
             new Token(

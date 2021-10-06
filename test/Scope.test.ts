@@ -8,7 +8,7 @@ describe("class Scope", () => {
     it("should retrieve values with no parents", () => {
         let scope = new Scope();
         scope.setLocal("a", [new Box(new StlNumber(49n)), false]);
-        expect(scope.get("a")?.value).to.equal(49);
+        expect(scope.get("a")?.value).to.eql(new StlNumber(49n));
     });
 
     it("should return null if the value doesn't exist", () => {
@@ -20,7 +20,7 @@ describe("class Scope", () => {
         let parentScope = new Scope();
         let childScope = new Scope(parentScope);
         parentScope.setLocal("a", [new Box(new StlNumber(49n)), false]);
-        expect(childScope.get("a")?.value).to.equal(49);
+        expect(childScope.get("a")?.value).to.eql(new StlNumber(49n));
     });
 
     it("should throw an error when reassigning to an immutable value", () => {
