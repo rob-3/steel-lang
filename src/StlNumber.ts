@@ -3,7 +3,24 @@
  * accurate.
  */
 export default class StlNumber {
-    constructor(public top: bigint, public bottom: bigint = 1n) {}
+    top: bigint;
+    bottom: bigint;
+
+    constructor(top: bigint, bottom: bigint = 1n) {
+        if (bottom === 0n) {
+            throw Error("Cannot use zero as denominator!");
+        }
+        const divisor = gcd(top, bottom);
+        top /= divisor;
+        bottom /= divisor;
+        if (bottom < 0) {
+            this.top = -top;
+            this.bottom = -bottom;
+        } else {
+            this.top = top;
+            this.bottom = bottom;
+        }
+    }
 
     static of(real: number | string) {
         if (typeof real === "number") {
@@ -13,8 +30,15 @@ export default class StlNumber {
             if (decimalIndex === -1) {
                 return new StlNumber(BigInt(real));
             }
-            const decimalPlaces: bigint = BigInt(real.length - decimalIndex - 1);
-            return new StlNumber(BigInt(real.slice(0, decimalIndex) + real.slice(decimalIndex + 1)), BigInt(10)**decimalPlaces);
+            const decimalPlaces: bigint = BigInt(
+                real.length - decimalIndex - 1
+            );
+            return new StlNumber(
+                BigInt(
+                    real.slice(0, decimalIndex) + real.slice(decimalIndex + 1)
+                ),
+                BigInt(10) ** decimalPlaces
+            );
         }
     }
 
@@ -22,14 +46,20 @@ export default class StlNumber {
         if (this.bottom === n.bottom) {
             return new StlNumber(this.top + n.top, this.bottom);
         }
-        return new StlNumber(this.top * n.bottom + n.top * this.bottom, this.bottom * n.bottom);
+        return new StlNumber(
+            this.top * n.bottom + n.top * this.bottom,
+            this.bottom * n.bottom
+        );
     }
 
     subtract(n: StlNumber) {
         if (this.bottom === n.bottom) {
             return new StlNumber(this.top - n.top, this.bottom);
         }
-        return new StlNumber(this.top * n.bottom - n.top * this.bottom, this.bottom * n.bottom);
+        return new StlNumber(
+            this.top * n.bottom - n.top * this.bottom,
+            this.bottom * n.bottom
+        );
     }
 
     multiply(n: StlNumber) {
@@ -54,4 +84,23 @@ export default class StlNumber {
         }
         return `${this.top.toString()}/${this.bottom.toString()}`;
     }
+
+    equals(n: StlNumber) {
+        return this.top === n.top && this.bottom === n.bottom;
+    }
+}
+
+function gcd(a: bigint, b: bigint): bigint {
+    a = abs(a);
+    b = abs(b);
+    while (b > 0) {
+        let temp = a;
+        a = b % a;
+        b = temp;
+    }
+    return a;
+}
+
+function abs(a: bigint): bigint {
+    return a >= 0 ? a : -a;
 }
