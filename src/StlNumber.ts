@@ -90,15 +90,16 @@ export default class StlNumber {
     }
 }
 
-function gcd(a: bigint, b: bigint): bigint {
+export function gcd(a: bigint, b: bigint): bigint {
     a = abs(a);
     b = abs(b);
-    while (b > 0) {
-        let temp = a;
-        a = b % a;
-        b = temp;
+    let r: bigint;
+    while ((a % b) > 0) {
+        r = a % b;
+        a = b;
+        b = r;
     }
-    return a;
+    return b;
 }
 
 function abs(a: bigint): bigint {
