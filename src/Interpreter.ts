@@ -148,19 +148,27 @@ export function not(right: Value): Box<boolean> {
 }
 
 export function greaterEqual(left: Value, right: Value): Box<boolean> {
-    return numberComparision(left, right, (l, r) => l >= r, ">=");
+    if (left.value instanceof StlNumber && right.value instanceof StlNumber)
+        return new Box(left.value.greaterEqual(right.value));
+    else throw RuntimePanic(`Operands of >= should be numbers.`);
 }
 
 export function greater(left: Value, right: Value): Box<boolean> {
-    return numberComparision(left, right, (l, r) => l > r, ">");
+    if (left.value instanceof StlNumber && right.value instanceof StlNumber)
+        return new Box(left.value.greater(right.value));
+    else throw RuntimePanic(`Operands of > should be numbers.`);
 }
 
 export function lessEqual(left: Value, right: Value): Box<boolean> {
-    return numberComparision(left, right, (l, r) => l <= r, "<=");
+    if (left.value instanceof StlNumber && right.value instanceof StlNumber)
+        return new Box(left.value.lessEqual(right.value));
+    else throw RuntimePanic(`Operands of <= should be numbers.`);
 }
 
 export function less(left: Value, right: Value): Box<boolean> {
-    return numberComparision(left, right, (l, r) => l < r, "<");
+    if (left.value instanceof StlNumber && right.value instanceof StlNumber)
+        return new Box(left.value.less(right.value));
+    else throw RuntimePanic(`Operands of < should be numbers.`);
 }
 
 export function equal(left: Value, right: Value): Box<boolean> {
@@ -204,24 +212,6 @@ export function equal(left: Value, right: Value): Box<boolean> {
     } else {
         return new Box(false);
     }
-}
-
-function numberComparision(
-    left: Value,
-    right: Value,
-    operator: (left: number, right: number) => boolean,
-    err: string
-): Box<boolean> {
-    const unboxedLeft = left.value;
-    const unboxedRight = right.value;
-    if (
-        typeof unboxedLeft === "number" &&
-        typeof unboxedRight === "number" &&
-        unboxedLeft !== null &&
-        unboxedRight !== null
-    ) {
-        return new Box(operator(unboxedLeft, unboxedRight));
-    } else throw RuntimePanic(`Operands of ${err} should be numbers.`);
 }
 
 export function mod(left: Value, right: Value): Box<StlNumber> {

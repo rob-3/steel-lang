@@ -88,6 +88,22 @@ export default class StlNumber {
     equals(n: StlNumber) {
         return this.top === n.top && this.bottom === n.bottom;
     }
+
+    greater(n: StlNumber) {
+        return this.top * n.bottom > n.top * this.bottom;
+    }
+    
+    less(n: StlNumber) {
+        return this.top * n.bottom < n.top * this.bottom;
+    }
+
+    greaterEqual(n: StlNumber) {
+        return this.greater(n) || this.equals(n);        
+    }
+
+    lessEqual(n: StlNumber) {
+        return this.less(n) || this.equals(n);        
+    }
 }
 
 export function gcd(a: bigint, b: bigint): bigint {
