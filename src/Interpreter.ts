@@ -8,6 +8,7 @@ import { StlFunction } from "./StlFunction";
 import tokenize from "./Tokenizer";
 import { Value, Box } from "./Value";
 import StlNumber from "./StlNumber";
+import StlObject from './StlObject';
 
 export function execStmts(stmts: Expr[], scope: Scope): [Value, Scope] {
     let value: Value | null = null;
@@ -163,7 +164,46 @@ export function less(left: Value, right: Value): Box<boolean> {
 }
 
 export function equal(left: Value, right: Value): Box<boolean> {
-    return new Box(left.value === right.value);
+    const unboxedLeft = left.value;
+    const unboxedRight = right.value;
+    if (typeof unboxedLeft !== typeof unboxedRight) {
+        return new Box(false);
+    } else if (
+        (typeof unboxedLeft === "boolean" || typeof unboxedLeft === "string") && 
+        (typeof unboxedRight === "boolean" || typeof unboxedRight === "string")
+    ) {
+        return new Box(unboxedLeft === unboxedRight);
+    } else if (unboxedLeft instanceof StlNumber && unboxedRight instanceof StlNumber){
+        return new Box(unboxedLeft.equals(unboxedRight));
+    } else if (unboxedLeft instanceof StlFunction || unboxedRight instanceof StlFunction){
+        return new Box(false);
+    } else if (unboxedLeft instanceof StlObject && unboxedRight instanceof StlObject){
+        const leftMap = unboxedLeft.properties;
+        const rightMap = unboxedRight.properties;
+        if (leftMap.size !== rightMap.size) {
+            return new Box(false);
+        } else {
+            for (const [key, value] of leftMap) {
+                if (rightMap.get(key) !== value || !rightMap.has(key)) {
+                    return new Box(false);
+                }
+            }
+            return new Box(true);
+        }
+    } else if (Array.isArray(unboxedLeft) && Array.isArray(unboxedRight)) {
+        if (unboxedLeft.length !== unboxedRight.length) {
+            return new Box(false);
+        } else {
+            for (let i = 0; i < unboxedRight.length; i++) {
+                if (!equal(unboxedLeft[i], unboxedRight[i])) {
+                    return new Box(false);
+                }
+            }
+            return new Box(true);
+        }
+    } else {
+        return new Box(false);
+    }
 }
 
 function numberComparision(
