@@ -3,6 +3,7 @@ import { Expr } from "../Expr";
 import Scope from "../Scope";
 import Token from "../Token";
 import { Value } from "../Value";
+import StlNumber from '../StlNumber';
 
 export default class IndexExpr implements Expr {
     arr: string;
@@ -18,15 +19,16 @@ export default class IndexExpr implements Expr {
     eval(scope: Scope): [Value, Scope] {
         const [boxedIndex, newScope] = this.index.eval(scope);
         const index = boxedIndex?.value;
-        if (typeof index !== "number") {
+        if (!(index instanceof StlNumber) || index.bottom > 1n) {
             throw RuntimePanic(
-                "Indexing expression must evaluate to a number!"
+                "Indexing expression must evaluate to a integer!"
             );
         }
         const array = newScope.lookup(this.arr).value;
         if (!Array.isArray(array)) {
             throw RuntimePanic(`${this.arr} is not an array!`);
         }
-        return [array[index], newScope];
+        // FIXME lossy conversion
+        return [array[Number(index.top)], newScope];
     }
 }
