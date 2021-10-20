@@ -238,7 +238,7 @@ describe("exec()", () => {
             let src = "if (true) {\nprint(5)\n}";
             let spy = chai.spy();
             stlExec(src, spy);
-            expect(spy).to.have.been.called.with(5);
+            expect(spy).to.have.been.called.with(new StlNumber(5n));
         });
 
         it("should not execute an if stmt with a false condition", () => {
@@ -263,7 +263,7 @@ describe("exec()", () => {
             let spy = chai.spy();
             stlExec(src, spy);
             expect(spy).to.have.been.called.once;
-            expect(spy).to.have.been.called.with(6);
+            expect(spy).to.have.been.called.with(new StlNumber(6n));
         });
 
         it("should not execute the if body with a false condition", () => {
@@ -289,8 +289,8 @@ describe("exec()", () => {
             `;
             let spy = chai.spy();
             stlExec(src, spy);
-            expect(spy).not.to.have.been.called.with(5);
-            expect(spy).to.have.been.called.with(6);
+            expect(spy).not.to.have.been.called.with(new StlNumber(5n));
+            expect(spy).to.have.been.called.with(new StlNumber(6n));
         });
 
         it("should support then", () => {
@@ -371,8 +371,8 @@ describe("exec()", () => {
                 spy
             );
             expect(spy).to.have.been.called.twice;
-            expect(spy).to.have.been.called.with(15);
-            expect(spy).to.have.been.called.with(4);
+            expect(spy).to.have.been.called.with(new StlNumber(15n));
+            expect(spy).to.have.been.called.with(new StlNumber(4n));
         });
 
         it("should prohibit local shadowing", () => {
@@ -409,7 +409,7 @@ describe("exec()", () => {
                 let spy = chai.spy();
                 stlExec(src2, spy);
                 expect(spy).to.have.been.called.once;
-                expect(spy).to.have.been.called.with(5);
+                expect(spy).to.have.been.called.with(new StlNumber(5n));
             });
 
             it("shouldn't care about whitespace in a function", () => {
@@ -466,7 +466,7 @@ describe("exec()", () => {
                 let spy = chai.spy();
                 stlExec(src2, spy);
                 expect(spy).to.have.been.called.once;
-                expect(spy).to.have.been.called.with(11);
+                expect(spy).to.have.been.called.with(new StlNumber(11n));
             });
 
             it("should have the correct scope", () => {
