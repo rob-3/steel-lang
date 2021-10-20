@@ -75,7 +75,10 @@ export default class StlNumber {
     }
 
     mod(n: StlNumber): StlNumber {
-        throw Error("Can't do mod for now!");
+        if (this.bottom < 1n || n.bottom < 1n) {
+            throw Error("Negative numbers and fractions cannot be used with mod.");
+        }
+        return new StlNumber(this.top % n.top);
     }
 
     toString() {
