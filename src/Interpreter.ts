@@ -184,6 +184,7 @@ export function equal(left: Value, right: Value): Box<boolean> {
     } else if (unboxedLeft instanceof StlNumber && unboxedRight instanceof StlNumber){
         return new Box(unboxedLeft.equals(unboxedRight));
     } else if (unboxedLeft instanceof StlFunction || unboxedRight instanceof StlFunction){
+        // FIXME this should be a typeerror
         return new Box(false);
     } else if (unboxedLeft instanceof StlObject && unboxedRight instanceof StlObject){
         const leftMap = unboxedLeft.properties;
