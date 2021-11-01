@@ -192,7 +192,8 @@ export function equal(left: Value, right: Value): Box<boolean> {
             return new Box(false);
         } else {
             for (const [key, value] of leftMap) {
-                if (rightMap.get(key) !== value || !rightMap.has(key)) {
+                const rightVal = rightMap.get(key);
+                if (rightVal !== undefined && !equal(rightVal, value) || !rightMap.has(key)) {
                     return new Box(false);
                 }
             }

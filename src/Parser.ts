@@ -86,9 +86,6 @@ function eatNewlines(): void {
 }
 
 function makeExpr(): Either<Error, Expr> {
-    if (matchType(TokenType.OPEN_BRACKET)) {
-        return finishArrayLiteral();
-    }
     if (matchType(TokenType.RETURN))
         return Right(new ReturnStmt(makeExpr().unsafeCoerce(), getTokens()));
     if (matchType(TokenType.LET)) return finishVariableDeclaration();
@@ -104,8 +101,6 @@ function makeExpr(): Either<Error, Expr> {
             backTrack();
         }
     }
-    if (matchType(TokenType.OPEN_BRACE))
-        return finishBlockStmtOrObjectLiteral();
     if (matchType(TokenType.LEFT_SINGLE_ARROW))
         return Left(Error("Unexpected left single arrow!"));
     if (matchType(TokenType.NEWLINE))
@@ -551,6 +546,10 @@ function makeCallOrDotAccessRecursive(callee: Expr): Either<Error, Expr> {
 }
 
 function makePrimary(): Either<Error, Expr> {
+    if (matchType(TokenType.OPEN_BRACKET))
+        return finishArrayLiteral();
+    if (matchType(TokenType.OPEN_BRACE))
+        return finishBlockStmtOrObjectLiteral();
     if (matchType(TokenType.TRUE))
         return Right(new PrimaryExpr(true, getTokens()));
     if (matchType(TokenType.FALSE))
