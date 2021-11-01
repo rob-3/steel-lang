@@ -122,28 +122,21 @@ export function slash(left: Value, right: Value): Box<StlNumber> {
 }
 
 export function and(left: Value, right: Value): Box<boolean> {
-    if (assertBool(left.value, right.value)) {
-        return new Box(<boolean>left.value && <boolean>right.value);
+    if (typeof left.value === "boolean" && typeof right.value === "boolean") {
+        return new Box(left.value && right.value);
     } else throw RuntimePanic('Operands of "and" must be booleans.');
 }
 
 export function or(left: Value, right: Value): Box<boolean> {
-    if (assertBool(left.value, right.value)) {
-        return new Box(<boolean>left.value || <boolean>right.value);
+    if (typeof left.value === "boolean" && typeof right.value === "boolean") {
+        return new Box(left.value || right.value);
     } else {
         throw RuntimePanic('Operands of "or" must be booleans.');
     }
 }
 
-export function assertBool(...literals: any[]): boolean {
-    for (const literal of literals) {
-        if (typeof literal !== "boolean") return false;
-    }
-    return true;
-}
-
 export function not(right: Value): Box<boolean> {
-    if (assertBool(right.value)) return new Box(!right.value);
+    if (typeof right.value === "boolean") return new Box(!right.value);
     else throw RuntimePanic('Operands of "not" should be booleans.');
 }
 

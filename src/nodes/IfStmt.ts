@@ -1,6 +1,5 @@
 import { RuntimePanic } from "../Debug";
 import { Expr } from "../Expr";
-import { assertBool } from "../Interpreter";
 import Scope from "../Scope";
 import Token from "../Token";
 import { Value } from "../Value";
@@ -25,7 +24,7 @@ export default class IfStmt implements Expr {
     eval(scope: Scope): [Value | null, Scope] {
         const [boxedMaybeBool, newScope] = this.condition.eval(scope);
         const shouldBeBool = boxedMaybeBool?.value;
-        if (!assertBool(shouldBeBool)) {
+        if (typeof shouldBeBool !== "boolean") {
             throw RuntimePanic("Condition doesn't evaluate to a boolean.");
         }
         if (shouldBeBool) {
