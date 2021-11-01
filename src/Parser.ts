@@ -35,7 +35,7 @@ export default function parse(tokenList: Token[]): Either<Error[], Expr[]> {
 
     eatNewlines();
     while (!atEnd()) {
-        parseTree.push(makeStmt());
+        parseTree.push(makeExpr());
         eatNewlines();
     }
     reset();
@@ -85,7 +85,7 @@ function eatNewlines(): void {
     while (matchType(TokenType.NEWLINE)) continue;
 }
 
-function makeStmt(): Either<Error, Expr> {
+function makeExpr(): Either<Error, Expr> {
     if (matchType(TokenType.OPEN_BRACKET)) {
         return finishArrayLiteral();
     }
@@ -110,7 +110,14 @@ function makeStmt(): Either<Error, Expr> {
         return Left(Error("Unexpected left single arrow!"));
     if (matchType(TokenType.NEWLINE))
         return Left(Error("Unexpected newline; parser bug."));
-    return makeExpr();
+    const expr = makeBinaryLogical();
+    return expr.chain((e) => {
+        // FIXME add error messages for invalid assignments
+        if (isAssignmentLeft(e) && matchType(TokenType.EQUAL)) {
+            return finishAssignment(e);
+        }
+        return expr;
+    });
 }
 
 function finishArrayLiteral(): Either<Error, Expr> {
@@ -142,7 +149,7 @@ function finishVariableDeclaration(): Either<Error, Expr> {
     }
     eatNewlines();
     const isImmutable = identifier[0] !== "~";
-    return makeStmt().chain((stmt) => {
+    return makeExpr().chain((stmt) => {
         if (matchType(TokenType.NEWLINE) || atEnd()) {
             return Right(
                 new VariableDeclarationStmt(
@@ -160,7 +167,7 @@ function finishVariableDeclaration(): Either<Error, Expr> {
 
 function finishImmutableDeclaration(identifier: string): Either<Error, Expr> {
     eatNewlines();
-    return makeStmt().chain((expr) => {
+    return makeExpr().chain((expr) => {
         if (
             matchType(TokenType.NEWLINE) ||
             atEnd() ||
@@ -209,7 +216,7 @@ function makeMatchCase(): Either<Error, MatchCase> {
                 )
             );
         }
-        const expr = makeStmt();
+        const expr = makeExpr();
         if (!matchType(TokenType.NEWLINE)) {
             return Left(
                 ParseError(`Expected a newline after match case.`, lookAhead())
@@ -239,7 +246,7 @@ function makeMatchPrimary(): Either<Error, PrimaryExpr | UnderscoreExpr> {
 }
 
 function finishWhileStmt(): Either<Error, Expr> {
-    return makeStmt().chain((condition) => {
+    return makeExpr().chain((condition) => {
         if (atEnd()) {
             return Left(
                 ParseError(
@@ -248,7 +255,7 @@ function finishWhileStmt(): Either<Error, Expr> {
                 )
             );
         }
-        return makeStmt().map(
+        return makeExpr().map(
             (body) => new WhileStmt(condition, body, getTokens())
         );
     });
@@ -356,7 +363,7 @@ function finishBlockStmtOrObjectLiteral(): Either<
                     )
                 );
             }
-            stmts.push(makeStmt());
+            stmts.push(makeExpr());
             eatNewlines();
         }
         const maybeStmts: Either<Error, Expr[]> = Either.sequence(stmts);
@@ -375,7 +382,7 @@ function makeStringExprPair(): Either<Error, [string, Expr]> {
         return Left(ParseError('Expected a ":" here.', lookAhead()));
     }
     const identifier = lookBehind(2).lexeme;
-    return makeStmt().chain((e) => Right([identifier, e]));
+    return makeExpr().chain((e) => Right([identifier, e]));
 }
 
 function finishIfStmt(): Either<Error, Expr> {
@@ -392,7 +399,7 @@ function finishIfStmt(): Either<Error, Expr> {
                 lookBehind()
             )
         );
-    const maybeBody: Either<Error, Expr> = makeStmt();
+    const maybeBody: Either<Error, Expr> = makeExpr();
     eatNewlines();
 
     if (matchType(TokenType.ELSE)) {
@@ -403,7 +410,7 @@ function finishIfStmt(): Either<Error, Expr> {
                     lookBehind()
                 )
             );
-        return makeStmt()
+        return makeExpr()
             .chain((elseBody) => {
                 eatNewlines();
                 return Right(
@@ -436,21 +443,10 @@ function finishIfStmt(): Either<Error, Expr> {
     );
 }
 
-function makeExpr(): Either<Error, Expr> {
-    const expr = makeBinaryLogical();
-    return expr.chain((e) => {
-        // FIXME add error messages for invalid assignments
-        if (isAssignmentLeft(e) && matchType(TokenType.EQUAL)) {
-            return finishAssignment(e);
-        }
-        return expr;
-    });
-}
-
 function finishAssignment(left: VariableExpr | DotAccess): Either<Error, Expr> {
     // TODO check if identifier has already been declared
     eatNewlines();
-    return makeStmt().map(
+    return makeExpr().map(
         (right) => new VariableAssignmentStmt(left, right, getTokens())
     );
 }
@@ -507,7 +503,7 @@ function makeUnary(): Either<Error, Expr> {
 function readCommaDelimitedList(): Either<Error, Expr[]> {
     const list: Either<Error, Expr>[] = [];
     do {
-        list.push(makeStmt());
+        list.push(makeExpr());
     } while (matchType(TokenType.COMMA));
     return Either.sequence(list);
 }
@@ -634,7 +630,7 @@ function makePrimary(): Either<Error, Expr> {
 
 function finishLambda(args: string[]): Either<Error, FunctionExpr> {
     eatNewlines();
-    return makeStmt().map((body) => new FunctionExpr(args, body, getTokens()));
+    return makeExpr().map((body) => new FunctionExpr(args, body, getTokens()));
     // TODO: add checks and nice error messages
 }
 
