@@ -43,3 +43,9 @@ describe("StlNumber", () => {
         expect(StlNumber.of("0.1").add(StlNumber.of("0.2"))).to.eql(StlNumber.of("0.3"));
     });
 });
+
+describe("arrays", () => {
+    it("should use deep equality", () => {
+        expect(stlEval("[1, 2, 3] == [1, 2, 3]")).to.equal(true);
+    });
+})
