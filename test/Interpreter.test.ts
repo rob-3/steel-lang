@@ -9,6 +9,9 @@ import tokenize from "../src/Tokenizer";
 import { Value, UnboxedValue } from "../src/Value";
 import StlNumber from "../src/StlNumber";
 
+// silence logs unless we're debugging
+console.log = () => {};
+
 const stlEval = (
     src: string,
     scope: Scope = new Scope()
