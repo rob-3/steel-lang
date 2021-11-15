@@ -1,4 +1,3 @@
-import { expect } from "chai";
 import Token from "../src/Token";
 import _tokenize, {
     isAlpha,
@@ -18,7 +17,7 @@ describe("tokenize()", () => {
     it("should tokenize input", () => {
         const src = '2 "hello" 6.04 my_identifier';
         const output = tokenize(src);
-        expect(output).to.deep.equal([
+        expect(output).toEqual([
             new Token(
                 TokenType.NUMBER,
                 "2",
@@ -54,7 +53,7 @@ describe("tokenize()", () => {
 
     it("should provide correct line numbers", () => {
         let result = tokenize("hi\n7.543\n92");
-        expect(result.map((t) => t.location.start[0])).to.deep.equal([
+        expect(result.map((t) => t.location.start[0])).toEqual([
             1, 1, 2, 2, 3, 3,
         ]);
     });
@@ -63,7 +62,7 @@ describe("tokenize()", () => {
         const src =
             "apple = 4.3 // apple = 0 *//**/??////\npancakes = apple * 3 // rando-stuff";
         let result = tokenize(src);
-        expect(result).to.deep.equal([
+        expect(result).toEqual([
             new Token(
                 TokenType.IDENTIFIER,
                 "apple",
@@ -131,7 +130,7 @@ describe("tokenize()", () => {
         const src =
             "/**//**\n let var = 32.432.32 *//* laskdjflaskdf 43*/apple";
         let result = tokenize(src);
-        expect(result).to.deep.equal([
+        expect(result).toEqual([
             new Token(
                 TokenType.IDENTIFIER,
                 "apple",
@@ -150,7 +149,7 @@ describe("tokenize()", () => {
     it("should use LET TokenType and NEWLINE", () => {
         const src = "a = 23\nlet b = 46";
         let result = tokenize(src);
-        expect(result).to.deep.equal([
+        expect(result).toEqual([
             new Token(
                 TokenType.IDENTIFIER,
                 "a",
@@ -211,7 +210,7 @@ describe("tokenize()", () => {
     it("should end with an EOF token no matter what", () => {
         const src = "";
         let result = tokenize(src);
-        expect(result).to.deep.equal([
+        expect(result).toEqual([
             new Token(
                 TokenType.EOF,
                 "",
@@ -224,7 +223,7 @@ describe("tokenize()", () => {
     it("should tokenize true and false", () => {
         const src = "true false";
         let result = tokenize(src);
-        expect(result).to.deep.equal([
+        expect(result).toEqual([
             new Token(
                 TokenType.TRUE,
                 "true",
@@ -249,7 +248,7 @@ describe("tokenize()", () => {
     it("should tokenize the fun keyword", () => {
         const src = "fun";
         let result = tokenize(src);
-        expect(result).to.deep.equal([
+        expect(result).toEqual([
             new Token(
                 TokenType.FUN,
                 "fun",
@@ -268,7 +267,7 @@ describe("tokenize()", () => {
     it("should tokenize the for keyword", () => {
         const src = "for";
         let result = tokenize(src);
-        expect(result).to.deep.equal([
+        expect(result).toEqual([
             new Token(
                 TokenType.FOR,
                 "for",
@@ -287,7 +286,7 @@ describe("tokenize()", () => {
     it("should tokenize the while keyword", () => {
         const src = "while";
         let result = tokenize(src);
-        expect(result).to.deep.equal([
+        expect(result).toEqual([
             new Token(
                 TokenType.WHILE,
                 "while",
@@ -306,7 +305,7 @@ describe("tokenize()", () => {
     it("should tokenize the if and else keywords", () => {
         const src = "if else";
         let result = tokenize(src);
-        expect(result).to.deep.equal([
+        expect(result).toEqual([
             new Token(
                 TokenType.IF,
                 "if",
@@ -331,7 +330,7 @@ describe("tokenize()", () => {
     it("should tokenize the and, or, and not keywords", () => {
         const src = "and or not";
         let result = tokenize(src);
-        expect(result).to.deep.equal([
+        expect(result).toEqual([
             new Token(
                 TokenType.AND,
                 "and",
@@ -361,7 +360,7 @@ describe("tokenize()", () => {
 
     it("should tokenize colons", () => {
         const src = ":";
-        expect(tokenize(src)[0]).to.deep.equal(
+        expect(tokenize(src)[0]).toEqual(
             new Token(
                 TokenType.COLON,
                 ":",
@@ -373,7 +372,7 @@ describe("tokenize()", () => {
 
     it("should tokenize a dot", () => {
         const src = ".";
-        expect(tokenize(src)[0]).to.deep.equal(
+        expect(tokenize(src)[0]).toEqual(
             new Token(
                 TokenType.DOT,
                 ".",
@@ -383,25 +382,16 @@ describe("tokenize()", () => {
         );
     });
 
-    // FIXME I don't think this actually works
-    it("should not loop if there is a comment and no newline before EOF", function () {
-        this.timeout(1000);
-        tokenize(
-            `let a = 3
-            let b = 5.34 //`
-        );
-    });
-
     it("should throw if there is an unterminated string literal", () => {
         let source = '"23';
-        expect(_tokenize(source).mapLeft(toStringArray).extract()).to.eql([
+        expect(_tokenize(source).mapLeft(toStringArray).extract()).toEqual([
             "Unterminated string literal.",
         ]);
     });
 
     it("should throw if there is an unexpected character", () => {
         let source = "\\";
-        expect(_tokenize(source).mapLeft(toStringArray).extract()).to.eql([
+        expect(_tokenize(source).mapLeft(toStringArray).extract()).toEqual([
             'Unrecognized character "\\". Perhaps you intended to put this in a string?',
         ]);
     });
@@ -409,7 +399,7 @@ describe("tokenize()", () => {
     it("should tokenize a unary not", () => {
         const src = "not true";
         let result = tokenize(src);
-        expect(result).to.deep.equal([
+        expect(result).toEqual([
             new Token(
                 TokenType.NOT,
                 "not",
@@ -433,7 +423,7 @@ describe("tokenize()", () => {
 
     it("should tokenize commas", () => {
         const src = ",";
-        expect(tokenize(src)).to.deep.equal([
+        expect(tokenize(src)).toEqual([
             new Token(
                 TokenType.COMMA,
                 ",",
@@ -451,7 +441,7 @@ describe("tokenize()", () => {
 
     it("should tokenize right double arrow", () => {
         const src = "=>";
-        expect(tokenize(src)).to.eql([
+        expect(tokenize(src)).toEqual([
             new Token(
                 TokenType.RIGHT_DOUBLE_ARROW,
                 "=>",
@@ -469,7 +459,7 @@ describe("tokenize()", () => {
 
     it("should tokenize underscore", () => {
         const src = "_";
-        expect(tokenize(src)).to.eql([
+        expect(tokenize(src)).toEqual([
             new Token(
                 TokenType.UNDERSCORE,
                 "_",
@@ -488,90 +478,90 @@ describe("tokenize()", () => {
 
 describe("isLegalIdentifierChar()", () => {
     it("should return true if a character is [a-zA-Z]", () => {
-        expect(isLegalIdentifierChar("a")).to.equal(true);
-        expect(isLegalIdentifierChar("z")).to.equal(true);
-        expect(isLegalIdentifierChar("A")).to.equal(true);
-        expect(isLegalIdentifierChar("Z")).to.equal(true);
+        expect(isLegalIdentifierChar("a")).toBe(true);
+        expect(isLegalIdentifierChar("z")).toBe(true);
+        expect(isLegalIdentifierChar("A")).toBe(true);
+        expect(isLegalIdentifierChar("Z")).toBe(true);
     });
 
     it("should return true if a character is [0-9]", () => {
-        expect(isLegalIdentifierChar("0")).to.equal(true);
-        expect(isLegalIdentifierChar("9")).to.equal(true);
-        expect(isLegalIdentifierChar("-")).to.equal(false);
+        expect(isLegalIdentifierChar("0")).toBe(true);
+        expect(isLegalIdentifierChar("9")).toBe(true);
+        expect(isLegalIdentifierChar("-")).toBe(false);
     });
 
     it("should return true if a character is [_]", () => {
-        expect(isLegalIdentifierChar("_")).to.equal(true);
+        expect(isLegalIdentifierChar("_")).toBe(true);
     });
 
     it("should return false if a character is [-\\0\"'\\n()]", () => {
-        expect(isLegalIdentifierChar("\0")).to.equal(false);
-        expect(isLegalIdentifierChar('"')).to.equal(false);
-        expect(isLegalIdentifierChar("'")).to.equal(false);
-        expect(isLegalIdentifierChar("\n")).to.equal(false);
-        expect(isLegalIdentifierChar("(")).to.equal(false);
-        expect(isLegalIdentifierChar(")")).to.equal(false);
+        expect(isLegalIdentifierChar("\0")).toBe(false);
+        expect(isLegalIdentifierChar('"')).toBe(false);
+        expect(isLegalIdentifierChar("'")).toBe(false);
+        expect(isLegalIdentifierChar("\n")).toBe(false);
+        expect(isLegalIdentifierChar("(")).toBe(false);
+        expect(isLegalIdentifierChar(")")).toBe(false);
     });
 });
 
 describe("isAlphaNumeric()", () => {
     it("should return true if a character is [a-zA-Z]", () => {
-        expect(isAlphaNumeric("a")).to.equal(true);
-        expect(isAlphaNumeric("z")).to.equal(true);
-        expect(isAlphaNumeric("A")).to.equal(true);
-        expect(isAlphaNumeric("Z")).to.equal(true);
+        expect(isAlphaNumeric("a")).toBe(true);
+        expect(isAlphaNumeric("z")).toBe(true);
+        expect(isAlphaNumeric("A")).toBe(true);
+        expect(isAlphaNumeric("Z")).toBe(true);
     });
 
     it("should return true if a character is [0-9]", () => {
-        expect(isAlphaNumeric("0")).to.equal(true);
-        expect(isAlphaNumeric("9")).to.equal(true);
+        expect(isAlphaNumeric("0")).toBe(true);
+        expect(isAlphaNumeric("9")).toBe(true);
     });
 
     it("should return false if a character is [_-\\0\"'\\n]", () => {
-        expect(isAlphaNumeric("_")).to.equal(false);
-        expect(isAlphaNumeric("-")).to.equal(false);
-        expect(isAlphaNumeric("\0")).to.equal(false);
-        expect(isAlphaNumeric('"')).to.equal(false);
-        expect(isAlphaNumeric("'")).to.equal(false);
-        expect(isAlphaNumeric("\n")).to.equal(false);
+        expect(isAlphaNumeric("_")).toBe(false);
+        expect(isAlphaNumeric("-")).toBe(false);
+        expect(isAlphaNumeric("\0")).toBe(false);
+        expect(isAlphaNumeric('"')).toBe(false);
+        expect(isAlphaNumeric("'")).toBe(false);
+        expect(isAlphaNumeric("\n")).toBe(false);
     });
 });
 
 describe("isAlpha()", () => {
     it("should return true if a character is [a-zA-Z]", () => {
-        expect(isAlpha("a")).to.equal(true);
-        expect(isAlpha("z")).to.equal(true);
-        expect(isAlpha("A")).to.equal(true);
-        expect(isAlpha("Z")).to.equal(true);
+        expect(isAlpha("a")).toBe(true);
+        expect(isAlpha("z")).toBe(true);
+        expect(isAlpha("A")).toBe(true);
+        expect(isAlpha("Z")).toBe(true);
     });
 
     it("should return false if a character is [_-\\0\"'\\n]", () => {
-        expect(isAlpha("0")).to.equal(false);
-        expect(isAlpha("9")).to.equal(false);
-        expect(isAlpha("_")).to.equal(false);
-        expect(isAlpha("-")).to.equal(false);
-        expect(isAlpha("\0")).to.equal(false);
-        expect(isAlpha('"')).to.equal(false);
-        expect(isAlpha("'")).to.equal(false);
-        expect(isAlpha("\n")).to.equal(false);
+        expect(isAlpha("0")).toBe(false);
+        expect(isAlpha("9")).toBe(false);
+        expect(isAlpha("_")).toBe(false);
+        expect(isAlpha("-")).toBe(false);
+        expect(isAlpha("\0")).toBe(false);
+        expect(isAlpha('"')).toBe(false);
+        expect(isAlpha("'")).toBe(false);
+        expect(isAlpha("\n")).toBe(false);
     });
 });
 
 describe("isNumber()", () => {
     it("should return true if a character is [0-9]", () => {
-        expect(isNumber("0")).to.equal(true);
-        expect(isNumber("9")).to.equal(true);
+        expect(isNumber("0")).toBe(true);
+        expect(isNumber("9")).toBe(true);
     });
 
     it("should return false if a character is not [0-9]", () => {
-        expect(isNumber("a")).to.equal(false);
-        expect(isNumber("z")).to.equal(false);
-        expect(isNumber("A")).to.equal(false);
-        expect(isNumber("Z")).to.equal(false);
-        expect(isNumber("_")).to.equal(false);
-        expect(isNumber("-")).to.equal(false);
-        expect(isNumber("\0")).to.equal(false);
-        expect(isNumber('"')).to.equal(false);
-        expect(isNumber("'")).to.equal(false);
+        expect(isNumber("a")).toBe(false);
+        expect(isNumber("z")).toBe(false);
+        expect(isNumber("A")).toBe(false);
+        expect(isNumber("Z")).toBe(false);
+        expect(isNumber("_")).toBe(false);
+        expect(isNumber("-")).toBe(false);
+        expect(isNumber("\0")).toBe(false);
+        expect(isNumber('"')).toBe(false);
+        expect(isNumber("'")).toBe(false);
     });
 });

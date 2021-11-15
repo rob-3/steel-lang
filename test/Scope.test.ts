@@ -1,4 +1,3 @@
-import { expect } from "chai";
 import { stlEval } from "../src/Interpreter";
 import Scope from "../src/Scope";
 import { Box } from "../src/Value";
@@ -8,19 +7,19 @@ describe("class Scope", () => {
     it("should retrieve values with no parents", () => {
         let scope = new Scope();
         scope.setLocal("a", [new Box(new StlNumber(49n)), false]);
-        expect(scope.get("a")?.value).to.eql(new StlNumber(49n));
+        expect(scope.get("a")?.value).toEqual(new StlNumber(49n));
     });
 
     it("should return null if the value doesn't exist", () => {
         let scope = new Scope();
-        expect(scope.get("a")?.value).to.equal(undefined);
+        expect(scope.get("a")?.value).toBeUndefined();
     });
 
     it("should defer to higher parent scope", () => {
         let parentScope = new Scope();
         let childScope = new Scope(parentScope);
         parentScope.setLocal("a", [new Box(new StlNumber(49n)), false]);
-        expect(childScope.get("a")?.value).to.eql(new StlNumber(49n));
+        expect(childScope.get("a")?.value).toEqual(new StlNumber(49n));
     });
 
     it("should throw an error when reassigning to an immutable value", () => {
@@ -30,7 +29,7 @@ describe("class Scope", () => {
         a = 6
         `;
         const scope = new Scope();
-        expect(() => stlEval(src, scope)).to.throw(
+        expect(() => stlEval(src, scope)).toThrow(
             'Cannot assign to immutable variable "a".'
         );
     });
