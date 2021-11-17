@@ -47,52 +47,52 @@ describe("stlEval()", () => {
         });
 
         it("should evaluate string literals", () => {
-            let src = `"happy day"`;
-            let result = stlEval(src);
+            const src = `"happy day"`;
+            const result = stlEval(src);
             expect(result).toBe("happy day");
         });
 
         it("should evaluate boolean literals", () => {
-            let src = "true";
-            let result = stlEval(src);
+            const src = "true";
+            const result = stlEval(src);
             expect(result).toBe(true);
         });
     });
 
     describe("math", () => {
         it("should do addition correctly", () => {
-            let src = "2 + 2";
-            let result = stlEval(src);
+            const src = "2 + 2";
+            const result = stlEval(src);
             expect(result).toEqual(new StlNumber(4n));
         });
 
         it("should do subtraction correctly", () => {
-            let src = "2 - 2";
-            let result = stlEval(src);
+            const src = "2 - 2";
+            const result = stlEval(src);
             expect(result).toEqual(new StlNumber(0n));
         });
 
         it("should do multiplication correctly", () => {
-            let src = "2 * 5";
-            let result = stlEval(src);
+            const src = "2 * 5";
+            const result = stlEval(src);
             expect(result).toEqual(new StlNumber(10n));
         });
 
         it("should do division correctly", () => {
-            let src = "2 / 2";
-            let result = stlEval(src);
+            const src = "2 / 2";
+            const result = stlEval(src);
             expect(result).toEqual(new StlNumber(1n));
         });
 
         it("should do floating point division correctly", () => {
-            let src = "5 / 2";
-            let result = stlEval(src);
+            const src = "5 / 2";
+            const result = stlEval(src);
             expect(result).toEqual(StlNumber.of("2.5"));
         });
 
         it("should follow order of operations", () => {
-            let src = "5 / 5 + 3 * 2";
-            let result = stlEval(src);
+            const src = "5 / 5 + 3 * 2";
+            const result = stlEval(src);
             expect(result).toEqual(new StlNumber(7n));
         });
 
@@ -159,7 +159,7 @@ describe("stlEval()", () => {
         });
 
         it("should evaluate block stmts", () => {
-            let src = `
+            const src = `
             {
                 let a = 5
                 let b = -3
@@ -234,58 +234,58 @@ describe("stlEval()", () => {
 describe("exec()", () => {
     describe("if statements", () => {
         it("should execute an if stmt with true condition", () => {
-            let src = "if (true) {\nprint(5)\n}";
-            let spy = jest.fn();
+            const src = "if (true) {\nprint(5)\n}";
+            const spy = jest.fn();
             stlExec(src, spy);
             expect(spy.mock.calls).toEqual([[new StlNumber(5n)]]);
         });
 
         it("should not execute an if stmt with a false condition", () => {
-            let src = `
+            const src = `
             if (false) {
                 print(5)
             }
             `;
-            let spy = jest.fn();
+            const spy = jest.fn();
             stlExec(src, spy);
             expect(spy.mock.calls).toEqual([]);
         });
 
         it("should execute the else body stmt with a false condition", () => {
-            let src = `
+            const src = `
             if (false) {
                 print(5)
             } else {
                 print(6)
             }
             `;
-            let spy = jest.fn();
+            const spy = jest.fn();
             stlExec(src, spy);
             expect(spy.mock.calls).toEqual([[new StlNumber(6n)]]);
         });
 
         it("should not execute the if body with a false condition", () => {
-            let src = `
+            const src = `
             if (false) {
                 print(5)
             } else {
                 print(6)
             }
             `;
-            let spy = jest.fn();
+            const spy = jest.fn();
             stlExec(src, spy);
             expect(spy.mock.calls).not.toContain(5);
         });
 
         it("should support no parentheses", () => {
-            let src = `
+            const src = `
             if false {
                 print(5)
             } else {
                 print(6)
             }
             `;
-            let spy = jest.fn();
+            const spy = jest.fn();
             stlExec(src, spy);
             expect(spy.mock.calls).not.toContainEqual(new StlNumber(5n));
             expect(spy.mock.calls).toContainEqual([new StlNumber(6n)]);
@@ -303,7 +303,7 @@ describe("exec()", () => {
     });
 
     describe("while loops", () => {
-        let src = `
+        const src = `
         let ~a = 0
         while (~a < 10) {
             print(~a)
@@ -311,7 +311,7 @@ describe("exec()", () => {
         }
         `;
         it("should loop until the condition is met", () => {
-            let spy = jest.fn();
+            const spy = jest.fn();
             stlExec(src, spy);
             expect(spy.mock.calls.length).toBe(10);
         });
@@ -319,13 +319,13 @@ describe("exec()", () => {
 
     describe("variables", () => {
         it("should be able to access a variable", () => {
-            let src = "let ~a = 14";
-            let scope: Scope = stlExec(src)[1];
+            const src = "let ~a = 14";
+            const scope: Scope = stlExec(src)[1];
             expect(stlEval("~a", scope)).toEqual(new StlNumber(14n));
         });
 
         it("should be able to assign to a variable", () => {
-            let scope = stlExec("let ~a = 14\n~a = 15")[1];
+            const scope = stlExec("let ~a = 14\n~a = 15")[1];
             expect(stlEval("~a", scope)).toEqual(new StlNumber(15n));
         });
 
@@ -354,7 +354,7 @@ describe("exec()", () => {
         });
 
         it("should allow nonlocal shadowing", () => {
-            let spy = jest.fn();
+            const spy = jest.fn();
             stlExec(
                 ` 
                 let a = 4 
@@ -388,7 +388,7 @@ describe("exec()", () => {
 
     describe("functions", () => {
         describe("argless functions", () => {
-            let src = `
+            const src = `
             fun a = () -> {
                 print(5)
             }
@@ -398,20 +398,20 @@ describe("exec()", () => {
             });
 
             it("should not run the definition of a function", () => {
-                let spy = jest.fn();
+                const spy = jest.fn();
                 stlExec(src, spy);
                 expect(spy.mock.calls.length).toBe(0);
             });
 
             it("should be callable", () => {
-                let src2 = src + "a()";
-                let spy = jest.fn();
+                const src2 = src + "a()";
+                const spy = jest.fn();
                 stlExec(src2, spy);
                 expect(spy.mock.calls).toEqual([[new StlNumber(5n)]]);
             });
 
             it("shouldn't care about whitespace in a function", () => {
-                let src = `
+                const src = `
                 fun a = () -> { 5 }
 
                 a()
@@ -420,7 +420,7 @@ describe("exec()", () => {
             });
 
             it("should allow early returns", () => {
-                let src = `
+                const src = `
                 fun a = () -> {
                     return 5
                     6
@@ -444,7 +444,7 @@ describe("exec()", () => {
             });
         });
         describe("functions with arguments", () => {
-            let src = `
+            const src = `
            fun a = (a, b) -> {
                 print(a + b)
            }
@@ -454,20 +454,20 @@ describe("exec()", () => {
             });
 
             it("should not run the definition of a function", () => {
-                let spy = jest.fn();
+                const spy = jest.fn();
                 stlExec(src, spy);
                 expect(spy.mock.calls).toEqual([]);
             });
 
             it("should be callable", () => {
-                let src2 = src + "a(5, 6)";
-                let spy = jest.fn();
+                const src2 = src + "a(5, 6)";
+                const spy = jest.fn();
                 stlExec(src2, spy);
                 expect(spy.mock.calls).toEqual([[new StlNumber(11n)]]);
             });
 
             it("should have the correct scope", () => {
-                let src = `
+                const src = `
                 let a = 42
                 let b = 16
                 fun sum = (a, b) -> {
@@ -480,7 +480,7 @@ describe("exec()", () => {
             });
 
             it("should allow recursion", () => {
-                let src = `
+                const src = `
                 fun fac = (a) -> {
                     if (a == 0) {
                         1
@@ -495,7 +495,7 @@ describe("exec()", () => {
             });
 
             it("should be able to implement fib", () => {
-                let src = `
+                const src = `
                 fun fib = (a) -> {
                     if (a == 0) {
                         0
@@ -512,7 +512,7 @@ describe("exec()", () => {
             });
 
             it("should be able to be passed into another function", () => {
-                let src = `
+                const src = `
                 fun a = (a, b) -> {
                     a + b
                 }
@@ -529,7 +529,7 @@ describe("exec()", () => {
 
         describe("lambdas", () => {
             it("should permit anonymous function style declaration", () => {
-                let src = `
+                const src = `
                let a = (a, b) -> {
                    a * b
                }
@@ -552,7 +552,7 @@ describe("exec()", () => {
             });
 
             it("should allow anonymous functions to be passed inline", () => {
-                let src = `
+                const src = `
                 let math = (a, b, c) -> {
                     a(b) * c
                 }
@@ -668,7 +668,7 @@ describe("exec()", () => {
         });
 
         it("should be able to be used as an expression", () => {
-            let spy = jest.fn();
+            const spy = jest.fn();
             stlExec(
                 `
                 let a = 4
