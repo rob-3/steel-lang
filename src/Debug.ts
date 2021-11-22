@@ -78,14 +78,13 @@ export function ParseError(message: string, highlight: Token) {
         endIndex++;
     }
     const lineString = source.slice(startIndex, endIndex);
-    return Error(`parse error: ${message} 
+    return Error(`parse error: ${message}
 ${" ".repeat(pad)}--> ${filename}:${line}:${column}
 ${" ".repeat(pad + 1)}|
 ${line.toString()} |    ${lineString}
 ${" ".repeat(pad + 1)}|    ${" ".repeat(startColumn)}${"^".repeat(
         endColumn - startColumn + 1
-    )}
-`);
+    )}`);
 }
 
 export function lexError(message: string, token: Token) {}

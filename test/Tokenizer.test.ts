@@ -44,7 +44,7 @@ describe("tokenize()", () => {
             ),
             new Token(
                 TokenType.EOF,
-                "",
+                "EOF",
                 null,
                 new Location([1, 29], [1, 29], "<anonymous>", src)
             ),
@@ -119,7 +119,7 @@ describe("tokenize()", () => {
             ),
             new Token(
                 TokenType.EOF,
-                "",
+                "EOF",
                 null,
                 new Location([2, 36], [2, 36], "<anonymous>", src)
             ),
@@ -139,7 +139,7 @@ describe("tokenize()", () => {
             ),
             new Token(
                 TokenType.EOF,
-                "",
+                "EOF",
                 null,
                 new Location([2, 58], [2, 58], "<anonymous>", src)
             ),
@@ -200,7 +200,7 @@ describe("tokenize()", () => {
             ),
             new Token(
                 TokenType.EOF,
-                "",
+                "EOF",
                 null,
                 new Location([2, 11], [2, 11], "<anonymous>", src)
             ),
@@ -213,7 +213,7 @@ describe("tokenize()", () => {
         expect(result).toEqual([
             new Token(
                 TokenType.EOF,
-                "",
+                "EOF",
                 null,
                 new Location([1, 1], [1, 1], "<anonymous>", src)
             ),
@@ -238,7 +238,7 @@ describe("tokenize()", () => {
             ),
             new Token(
                 TokenType.EOF,
-                "",
+                "EOF",
                 null,
                 new Location([1, 11], [1, 11], "<anonymous>", src)
             ),
@@ -257,7 +257,7 @@ describe("tokenize()", () => {
             ),
             new Token(
                 TokenType.EOF,
-                "",
+                "EOF",
                 null,
                 new Location([1, 4], [1, 4], "<anonymous>", src)
             ),
@@ -276,7 +276,7 @@ describe("tokenize()", () => {
             ),
             new Token(
                 TokenType.EOF,
-                "",
+                "EOF",
                 null,
                 new Location([1, 4], [1, 4], "<anonymous>", src)
             ),
@@ -295,7 +295,7 @@ describe("tokenize()", () => {
             ),
             new Token(
                 TokenType.EOF,
-                "",
+                "EOF",
                 null,
                 new Location([1, 6], [1, 6], "<anonymous>", src)
             ),
@@ -320,7 +320,7 @@ describe("tokenize()", () => {
             ),
             new Token(
                 TokenType.EOF,
-                "",
+                "EOF",
                 null,
                 new Location([1, 8], [1, 8], "<anonymous>", src)
             ),
@@ -351,7 +351,7 @@ describe("tokenize()", () => {
             ),
             new Token(
                 TokenType.EOF,
-                "",
+                "EOF",
                 null,
                 new Location([1, 11], [1, 11], "<anonymous>", src)
             ),
@@ -414,7 +414,7 @@ describe("tokenize()", () => {
             ),
             new Token(
                 TokenType.EOF,
-                "",
+                "EOF",
                 null,
                 new Location([1, 9], [1, 9], "<anonymous>", src)
             ),
@@ -432,7 +432,7 @@ describe("tokenize()", () => {
             ),
             new Token(
                 TokenType.EOF,
-                "",
+                "EOF",
                 null,
                 new Location([1, 2], [1, 2], "<anonymous>", src)
             ),
@@ -450,7 +450,7 @@ describe("tokenize()", () => {
             ),
             new Token(
                 TokenType.EOF,
-                "",
+                "EOF",
                 null,
                 new Location([1, 3], [1, 3], "<anonymous>", src)
             ),
@@ -468,7 +468,7 @@ describe("tokenize()", () => {
             ),
             new Token(
                 TokenType.EOF,
-                "",
+                "EOF",
                 null,
                 new Location([1, 2], [1, 2], "<anonymous>", src)
             ),

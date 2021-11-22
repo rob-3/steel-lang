@@ -612,7 +612,8 @@ function makePrimary(): Either<Error, Expr> {
 
     // if we get here, it is an error
     if (lookAhead().type === TokenType.EOF) {
-        eatToken();
+        // FIXME
+        //eatToken();
         return Left(
             ParseError(`Reached EOF before reading a primary`, lookBehind())
         );

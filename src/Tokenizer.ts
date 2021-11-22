@@ -38,7 +38,7 @@ export default function tokenize(
             Right(
                 new Token(
                     TokenType.EOF,
-                    "",
+                    "EOF",
                     null,
                     new Location(
                         [startLine, startColumn],
