@@ -29,6 +29,10 @@ export default class IndexExpr implements Expr {
             throw RuntimePanic(`${this.arr} is not an array!`);
         }
         // FIXME lossy conversion
-        return [array[Number(index.top)], newScope];
+        const indexResult: Value | undefined = array[Number(index.top)];
+        if (indexResult === undefined) {
+            throw RuntimePanic(`Index is out of bounds!`);
+        }
+        return [indexResult, newScope];
     }
 }
