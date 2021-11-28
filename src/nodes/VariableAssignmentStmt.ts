@@ -6,11 +6,12 @@ import DotAccess from "./DotAccess";
 import StlObject from "../StlObject";
 import { RuntimePanic } from "../Debug";
 import { Value } from "../Value";
+import IndexExpr from './IndexExpr';
 
-export type AssignmentLeft = VariableExpr | DotAccess;
+export type AssignmentLeft = VariableExpr | DotAccess | IndexExpr;
 
 export function isAssignmentLeft(expr: Expr): expr is AssignmentLeft {
-    return expr instanceof VariableExpr || expr instanceof DotAccess;
+    return expr instanceof VariableExpr || expr instanceof DotAccess || expr instanceof IndexExpr;
 }
 
 export default class VariableAssignmentStmt implements Expr {
