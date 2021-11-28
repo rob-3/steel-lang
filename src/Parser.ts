@@ -87,7 +87,7 @@ function eatNewlines(): void {
 
 function makeExpr(): Either<Error, Expr> {
     if (matchType(TokenType.RETURN))
-        return Right(new ReturnStmt(makeExpr().unsafeCoerce(), getTokens()));
+        return makeExpr().chain(expr => Right(new ReturnStmt(expr, getTokens())));
     if (matchType(TokenType.LET)) return finishVariableDeclaration();
     if (matchType(TokenType.IF)) return finishIfStmt();
     if (matchType(TokenType.WHILE)) return finishWhileStmt();
@@ -192,12 +192,12 @@ function finishMatchStmt(): Either<Error, Expr> {
                 ParseError(`Expected a newline after "{"`, lookAhead())
             );
         }
-        const cases: MatchCase[] = [];
+        const cases: Either<Error, MatchCase>[] = [];
         while (!matchType(TokenType.CLOSE_BRACE)) {
             eatNewlines();
-            cases.push(makeMatchCase().unsafeCoerce());
+            cases.push(makeMatchCase());
         }
-        return Right(new MatchStmt(expr, cases, getTokens()));
+        return Either.sequence(cases).chain(cases => Right(new MatchStmt(expr, cases, getTokens())));
     });
 }
 
@@ -283,11 +283,11 @@ function finishFunctionDeclaration(): Either<Error, Expr> {
 }
 
 function makeLambda(): Either<Error, FunctionExpr> {
-    let args: string[];
+    let args: Either<Error, string[]>;
     if (matchType(TokenType.IDENTIFIER)) {
-        args = [lookBehind().lexeme];
+        args = Right([lookBehind().lexeme]);
     } else if (matchType(TokenType.OPEN_PAREN)) {
-        args = finishFunctDecArgs().unsafeCoerce();
+        args = finishFunctDecArgs();
     } else {
         // FIXME better error
         return Left(
@@ -297,8 +297,7 @@ function makeLambda(): Either<Error, FunctionExpr> {
     // FIXME better error
     if (!matchType(TokenType.RIGHT_SINGLE_ARROW))
         return Left(ParseError("Expected ->", lookAhead()));
-    return finishLambda(args);
-}
+    return args.chain(finishLambda); }
 
 function finishFunctDecArgs(): Either<Error, string[]> {
     const args: string[] = [];
@@ -408,14 +407,18 @@ function finishIfStmt(): Either<Error, Expr> {
         return makeExpr()
             .chain((elseBody) => {
                 eatNewlines();
-                return Right(
-                    new IfStmt(
-                        condition.unsafeCoerce(),
-                        maybeBody.unsafeCoerce(),
-                        elseBody,
-                        getTokens()
-                    )
-                );
+                return condition.chain((condition) => {
+                    return maybeBody.chain((maybeBody) => {
+                        return Right(
+                            new IfStmt(
+                                condition,
+                                maybeBody,
+                                elseBody,
+                                getTokens()
+                            )
+                        );
+                    });
+                });
             })
             .chainLeft((_) => {
                 return Left(
@@ -428,14 +431,18 @@ function finishIfStmt(): Either<Error, Expr> {
                 );
             });
     }
-    return Right(
-        new IfStmt(
-            condition.unsafeCoerce(),
-            maybeBody.unsafeCoerce(),
-            null,
-            getTokens()
-        )
-    );
+    return condition.chain((condition) => {
+        return maybeBody.chain((maybeBody) => {
+            return Right(
+                new IfStmt(
+                    condition,
+                    maybeBody,
+                    null,
+                    getTokens()
+                )
+            );
+        });
+    });
 }
 
 function finishAssignment(left: VariableExpr | DotAccess): Either<Error, Expr> {
@@ -582,16 +589,17 @@ function makePrimary(): Either<Error, Expr> {
         if (matchType(TokenType.IDENTIFIER)) {
             if (matchType(TokenType.COMMA, TokenType.CLOSE_PAREN)) {
                 current -= 2;
-                const args: string[] = finishFunctDecArgs().unsafeCoerce();
-                if (!matchType(TokenType.RIGHT_SINGLE_ARROW)) {
-                    return Left(
-                        ParseError(
-                            `Expected "->", got "${lookAhead().lexeme}"`,
-                            lookAhead()
-                        )
-                    );
+                return finishFunctDecArgs().chain(args => {
+                    if (!matchType(TokenType.RIGHT_SINGLE_ARROW)) {
+                        return Left(
+                            ParseError(
+                                `Expected "->", got "${lookAhead().lexeme}"`,
+                                lookAhead()
+                            )
+                        );
                 }
                 return finishLambda(args);
+                })
             } else {
                 current -= 1;
             }
@@ -666,14 +674,13 @@ function makeBinaryExpr(
     while (matchType(...matches)) {
         const operator = lookBehind();
         const right = higherPrecedenceOperation();
-        expr = Right(
-            new BinaryExpr(
-                expr.unsafeCoerce(),
-                operator,
-                right.unsafeCoerce(),
-                getTokens()
-            )
-        );
+        expr = expr.chain((expr) => {
+            return right.chain((right) => {
+                return Right(
+                    new BinaryExpr(expr, operator, right, getTokens())
+                );
+            });
+        });
     }
     return expr;
 }
