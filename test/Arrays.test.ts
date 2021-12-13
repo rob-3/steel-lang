@@ -11,4 +11,8 @@ describe("Steel arrays", () => {
     it("should properly store assignments to array indices", () => {
         expect(stlEval(`let ~a = []\n~a[0] = 5`)).toEqual(new StlNumber(5n));
     })
+
+    it("should fail on an assignment to an index of an immutable array", () => {
+        expect(() => stlEval(`let a = []\na[0] = 5`)).toThrow(`Cannot assign to index of immutable array "a"`);
+    })
 })

@@ -15,7 +15,7 @@ import PrimaryExpr from "./nodes/PrimaryExpr";
 import ReturnStmt from "./nodes/ReturnStmt";
 import UnaryExpr from "./nodes/UnaryExpr";
 import VariableAssignmentStmt, {
-    isAssignmentLeft,
+    isAssignmentLeft, AssignmentLeft,
 } from "./nodes/VariableAssignmentStmt";
 import VariableDeclarationStmt from "./nodes/VariableDeclarationStmt";
 import VariableExpr from "./nodes/VariableExpr";
@@ -445,7 +445,7 @@ function finishIfStmt(): Either<Error, Expr> {
     });
 }
 
-function finishAssignment(left: VariableExpr | DotAccess): Either<Error, Expr> {
+function finishAssignment(left: AssignmentLeft): Either<Error, Expr> {
     // TODO check if identifier has already been declared
     eatNewlines();
     return makeExpr().map(

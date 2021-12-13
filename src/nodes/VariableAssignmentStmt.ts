@@ -74,6 +74,9 @@ export default class VariableAssignmentStmt implements Expr {
             if (!Array.isArray(array)) {
                 throw RuntimePanic(`${this.left.arr} is not an array!`);
             }
+            if (this.left.arr.slice(0, 1) !== "~") {
+                throw RuntimePanic(`Cannot assign to index of immutable array "${this.left.arr}"`);
+            }
             const [boxedIndex, newScope] = this.left.index.eval(scope);
             if (boxedIndex === null) {
                 throw RuntimePanic(`Index cannot evaluate to null`);
