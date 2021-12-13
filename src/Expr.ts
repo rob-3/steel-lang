@@ -5,13 +5,3 @@ export interface Expr {
     eval(scope: Scope): [Value | null, Scope];
     tokens: Token[];
 }
-
-/*
-export class FailedParse implements Expr {
-    map(_: (expr: Expr) => Expr) {
-        return this;
-    }
-
-    getDebugInfo = () => null;
-}
-*/
