@@ -12,7 +12,7 @@ import StlNumber from "../src/StlNumber";
 // silence logs unless we're debugging
 console.log = () => {};
 
-const stlEval = (
+export const stlEval = (
     src: string,
     scope: Scope = new Scope()
 ): UnboxedValue | undefined => {

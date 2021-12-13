@@ -5,8 +5,9 @@ import VariableExpr from "./VariableExpr";
 import DotAccess from "./DotAccess";
 import StlObject from "../StlObject";
 import { RuntimePanic } from "../Debug";
-import { Value } from "../Value";
+import { Value, UnboxedValue } from "../Value";
 import IndexExpr from './IndexExpr';
+import StlNumber from '../StlNumber';
 
 export type AssignmentLeft = VariableExpr | DotAccess | IndexExpr;
 
@@ -68,6 +69,28 @@ export default class VariableAssignmentStmt implements Expr {
                     }
                 }
             }
+        } else if (this.left instanceof IndexExpr) {
+            const array: UnboxedValue = scope.lookup(this.left.arr).value;
+            if (!Array.isArray(array)) {
+                throw RuntimePanic(`${this.left.arr} is not an array!`);
+            }
+            const [boxedIndex, newScope] = this.left.index.eval(scope);
+            if (boxedIndex === null) {
+                throw RuntimePanic(`Index cannot evaluate to null`);
+            }
+            const index: UnboxedValue = boxedIndex.value;
+            if (!(index instanceof StlNumber)) {
+                throw RuntimePanic(`${index} is not a number!`);
+            }
+            if (index.bottom !== 1n) {
+                throw RuntimePanic(`Index must be an integer!`);
+            }
+            const [rightVal, newNewScope] = this.right.eval(newScope);
+            if (rightVal === null) {
+                throw RuntimePanic(`Right side of assignment cannot be null`);
+            }
+            array[Number(index.top)] = rightVal;
+            return [rightVal, newNewScope];
         } else {
             // TODO
             throw RuntimePanic("Unsupported left side of expression");
