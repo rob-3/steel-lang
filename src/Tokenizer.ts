@@ -42,7 +42,7 @@ export default function tokenize(
                     null,
                     new Location(
                         [startLine, startColumn],
-                        [startLine, startColumn], // EOF doesn't take up any space
+                        [startLine, startColumn + 1], // pretend EOF takes 1 space for better errors
                         filename,
                         source
                     )

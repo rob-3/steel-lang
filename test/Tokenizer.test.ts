@@ -46,7 +46,7 @@ describe("tokenize()", () => {
                 TokenType.EOF,
                 "EOF",
                 null,
-                new Location([1, 29], [1, 29], "<anonymous>", src)
+                new Location([1, 29], [1, 30], "<anonymous>", src)
             ),
         ]);
     });
@@ -121,7 +121,7 @@ describe("tokenize()", () => {
                 TokenType.EOF,
                 "EOF",
                 null,
-                new Location([2, 36], [2, 36], "<anonymous>", src)
+                new Location([2, 36], [2, 37], "<anonymous>", src)
             ),
         ]);
     });
@@ -141,7 +141,7 @@ describe("tokenize()", () => {
                 TokenType.EOF,
                 "EOF",
                 null,
-                new Location([2, 58], [2, 58], "<anonymous>", src)
+                new Location([2, 58], [2, 59], "<anonymous>", src)
             ),
         ]);
     });
@@ -202,7 +202,7 @@ describe("tokenize()", () => {
                 TokenType.EOF,
                 "EOF",
                 null,
-                new Location([2, 11], [2, 11], "<anonymous>", src)
+                new Location([2, 11], [2, 12], "<anonymous>", src)
             ),
         ]);
     });
@@ -215,7 +215,7 @@ describe("tokenize()", () => {
                 TokenType.EOF,
                 "EOF",
                 null,
-                new Location([1, 1], [1, 1], "<anonymous>", src)
+                new Location([1, 1], [1, 2], "<anonymous>", src)
             ),
         ]);
     });
@@ -240,7 +240,7 @@ describe("tokenize()", () => {
                 TokenType.EOF,
                 "EOF",
                 null,
-                new Location([1, 11], [1, 11], "<anonymous>", src)
+                new Location([1, 11], [1, 12], "<anonymous>", src)
             ),
         ]);
     });
@@ -259,7 +259,7 @@ describe("tokenize()", () => {
                 TokenType.EOF,
                 "EOF",
                 null,
-                new Location([1, 4], [1, 4], "<anonymous>", src)
+                new Location([1, 4], [1, 5], "<anonymous>", src)
             ),
         ]);
     });
@@ -278,7 +278,7 @@ describe("tokenize()", () => {
                 TokenType.EOF,
                 "EOF",
                 null,
-                new Location([1, 4], [1, 4], "<anonymous>", src)
+                new Location([1, 4], [1, 5], "<anonymous>", src)
             ),
         ]);
     });
@@ -297,7 +297,7 @@ describe("tokenize()", () => {
                 TokenType.EOF,
                 "EOF",
                 null,
-                new Location([1, 6], [1, 6], "<anonymous>", src)
+                new Location([1, 6], [1, 7], "<anonymous>", src)
             ),
         ]);
     });
@@ -322,7 +322,7 @@ describe("tokenize()", () => {
                 TokenType.EOF,
                 "EOF",
                 null,
-                new Location([1, 8], [1, 8], "<anonymous>", src)
+                new Location([1, 8], [1, 9], "<anonymous>", src)
             ),
         ]);
     });
@@ -353,7 +353,7 @@ describe("tokenize()", () => {
                 TokenType.EOF,
                 "EOF",
                 null,
-                new Location([1, 11], [1, 11], "<anonymous>", src)
+                new Location([1, 11], [1, 12], "<anonymous>", src)
             ),
         ]);
     });
@@ -416,7 +416,7 @@ describe("tokenize()", () => {
                 TokenType.EOF,
                 "EOF",
                 null,
-                new Location([1, 9], [1, 9], "<anonymous>", src)
+                new Location([1, 9], [1, 10], "<anonymous>", src)
             ),
         ]);
     });
@@ -434,7 +434,7 @@ describe("tokenize()", () => {
                 TokenType.EOF,
                 "EOF",
                 null,
-                new Location([1, 2], [1, 2], "<anonymous>", src)
+                new Location([1, 2], [1, 3], "<anonymous>", src)
             ),
         ]);
     });
@@ -452,7 +452,7 @@ describe("tokenize()", () => {
                 TokenType.EOF,
                 "EOF",
                 null,
-                new Location([1, 3], [1, 3], "<anonymous>", src)
+                new Location([1, 3], [1, 4], "<anonymous>", src)
             ),
         ]);
     });
@@ -470,7 +470,7 @@ describe("tokenize()", () => {
                 TokenType.EOF,
                 "EOF",
                 null,
-                new Location([1, 2], [1, 2], "<anonymous>", src)
+                new Location([1, 2], [1, 3], "<anonymous>", src)
             ),
         ]);
     });

@@ -83,7 +83,7 @@ ${" ".repeat(pad)}--> ${filename}:${line}:${column}
 ${" ".repeat(pad + 1)}|
 ${line.toString()} |    ${lineString}
 ${" ".repeat(pad + 1)}|    ${" ".repeat(startColumn)}${"^".repeat(
-        endColumn - startColumn + 1
+        endColumn - startColumn
     )}`);
 }
 
