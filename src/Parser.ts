@@ -131,7 +131,7 @@ function finishVariableDeclaration(): Either<Error, Expr> {
     if (!matchType(TokenType.IDENTIFIER)) {
         return Left(
             ParseError(
-                `Expected identifier; got "${lookAhead().lexeme}"`,
+                `"let" is used to create a variable, but instead you put "${lookAhead().lexeme}"`,
                 lookAhead()
             )
         );

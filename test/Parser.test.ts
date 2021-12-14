@@ -20,4 +20,13 @@ describe("parse()", () => {
   |          ^`
       )]);
     });
+    it("should give proper error on let all alone", () => {
+      expect(tokenize("let").chain(parse).swap().unsafeCoerce()).toEqual([Error(
+`parse error: "let" is used to create a variable, but instead you put "EOF"
+ --> <anonymous>:1:4
+  |
+1 |    let
+  |       ^`
+      )]);
+    });
 });
