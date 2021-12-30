@@ -15,7 +15,8 @@ import PrimaryExpr from "./nodes/PrimaryExpr";
 import ReturnStmt from "./nodes/ReturnStmt";
 import UnaryExpr from "./nodes/UnaryExpr";
 import VariableAssignmentStmt, {
-    isAssignmentLeft, AssignmentLeft,
+    isAssignmentLeft,
+    AssignmentLeft,
 } from "./nodes/VariableAssignmentStmt";
 import VariableDeclarationStmt from "./nodes/VariableDeclarationStmt";
 import VariableExpr from "./nodes/VariableExpr";
@@ -85,9 +86,15 @@ function eatNewlines(): void {
     while (matchType(TokenType.NEWLINE)) continue;
 }
 
+function eatUntilNewline(): void {
+    while (!atEnd() && eatToken().type !== TokenType.NEWLINE);
+}
+
 function makeExpr(): Either<Error, Expr> {
     if (matchType(TokenType.RETURN))
-        return makeExpr().chain(expr => Right(new ReturnStmt(expr, getTokens())));
+        return makeExpr().chain((expr) =>
+            Right(new ReturnStmt(expr, getTokens()))
+        );
     if (matchType(TokenType.LET)) return finishVariableDeclaration();
     if (matchType(TokenType.IF)) return finishIfStmt();
     if (matchType(TokenType.WHILE)) return finishWhileStmt();
@@ -129,10 +136,16 @@ function finishArrayLiteral(): Either<Error, Expr> {
 
 function finishVariableDeclaration(): Either<Error, Expr> {
     if (!matchType(TokenType.IDENTIFIER)) {
+        const next = lookAhead();
+        eatUntilNewline();
         return Left(
             ParseError(
-                `"let" is used to create a variable, but instead you put "${lookAhead().lexeme}"`,
-                lookAhead()
+                next.type === TokenType.LET
+                    ? `Using "let" as a variable name is not allowed`
+                    : `"let" is used to create a variable, but instead you put "${
+                          next.lexeme
+                      }"`,
+                next
             )
         );
     }
@@ -197,7 +210,9 @@ function finishMatchStmt(): Either<Error, Expr> {
             eatNewlines();
             cases.push(makeMatchCase());
         }
-        return Either.sequence(cases).chain(cases => Right(new MatchStmt(expr, cases, getTokens())));
+        return Either.sequence(cases).chain((cases) =>
+            Right(new MatchStmt(expr, cases, getTokens()))
+        );
     });
 }
 
@@ -297,7 +312,8 @@ function makeLambda(): Either<Error, FunctionExpr> {
     // FIXME better error
     if (!matchType(TokenType.RIGHT_SINGLE_ARROW))
         return Left(ParseError("Expected ->", lookAhead()));
-    return args.chain(finishLambda); }
+    return args.chain(finishLambda);
+}
 
 function finishFunctDecArgs(): Either<Error, string[]> {
     const args: string[] = [];
@@ -433,14 +449,7 @@ function finishIfStmt(): Either<Error, Expr> {
     }
     return condition.chain((condition) => {
         return maybeBody.chain((maybeBody) => {
-            return Right(
-                new IfStmt(
-                    condition,
-                    maybeBody,
-                    null,
-                    getTokens()
-                )
-            );
+            return Right(new IfStmt(condition, maybeBody, null, getTokens()));
         });
     });
 }
@@ -553,8 +562,7 @@ function makeCallOrDotAccessRecursive(callee: Expr): Either<Error, Expr> {
 }
 
 function makePrimary(): Either<Error, Expr> {
-    if (matchType(TokenType.OPEN_BRACKET))
-        return finishArrayLiteral();
+    if (matchType(TokenType.OPEN_BRACKET)) return finishArrayLiteral();
     if (matchType(TokenType.OPEN_BRACE))
         return finishBlockStmtOrObjectLiteral();
     if (matchType(TokenType.TRUE))
@@ -589,7 +597,7 @@ function makePrimary(): Either<Error, Expr> {
         if (matchType(TokenType.IDENTIFIER)) {
             if (matchType(TokenType.COMMA, TokenType.CLOSE_PAREN)) {
                 current -= 2;
-                return finishFunctDecArgs().chain(args => {
+                return finishFunctDecArgs().chain((args) => {
                     if (!matchType(TokenType.RIGHT_SINGLE_ARROW)) {
                         return Left(
                             ParseError(
@@ -597,9 +605,9 @@ function makePrimary(): Either<Error, Expr> {
                                 lookAhead()
                             )
                         );
-                }
-                return finishLambda(args);
-                })
+                    }
+                    return finishLambda(args);
+                });
             } else {
                 current -= 1;
             }

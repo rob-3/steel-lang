@@ -29,4 +29,13 @@ describe("parse()", () => {
   |       ^`
       )]);
     });
+    it("should give proper error on using let as variable", () => {
+      expect(tokenize("let let =").chain(parse).swap().unsafeCoerce()).toEqual([Error(
+`parse error: Using "let" as a variable name is not allowed
+ --> <anonymous>:1:5
+  |
+1 |    let let =
+  |        ^^^`
+      )]);
+    });
 });
