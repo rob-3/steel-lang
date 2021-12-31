@@ -27,12 +27,12 @@ export default function tokenize(
             fullTokens.push(scanToken());
         }
         tokens = fullTokens.filter((t) =>
-            t.either(
-                (_) => true,
-                (token) =>
+            t.caseOf({
+                Left: (_) => true,
+                Right: (token) =>
                     token.type !== TokenType.WHITESPACE &&
-                    token.type !== TokenType.COMMENT
-            )
+                    token.type !== TokenType.COMMENT,
+            })
         );
         tokens.push(
             Right(

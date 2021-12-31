@@ -1,4 +1,4 @@
-import { Either } from "purify-ts";
+import { Either, Left, Right } from "purify-ts";
 import { Expr } from "./Expr";
 import { exprEval } from "./Interpreter";
 import { stlPrint } from "./Logger";
@@ -54,12 +54,12 @@ export function run(
          */
         const tokens = tokenize(src, filename);
         const ast: Either<Error[], Expr[]> = tokens.chain(parse);
-        const finalScope: Scope = ast.either(
-            (badAst) => {
+        const finalScope: Scope = ast.caseOf({
+            Left: (badAst) => {
                 badAst.map((err) => stlPrint(err.message));
                 return scope;
             },
-            (goodAst) => {
+            Right: (goodAst) => {
                 return goodAst.reduce<Scope>((scope: Scope, expr: Expr) => {
                     const [val, newScope] = exprEval(expr, scope);
                     // Print if using REPL and if the expression evaluates to a value
@@ -76,7 +76,7 @@ export function run(
                     return newScope;
                 }, scope);
             }
-        );
+        });
         return finalScope;
     } catch (e) {
         console.log((e as Error).message);
