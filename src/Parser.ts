@@ -46,18 +46,6 @@ export default function parse(tokenList: Token[]): Either<Error[], Expr[]> {
     } else {
         return Right(Either.rights(parseTree));
     }
-    /*
-    const exprs: Either<Error[], Expr[]> = Either.sequence(parseTree);
-    if (exprs.isLeft()) {
-        exprs.mapLeft((err) => printfn(err.message, new Scope()));
-        return [];
-    } else {
-        return astTransforms.reduce(
-            (acc: Ast, cur: (expr: Expr) => Expr) => acc.map(cur),
-            new Ast(exprs.unsafeCoerce())
-        ).exprs;
-    }
-    */
 }
 
 function matchType(...types: TokenType[]): boolean {
