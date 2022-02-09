@@ -5,6 +5,7 @@
 	"scripts": {
 		"start": "node dist/src/main.js",
 		"test": "jest",
+		"test:watch": "jest --watchAll --runInBand",
 		"build": "tsc"
 	},
 	"keywords": [],
