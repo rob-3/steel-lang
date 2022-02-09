@@ -21,7 +21,9 @@
 	},
 	"dependencies": {
 		"@babel/preset-env": "^7.16.0",
+		"@types/escodegen": "^0.0.7",
 		"@types/jest": "^27.0.2",
+		"escodegen": "^2.0.0",
 		"purify-ts": "^1.1.0",
 		"tslib": "^2.2.0"
 	}
