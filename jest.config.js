@@ -1,7 +1,7 @@
 // Sync object
 /** @type {import('@jest/types').Config.InitialOptions} */
 const config = {
-  testPathIgnorePatterns: ["<rootDir>/dist"]
+	testPathIgnorePatterns: ["<rootDir>/dist"],
 };
 
 module.exports = config;

@@ -4,15 +4,15 @@ import Token from "../Token";
 import VariableDeclarationStmt from "./VariableDeclarationStmt";
 
 export default class FunctionDefinition implements Expr {
-    definition: VariableDeclarationStmt;
-    tokens: Token[];
+	definition: VariableDeclarationStmt;
+	tokens: Token[];
 
-    constructor(definition: VariableDeclarationStmt, tokens: Token[]) {
-        this.definition = definition;
-        this.tokens = tokens;
-    }
+	constructor(definition: VariableDeclarationStmt, tokens: Token[]) {
+		this.definition = definition;
+		this.tokens = tokens;
+	}
 
-    eval(scope: Scope) {
-        return this.definition.eval(scope);
-    }
+	eval(scope: Scope) {
+		return this.definition.eval(scope);
+	}
 }

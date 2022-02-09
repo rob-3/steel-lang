@@ -13,166 +13,166 @@ import StlNumber from "../src/StlNumber";
 console.log = () => {};
 
 export const stlEval = (
-    src: string,
-    scope: Scope = new Scope()
+	src: string,
+	scope: Scope = new Scope()
 ): UnboxedValue | undefined => {
-    const val = _stlEval(src, scope);
-    try {
-        return val.unsafeCoerce()[0]?.value;
-    } catch (e) {
-        console.log(val);
-        throw e;
-    }
+	const val = _stlEval(src, scope);
+	try {
+		return val.unsafeCoerce()[0]?.value;
+	} catch (e) {
+		console.log(val);
+		throw e;
+	}
 };
 
 const stlExec = (
-    src: string,
-    printfn: ((a: any) => void) | null = null
+	src: string,
+	printfn: ((a: any) => void) | null = null
 ): [Value | null, Scope] => {
-    if (printfn !== null) setPrintFn(printfn);
-    const val = _stlEval(src, new Scope());
-    try {
-        return val.unsafeCoerce();
-    } catch (e) {
-        console.log(val);
-        throw e;
-    }
+	if (printfn !== null) setPrintFn(printfn);
+	const val = _stlEval(src, new Scope());
+	try {
+		return val.unsafeCoerce();
+	} catch (e) {
+		console.log(val);
+		throw e;
+	}
 };
 
 describe("stlEval()", () => {
-    describe("literals", () => {
-        it("should evaluate number literals", () => {
-            expect(stlEval("2")).toEqual(new StlNumber(2n));
-            expect(stlEval("-2")).toEqual(new StlNumber(-2n));
-        });
+	describe("literals", () => {
+		it("should evaluate number literals", () => {
+			expect(stlEval("2")).toEqual(new StlNumber(2n));
+			expect(stlEval("-2")).toEqual(new StlNumber(-2n));
+		});
 
-        it("should evaluate string literals", () => {
-            const src = `"happy day"`;
-            const result = stlEval(src);
-            expect(result).toBe("happy day");
-        });
+		it("should evaluate string literals", () => {
+			const src = `"happy day"`;
+			const result = stlEval(src);
+			expect(result).toBe("happy day");
+		});
 
-        it("should evaluate boolean literals", () => {
-            const src = "true";
-            const result = stlEval(src);
-            expect(result).toBe(true);
-        });
-    });
+		it("should evaluate boolean literals", () => {
+			const src = "true";
+			const result = stlEval(src);
+			expect(result).toBe(true);
+		});
+	});
 
-    describe("math", () => {
-        it("should do addition correctly", () => {
-            const src = "2 + 2";
-            const result = stlEval(src);
-            expect(result).toEqual(new StlNumber(4n));
-        });
+	describe("math", () => {
+		it("should do addition correctly", () => {
+			const src = "2 + 2";
+			const result = stlEval(src);
+			expect(result).toEqual(new StlNumber(4n));
+		});
 
-        it("should do subtraction correctly", () => {
-            const src = "2 - 2";
-            const result = stlEval(src);
-            expect(result).toEqual(new StlNumber(0n));
-        });
+		it("should do subtraction correctly", () => {
+			const src = "2 - 2";
+			const result = stlEval(src);
+			expect(result).toEqual(new StlNumber(0n));
+		});
 
-        it("should do multiplication correctly", () => {
-            const src = "2 * 5";
-            const result = stlEval(src);
-            expect(result).toEqual(new StlNumber(10n));
-        });
+		it("should do multiplication correctly", () => {
+			const src = "2 * 5";
+			const result = stlEval(src);
+			expect(result).toEqual(new StlNumber(10n));
+		});
 
-        it("should do division correctly", () => {
-            const src = "2 / 2";
-            const result = stlEval(src);
-            expect(result).toEqual(new StlNumber(1n));
-        });
+		it("should do division correctly", () => {
+			const src = "2 / 2";
+			const result = stlEval(src);
+			expect(result).toEqual(new StlNumber(1n));
+		});
 
-        it("should do floating point division correctly", () => {
-            const src = "5 / 2";
-            const result = stlEval(src);
-            expect(result).toEqual(StlNumber.of("2.5"));
-        });
+		it("should do floating point division correctly", () => {
+			const src = "5 / 2";
+			const result = stlEval(src);
+			expect(result).toEqual(StlNumber.of("2.5"));
+		});
 
-        it("should follow order of operations", () => {
-            const src = "5 / 5 + 3 * 2";
-            const result = stlEval(src);
-            expect(result).toEqual(new StlNumber(7n));
-        });
+		it("should follow order of operations", () => {
+			const src = "5 / 5 + 3 * 2";
+			const result = stlEval(src);
+			expect(result).toEqual(new StlNumber(7n));
+		});
 
-        it("should evaluate a modulus correctly", () => {
-            expect(stlEval("5 % 5")).toEqual(new StlNumber(0n));
-            expect(stlEval("5 % 4")).toEqual(new StlNumber(1n));
-            expect(stlEval("5 % 2")).toEqual(new StlNumber(1n));
-        });
+		it("should evaluate a modulus correctly", () => {
+			expect(stlEval("5 % 5")).toEqual(new StlNumber(0n));
+			expect(stlEval("5 % 4")).toEqual(new StlNumber(1n));
+			expect(stlEval("5 % 2")).toEqual(new StlNumber(1n));
+		});
 
-        it("should not fall victim to floating point errors", () => {
-            expect(stlEval("0.1 + 0.2")).toEqual(StlNumber.of("0.3"));
-        });
-    });
+		it("should not fall victim to floating point errors", () => {
+			expect(stlEval("0.1 + 0.2")).toEqual(StlNumber.of("0.3"));
+		});
+	});
 
-    describe("comparisions", () => {
-        it("should handle equality checks", () => {
-            expect(stlEval("2 == 2")).toBe(true);
-            expect(stlEval("2 == 3")).toBe(false);
-        });
+	describe("comparisions", () => {
+		it("should handle equality checks", () => {
+			expect(stlEval("2 == 2")).toBe(true);
+			expect(stlEval("2 == 3")).toBe(false);
+		});
 
-        it("should handle greater equal", () => {
-            expect(stlEval("2 >= 2")).toBe(true);
-            expect(stlEval("1 >= 2")).toBe(false);
-        });
+		it("should handle greater equal", () => {
+			expect(stlEval("2 >= 2")).toBe(true);
+			expect(stlEval("1 >= 2")).toBe(false);
+		});
 
-        it("should handle less equal", () => {
-            expect(stlEval("2 <= 2")).toBe(true);
-            expect(stlEval("4 <= 3")).toBe(false);
-        });
+		it("should handle less equal", () => {
+			expect(stlEval("2 <= 2")).toBe(true);
+			expect(stlEval("4 <= 3")).toBe(false);
+		});
 
-        it("should handle greater than", () => {
-            expect(stlEval("2 > 1")).toBe(true);
-            expect(stlEval("1 > 2")).toBe(false);
-        });
+		it("should handle greater than", () => {
+			expect(stlEval("2 > 1")).toBe(true);
+			expect(stlEval("1 > 2")).toBe(false);
+		});
 
-        it("should handle less than", () => {
-            expect(stlEval("2 < 3")).toBe(true);
-            expect(stlEval("4 < 3")).toBe(false);
-        });
-    });
+		it("should handle less than", () => {
+			expect(stlEval("2 < 3")).toBe(true);
+			expect(stlEval("4 < 3")).toBe(false);
+		});
+	});
 
-    describe("booleans", () => {
-        it("should evaluate logical AND correctly", () => {
-            expect(stlEval("true and true")).toBe(true);
-            expect(stlEval("true and false")).toBe(false);
-            expect(stlEval("false and true")).toBe(false);
-            expect(stlEval("false and false")).toBe(false);
-        });
+	describe("booleans", () => {
+		it("should evaluate logical AND correctly", () => {
+			expect(stlEval("true and true")).toBe(true);
+			expect(stlEval("true and false")).toBe(false);
+			expect(stlEval("false and true")).toBe(false);
+			expect(stlEval("false and false")).toBe(false);
+		});
 
-        it("should evaluate logical OR correctly", () => {
-            expect(stlEval("true or true")).toBe(true);
-            expect(stlEval("true or false")).toBe(true);
-            expect(stlEval("false or true")).toBe(true);
-            expect(stlEval("false or false")).toBe(false);
-        });
+		it("should evaluate logical OR correctly", () => {
+			expect(stlEval("true or true")).toBe(true);
+			expect(stlEval("true or false")).toBe(true);
+			expect(stlEval("false or true")).toBe(true);
+			expect(stlEval("false or false")).toBe(false);
+		});
 
-        it("should evaluate logical NOT correctly", () => {
-            expect(stlEval("not true")).toBe(false);
-            expect(stlEval("not false")).toBe(true);
-        });
+		it("should evaluate logical NOT correctly", () => {
+			expect(stlEval("not true")).toBe(false);
+			expect(stlEval("not false")).toBe(true);
+		});
 
-        it("should handle logical NOT at a lower precedence than AND and OR", () => {
-            expect(stlEval("not true and false")).toBe(false);
-        });
+		it("should handle logical NOT at a lower precedence than AND and OR", () => {
+			expect(stlEval("not true and false")).toBe(false);
+		});
 
-        it("should evaluate block stmts", () => {
-            const src = `
+		it("should evaluate block stmts", () => {
+			const src = `
             {
                 let a = 5
                 let b = -3
                 a + b
             }
             `;
-            expect(stlEval(src)).toEqual(new StlNumber(2n));
-        });
+			expect(stlEval(src)).toEqual(new StlNumber(2n));
+		});
 
-        it("should evaluate if stmts", () => {
-            expect(
-                stlEval(
-                    `
+		it("should evaluate if stmts", () => {
+			expect(
+				stlEval(
+					`
                 let a = 5
                 if a == 5 {
                     6
@@ -180,183 +180,183 @@ describe("stlEval()", () => {
                     7
                 }
                 `
-                )
-            ).toEqual(new StlNumber(6n));
-        });
+				)
+			).toEqual(new StlNumber(6n));
+		});
 
-        it("should evaluate while stmts", () => {
-            expect(
-                stlEval(
-                    `
+		it("should evaluate while stmts", () => {
+			expect(
+				stlEval(
+					`
                 let ~a = 0
                 while ~a < 5 {
                     ~a = ~a + 1
                 }
                 `
-                )
-            ).toEqual(new StlNumber(5n));
-        });
-    });
+				)
+			).toEqual(new StlNumber(5n));
+		});
+	});
 
-    describe("arrays", () => {
-        it("should not throw on empty array literal", () => {
-            expect(() => stlEval(`let arr = []`)).not.toThrow();
-        });
+	describe("arrays", () => {
+		it("should not throw on empty array literal", () => {
+			expect(() => stlEval(`let arr = []`)).not.toThrow();
+		});
 
-        it("should allow nonempty array literals", () => {
-            expect(() => stlEval("let arr = [1, 2, 3]")).not.toThrow();
-        });
+		it("should allow nonempty array literals", () => {
+			expect(() => stlEval("let arr = [1, 2, 3]")).not.toThrow();
+		});
 
-        it("should allow indexing arrays with zero", () => {
-            expect(
-                stlEval(
-                    `
+		it("should allow indexing arrays with zero", () => {
+			expect(
+				stlEval(
+					`
                 let a = [1, 2, 3]
                 a[0]
                 `
-                )
-            ).toEqual(new StlNumber(1n));
-        });
+				)
+			).toEqual(new StlNumber(1n));
+		});
 
-        it("should allow indexing arrays with nonzero values", () => {
-            expect(
-                stlEval(
-                    `
+		it("should allow indexing arrays with nonzero values", () => {
+			expect(
+				stlEval(
+					`
                 let a = [1, 2, 3]
                 a[2]
                 `
-                )
-            ).toEqual(new StlNumber(3n));
-        });
-    });
+				)
+			).toEqual(new StlNumber(3n));
+		});
+	});
 });
 
 describe("exec()", () => {
-    describe("if statements", () => {
-        it("should execute an if stmt with true condition", () => {
-            const src = "if (true) {\nprint(5)\n}";
-            const spy = jest.fn();
-            stlExec(src, spy);
-            expect(spy.mock.calls).toEqual([[new StlNumber(5n)]]);
-        });
+	describe("if statements", () => {
+		it("should execute an if stmt with true condition", () => {
+			const src = "if (true) {\nprint(5)\n}";
+			const spy = jest.fn();
+			stlExec(src, spy);
+			expect(spy.mock.calls).toEqual([[new StlNumber(5n)]]);
+		});
 
-        it("should not execute an if stmt with a false condition", () => {
-            const src = `
+		it("should not execute an if stmt with a false condition", () => {
+			const src = `
             if (false) {
                 print(5)
             }
             `;
-            const spy = jest.fn();
-            stlExec(src, spy);
-            expect(spy.mock.calls).toEqual([]);
-        });
+			const spy = jest.fn();
+			stlExec(src, spy);
+			expect(spy.mock.calls).toEqual([]);
+		});
 
-        it("should execute the else body stmt with a false condition", () => {
-            const src = `
-            if (false) {
-                print(5)
-            } else {
-                print(6)
-            }
-            `;
-            const spy = jest.fn();
-            stlExec(src, spy);
-            expect(spy.mock.calls).toEqual([[new StlNumber(6n)]]);
-        });
-
-        it("should not execute the if body with a false condition", () => {
-            const src = `
+		it("should execute the else body stmt with a false condition", () => {
+			const src = `
             if (false) {
                 print(5)
             } else {
                 print(6)
             }
             `;
-            const spy = jest.fn();
-            stlExec(src, spy);
-            expect(spy.mock.calls).not.toContain(5);
-        });
+			const spy = jest.fn();
+			stlExec(src, spy);
+			expect(spy.mock.calls).toEqual([[new StlNumber(6n)]]);
+		});
 
-        it("should support no parentheses", () => {
-            const src = `
+		it("should not execute the if body with a false condition", () => {
+			const src = `
+            if (false) {
+                print(5)
+            } else {
+                print(6)
+            }
+            `;
+			const spy = jest.fn();
+			stlExec(src, spy);
+			expect(spy.mock.calls).not.toContain(5);
+		});
+
+		it("should support no parentheses", () => {
+			const src = `
             if false {
                 print(5)
             } else {
                 print(6)
             }
             `;
-            const spy = jest.fn();
-            stlExec(src, spy);
-            expect(spy.mock.calls).not.toContainEqual(new StlNumber(5n));
-            expect(spy.mock.calls).toContainEqual([new StlNumber(6n)]);
-        });
+			const spy = jest.fn();
+			stlExec(src, spy);
+			expect(spy.mock.calls).not.toContainEqual(new StlNumber(5n));
+			expect(spy.mock.calls).toContainEqual([new StlNumber(6n)]);
+		});
 
-        it("should support then", () => {
-            expect(
-                stlEval(
-                    `
+		it("should support then", () => {
+			expect(
+				stlEval(
+					`
                 let a = if false then 5 else 6
                 `
-                )
-            ).toEqual(new StlNumber(6n));
-        });
-    });
+				)
+			).toEqual(new StlNumber(6n));
+		});
+	});
 
-    describe("while loops", () => {
-        const src = `
+	describe("while loops", () => {
+		const src = `
         let ~a = 0
         while (~a < 10) {
             print(~a)
             ~a = ~a + 1
         }
         `;
-        it("should loop until the condition is met", () => {
-            const spy = jest.fn();
-            stlExec(src, spy);
-            expect(spy.mock.calls.length).toBe(10);
-        });
-    });
+		it("should loop until the condition is met", () => {
+			const spy = jest.fn();
+			stlExec(src, spy);
+			expect(spy.mock.calls.length).toBe(10);
+		});
+	});
 
-    describe("variables", () => {
-        it("should be able to access a variable", () => {
-            const src = "let ~a = 14";
-            const scope: Scope = stlExec(src)[1];
-            expect(stlEval("~a", scope)).toEqual(new StlNumber(14n));
-        });
+	describe("variables", () => {
+		it("should be able to access a variable", () => {
+			const src = "let ~a = 14";
+			const scope: Scope = stlExec(src)[1];
+			expect(stlEval("~a", scope)).toEqual(new StlNumber(14n));
+		});
 
-        it("should be able to assign to a variable", () => {
-            const scope = stlExec("let ~a = 14\n~a = 15")[1];
-            expect(stlEval("~a", scope)).toEqual(new StlNumber(15n));
-        });
+		it("should be able to assign to a variable", () => {
+			const scope = stlExec("let ~a = 14\n~a = 15")[1];
+			expect(stlEval("~a", scope)).toEqual(new StlNumber(15n));
+		});
 
-        it("should allow a variable declaration to spill over lines", () => {
-            expect(
-                stlEval(
-                    `
+		it("should allow a variable declaration to spill over lines", () => {
+			expect(
+				stlEval(
+					`
                 let ~x =
                     42 + 13 + 3
                 `
-                )
-            ).toEqual(StlNumber.of(42 + 13 + 3));
-        });
+				)
+			).toEqual(StlNumber.of(42 + 13 + 3));
+		});
 
-        it("should allow assignment to spill over lines", () => {
-            expect(
-                stlEval(
-                    `
+		it("should allow assignment to spill over lines", () => {
+			expect(
+				stlEval(
+					`
                     let ~x = 3
                     ~x = 
                         6
                     ~x
                     `
-                )
-            ).toEqual(new StlNumber(6n));
-        });
+				)
+			).toEqual(new StlNumber(6n));
+		});
 
-        it("should allow nonlocal shadowing", () => {
-            const spy = jest.fn();
-            stlExec(
-                ` 
+		it("should allow nonlocal shadowing", () => {
+			const spy = jest.fn();
+			stlExec(
+				` 
                 let a = 4 
                 let b = 6
                 let addTwo = (n) -> {
@@ -366,61 +366,61 @@ describe("exec()", () => {
                 print(addTwo(13))
                 print(a)
                 `,
-                spy
-            );
-            expect(spy.mock.calls).toEqual([
-                [new StlNumber(15n)],
-                [new StlNumber(4n)],
-            ]);
-        });
+				spy
+			);
+			expect(spy.mock.calls).toEqual([
+				[new StlNumber(15n)],
+				[new StlNumber(4n)],
+			]);
+		});
 
-        it("should prohibit local shadowing", () => {
-            expect(() =>
-                stlEval(
-                    `
+		it("should prohibit local shadowing", () => {
+			expect(() =>
+				stlEval(
+					`
                 let a = 4
                 let a = 5
                 `
-                )
-            ).toThrow();
-        });
-    });
+				)
+			).toThrow();
+		});
+	});
 
-    describe("functions", () => {
-        describe("argless functions", () => {
-            const src = `
+	describe("functions", () => {
+		describe("argless functions", () => {
+			const src = `
             fun a = () -> {
                 print(5)
             }
             `;
-            it("should not throw on function definition", () => {
-                expect(() => stlExec(src, () => {})).not.toThrow();
-            });
+			it("should not throw on function definition", () => {
+				expect(() => stlExec(src, () => {})).not.toThrow();
+			});
 
-            it("should not run the definition of a function", () => {
-                const spy = jest.fn();
-                stlExec(src, spy);
-                expect(spy.mock.calls.length).toBe(0);
-            });
+			it("should not run the definition of a function", () => {
+				const spy = jest.fn();
+				stlExec(src, spy);
+				expect(spy.mock.calls.length).toBe(0);
+			});
 
-            it("should be callable", () => {
-                const src2 = src + "a()";
-                const spy = jest.fn();
-                stlExec(src2, spy);
-                expect(spy.mock.calls).toEqual([[new StlNumber(5n)]]);
-            });
+			it("should be callable", () => {
+				const src2 = src + "a()";
+				const spy = jest.fn();
+				stlExec(src2, spy);
+				expect(spy.mock.calls).toEqual([[new StlNumber(5n)]]);
+			});
 
-            it("shouldn't care about whitespace in a function", () => {
-                const src = `
+			it("shouldn't care about whitespace in a function", () => {
+				const src = `
                 fun a = () -> { 5 }
 
                 a()
                 `;
-                expect(stlEval(src)).toEqual(new StlNumber(5n));
-            });
+				expect(stlEval(src)).toEqual(new StlNumber(5n));
+			});
 
-            it("should allow early returns", () => {
-                const src = `
+			it("should allow early returns", () => {
+				const src = `
                 fun a = () -> {
                     return 5
                     6
@@ -428,46 +428,46 @@ describe("exec()", () => {
 
                 a()
                 `;
-                expect(stlEval(src)).toEqual(new StlNumber(5n));
-            });
+				expect(stlEval(src)).toEqual(new StlNumber(5n));
+			});
 
-            it("should not be able to access variable declared after", () => {
-                expect(() =>
-                    stlEval(
-                        `
+			it("should not be able to access variable declared after", () => {
+				expect(() =>
+					stlEval(
+						`
                     let print_a = () -> print(a)
                     let a = 4
                     print_a()
                     `
-                    )
-                ).toThrow(`Variable "a" is not defined.`);
-            });
-        });
-        describe("functions with arguments", () => {
-            const src = `
+					)
+				).toThrow(`Variable "a" is not defined.`);
+			});
+		});
+		describe("functions with arguments", () => {
+			const src = `
            fun a = (a, b) -> {
                 print(a + b)
            }
            `;
-            it("should not throw on function definition", () => {
-                expect(() => stlExec(src, () => {})).not.toThrow();
-            });
+			it("should not throw on function definition", () => {
+				expect(() => stlExec(src, () => {})).not.toThrow();
+			});
 
-            it("should not run the definition of a function", () => {
-                const spy = jest.fn();
-                stlExec(src, spy);
-                expect(spy.mock.calls).toEqual([]);
-            });
+			it("should not run the definition of a function", () => {
+				const spy = jest.fn();
+				stlExec(src, spy);
+				expect(spy.mock.calls).toEqual([]);
+			});
 
-            it("should be callable", () => {
-                const src2 = src + "a(5, 6)";
-                const spy = jest.fn();
-                stlExec(src2, spy);
-                expect(spy.mock.calls).toEqual([[new StlNumber(11n)]]);
-            });
+			it("should be callable", () => {
+				const src2 = src + "a(5, 6)";
+				const spy = jest.fn();
+				stlExec(src2, spy);
+				expect(spy.mock.calls).toEqual([[new StlNumber(11n)]]);
+			});
 
-            it("should have the correct scope", () => {
-                const src = `
+			it("should have the correct scope", () => {
+				const src = `
                 let a = 42
                 let b = 16
                 fun sum = (a, b) -> {
@@ -476,11 +476,11 @@ describe("exec()", () => {
 
                 sum(4, 7)
                 `;
-                expect(stlEval(src)).toEqual(new StlNumber(11n));
-            });
+				expect(stlEval(src)).toEqual(new StlNumber(11n));
+			});
 
-            it("should allow recursion", () => {
-                const src = `
+			it("should allow recursion", () => {
+				const src = `
                 fun fac = (a) -> {
                     if (a == 0) {
                         1
@@ -491,11 +491,11 @@ describe("exec()", () => {
 
                 fac(4)
                 `;
-                expect(stlEval(src)).toEqual(new StlNumber(24n));
-            });
+				expect(stlEval(src)).toEqual(new StlNumber(24n));
+			});
 
-            it("should be able to implement fib", () => {
-                const src = `
+			it("should be able to implement fib", () => {
+				const src = `
                 fun fib = (a) -> {
                     if (a == 0) {
                         0
@@ -508,11 +508,11 @@ describe("exec()", () => {
 
                 fib(6)
                 `;
-                expect(stlEval(src)).toEqual(new StlNumber(8n));
-            });
+				expect(stlEval(src)).toEqual(new StlNumber(8n));
+			});
 
-            it("should be able to be passed into another function", () => {
-                const src = `
+			it("should be able to be passed into another function", () => {
+				const src = `
                 fun a = (a, b) -> {
                     a + b
                 }
@@ -523,85 +523,85 @@ describe("exec()", () => {
 
                 b(a, 4, 5)
                 `;
-                expect(stlEval(src)).toEqual(new StlNumber(9n));
-            });
-        });
+				expect(stlEval(src)).toEqual(new StlNumber(9n));
+			});
+		});
 
-        describe("lambdas", () => {
-            it("should permit anonymous function style declaration", () => {
-                const src = `
+		describe("lambdas", () => {
+			it("should permit anonymous function style declaration", () => {
+				const src = `
                let a = (a, b) -> {
                    a * b
                }
 
                a(5, 6)
                `;
-                expect(stlEval(src)).toEqual(new StlNumber(30n));
-            });
+				expect(stlEval(src)).toEqual(new StlNumber(30n));
+			});
 
-            it("should allow a zero argument lambda", () => {
-                expect(
-                    stlEval(
-                        `
+			it("should allow a zero argument lambda", () => {
+				expect(
+					stlEval(
+						`
                     let a = 4
                     let getA = () -> a
                     getA()
                     `
-                    )
-                ).toEqual(new StlNumber(4n));
-            });
+					)
+				).toEqual(new StlNumber(4n));
+			});
 
-            it("should allow anonymous functions to be passed inline", () => {
-                const src = `
+			it("should allow anonymous functions to be passed inline", () => {
+				const src = `
                 let math = (a, b, c) -> {
                     a(b) * c
                 }
 
                 math(a -> { a + 3 }, 2, 3)
                 `;
-                expect(stlEval(src)).toEqual(new StlNumber(15n));
-            });
+				expect(stlEval(src)).toEqual(new StlNumber(15n));
+			});
 
-            it("should allow short lambda syntax without parentheses", () => {
-                expect(
-                    stlEval(
-                        `
+			it("should allow short lambda syntax without parentheses", () => {
+				expect(
+					stlEval(
+						`
                 let double = a -> a * 2
 
                 double(2)
                 `
-                    )
-                ).toEqual(new StlNumber(4n));
-            });
+					)
+				).toEqual(new StlNumber(4n));
+			});
 
-            it("should allow short lambda syntax with parentheses", () => {
-                expect(
-                    stlEval(
-                        `
+			it("should allow short lambda syntax with parentheses", () => {
+				expect(
+					stlEval(
+						`
                 let double = (a) -> a * 2
 
                 double(2)
                 `
-                    )
-                ).toEqual(new StlNumber(4n));
-            });
+					)
+				).toEqual(new StlNumber(4n));
+			});
 
-            it("should allow short lambda syntax with parentheses and multiple args", () => {
-                expect(
-                    stlEval(
-                        `
+			it("should allow short lambda syntax with parentheses and multiple args", () => {
+				expect(
+					stlEval(
+						`
                 let sum = (a, b) -> a + b
 
                 sum(2, 6)
                 `
-                    )
-                ).toEqual(new StlNumber(8n));
-            });
+					)
+				).toEqual(new StlNumber(8n));
+			});
 
-            it("should allow a returned function to be called", () => {
-                expect(
-                    stlEval(
-                        `
+			it("should allow a returned function to be called", () => {
+				expect(
+					stlEval(
+						`
                     fun a = () -> {
                         fun b = () -> {
                             5
@@ -610,18 +610,18 @@ describe("exec()", () => {
 
                     a()()
                     `
-                    )
-                ).toEqual(new StlNumber(5n));
-            });
+					)
+				).toEqual(new StlNumber(5n));
+			});
 
-            it("should throw if a noncallable object is called", () => {
-                expect(() => stlEval("5()")).toThrow(
-                    "Can't call 5 because it is not a function."
-                );
-            });
-        });
+			it("should throw if a noncallable object is called", () => {
+				expect(() => stlEval("5()")).toThrow(
+					"Can't call 5 because it is not a function."
+				);
+			});
+		});
 
-        /* TODO fix this behavior without unsafeCoerce
+		/* TODO fix this behavior without unsafeCoerce
         describe("hoisted functions", () => {
             it("should allow a basic hoisted function", () => {
                 expect(
@@ -636,41 +636,41 @@ describe("exec()", () => {
             });
         });
         */
-    });
+	});
 
-    describe("pattern matching", () => {
-        it("should not throw on match keyword", () => {
-            expect(() =>
-                stlEval(
-                    `
+	describe("pattern matching", () => {
+		it("should not throw on match keyword", () => {
+			expect(() =>
+				stlEval(
+					`
                 let x = 15
                 match x {
                     15 => "correct"
                     _ => "wrong"
                 }
                 `
-                )
-            ).not.toThrow();
-        });
+				)
+			).not.toThrow();
+		});
 
-        it("should return the appropriate value", () => {
-            expect(
-                stlEval(
-                    `
+		it("should return the appropriate value", () => {
+			expect(
+				stlEval(
+					`
                 let x = 15
                 match x {
                     15 => "correct"
                     _ => "wrong"
                 }
                 `
-                )
-            ).toBe("correct");
-        });
+				)
+			).toBe("correct");
+		});
 
-        it("should be able to be used as an expression", () => {
-            const spy = jest.fn();
-            stlExec(
-                `
+		it("should be able to be used as an expression", () => {
+			const spy = jest.fn();
+			stlExec(
+				`
                 let a = 4
                 let b = a - 2
                 let c = a/b
@@ -680,92 +680,92 @@ describe("exec()", () => {
                     _ => "yep"
                 })
                 `,
-                spy
-            );
-            expect(spy.mock.calls).toEqual([["yep"]]);
-        });
+				spy
+			);
+			expect(spy.mock.calls).toEqual([["yep"]]);
+		});
 
-        it("should be able to match strings", () => {
-            expect(
-                stlEval(
-                    `
+		it("should be able to match strings", () => {
+			expect(
+				stlEval(
+					`
                 let x = "hello"
                 match x {
                     "hello" => "correct"
                     _ => "incorrect"
                 }
                 `
-                )
-            ).toBe("correct");
-        });
+				)
+			).toBe("correct");
+		});
 
-        it("should be able to match booleans", () => {
-            expect(
-                stlEval(
-                    `
+		it("should be able to match booleans", () => {
+			expect(
+				stlEval(
+					`
                 match true {
                     true => "correct"
                     false => "wrong"
                     _ => "really wrong"
                 }
                 `
-                )
-            ).toBe("correct");
-        });
-    });
+				)
+			).toBe("correct");
+		});
+	});
 
-    describe("objects", () => {
-        it("should not throw on definition", () => {
-            expect(() =>
-                stlEval(
-                    `
+	describe("objects", () => {
+		it("should not throw on definition", () => {
+			expect(() =>
+				stlEval(
+					`
                 let obj = {
                     a: 72
                 }
                 `
-                )
-            ).not.toThrow();
-        });
+				)
+			).not.toThrow();
+		});
 
-        it("should allow comma separated properties", () => {
-            expect(() =>
-                stlEval(
-                    `
+		it("should allow comma separated properties", () => {
+			expect(() =>
+				stlEval(
+					`
                 let obj = {
                     a: 72,
                     b: 73
                 }
                 `
-                )
-            ).not.toThrow();
-        });
+				)
+			).not.toThrow();
+		});
 
-        it("should allow trailing comma", () => {
-            expect(() =>
-                stlEval(
-                    `
+		it("should allow trailing comma", () => {
+			expect(() =>
+				stlEval(
+					`
                 let obj = {
                     a: 72,
                     b: 73,
                 }
                 `
-                )
-            ).not.toThrow();
-        });
+				)
+			).not.toThrow();
+		});
 
-        it("should allow shadowed identifiers", () => {
-            expect(() =>
-                stlEval(
-                    `
+		it("should allow shadowed identifiers", () => {
+			expect(() =>
+				stlEval(
+					`
                 let obj = {
                     obj: 72
                 }
                 `
-                )
-            ).not.toThrow();
-        });
+				)
+			).not.toThrow();
+		});
 
-        /*
+		/*
         it.only("should allow keyword identifiers", () => {
             expect(() =>
                 stlEval(
@@ -778,98 +778,96 @@ describe("exec()", () => {
             ).not.toThrow();
         });
         */
-        it("should allow dot notation with an identifier", () => {
-            expect(
-                stlEval(
-                    `
+		it("should allow dot notation with an identifier", () => {
+			expect(
+				stlEval(
+					`
                     let obj = {
                         a: 72
                     }
                     obj.a
                     `
-                )
-            ).toEqual(new StlNumber(72n));
-        });
+				)
+			).toEqual(new StlNumber(72n));
+		});
 
-        it("should not allow assignment to an immutable object's properties", () => {
-            expect(() =>
-                stlEval(
-                    `
+		it("should not allow assignment to an immutable object's properties", () => {
+			expect(() =>
+				stlEval(
+					`
                     let obj = {
                         a: 42
                     }
                     obj.a = 43
                     `
-                )
-            ).toThrow();
-        });
+				)
+			).toThrow();
+		});
 
-        it("should allow assignment to a mutable object's properties", () => {
-            expect(
-                stlEval(
-                    `
+		it("should allow assignment to a mutable object's properties", () => {
+			expect(
+				stlEval(
+					`
                     let ~obj = {
                         a: 42
                     }
                     ~obj.a = 43
                     ~obj.a
                     `
-                )
-            ).toEqual(new StlNumber(43n));
-        });
-    });
+				)
+			).toEqual(new StlNumber(43n));
+		});
+	});
 
-    describe("pass by reference semantics", () => {
-        it("should properly handle assignment within a function", () => {
-            expect(
-                stlEval(`
+	describe("pass by reference semantics", () => {
+		it("should properly handle assignment within a function", () => {
+			expect(
+				stlEval(`
                     let ~val = 5
                     let addTwo = ~a -> ~a = ~a + 2
                     addTwo(~val)
                     ~val
                `)
-            ).toEqual(new StlNumber(7n));
-        });
+			).toEqual(new StlNumber(7n));
+		});
 
-        it("should not allow assignment to an immutable argument", () => {
-            expect(() =>
-                stlEval(`
+		it("should not allow assignment to an immutable argument", () => {
+			expect(() =>
+				stlEval(`
                     let ~val = 5
                     let addTwo = a -> a = a + 2
                     addTwo(~val)
                     ~val
                `)
-            ).toThrow(`Cannot assign to immutable variable "a"`);
-        });
-    });
+			).toThrow(`Cannot assign to immutable variable "a"`);
+		});
+	});
 });
 
 describe("debug", () => {
-    it("should print an error correctly", () => {
-        expect(() => stlEval("print(hi)")).toThrow(
-            `Variable "hi" is not defined.`
-        );
-    });
+	it("should print an error correctly", () => {
+		expect(() => stlEval("print(hi)")).toThrow(`Variable "hi" is not defined.`);
+	});
 
-    it("should return old scope if error occurs", () => {
-        expect(run("a", false, new Scope(), "<anonymous>")).toBeDefined();
-    });
+	it("should return old scope if error occurs", () => {
+		expect(run("a", false, new Scope(), "<anonymous>")).toBeDefined();
+	});
 
-    it("should not allow reassignment to an immutable variable", () => {
-        expect(() => stlEval("let a = 5\na = 6")).toThrow(
-            `Cannot assign to immutable variable "a".`
-        );
-    });
+	it("should not allow reassignment to an immutable variable", () => {
+		expect(() => stlEval("let a = 5\na = 6")).toThrow(
+			`Cannot assign to immutable variable "a".`
+		);
+	});
 
-    it("should not loop if parsing fails", () => {
-        // will hang if this test fails
-        try {
-            stlEval(")");
-        } catch {}
-    });
+	it("should not loop if parsing fails", () => {
+		// will hang if this test fails
+		try {
+			stlEval(")");
+		} catch {}
+	});
 
-    it("should show the correct filename on a test", () => {
-        /* FIXME remove
+	it("should show the correct filename on a test", () => {
+		/* FIXME remove
         let wasAnonymous = true;
         const printfn = (v: Value) => {
             console.log(v);
@@ -878,18 +876,18 @@ describe("debug", () => {
         };
         setPrintFn(printfn);
         */
-        const tokens = tokenize("a = ", "filename");
-        const ast: Either<Error[], Expr[]> = tokens.chain(parse);
-        expect(ast.isLeft()).toBe(true);
-        expect(
-            ast.mapLeft((errs) =>
-                errs
-                    .map((err) => err.message)
-                    .map((message) => message.includes("filename"))
-                    .reduce((acc, cur) => acc && cur, true)
-            )
-        );
-        // FIXME remove
-        //expect(wasAnonymous).toBe.false;
-    });
+		const tokens = tokenize("a = ", "filename");
+		const ast: Either<Error[], Expr[]> = tokens.chain(parse);
+		expect(ast.isLeft()).toBe(true);
+		expect(
+			ast.mapLeft((errs) =>
+				errs
+					.map((err) => err.message)
+					.map((message) => message.includes("filename"))
+					.reduce((acc, cur) => acc && cur, true)
+			)
+		);
+		// FIXME remove
+		//expect(wasAnonymous).toBe.false;
+	});
 });

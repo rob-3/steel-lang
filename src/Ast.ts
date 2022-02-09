@@ -1,9 +1,9 @@
 import { Expr } from "./Expr";
 
 export default class Ast {
-    exprs: Expr[];
+	exprs: Expr[];
 
-    constructor(exprs: Expr[]) {
-        this.exprs = exprs;
-    }
+	constructor(exprs: Expr[]) {
+		this.exprs = exprs;
+	}
 }
