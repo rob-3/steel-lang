@@ -12,6 +12,7 @@
 	"author": "",
 	"license": "ISC",
 	"description": "",
+	"type": "module",
 	"devDependencies": {
 		"@babel/preset-typescript": "^7.16.0",
 		"@types/node": "^17.0.5",
