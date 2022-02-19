@@ -3,7 +3,7 @@
 	"version": "1.0.0",
 	"main": "index.js",
 	"scripts": {
-		"start": "NODE_OPTIONS=--experimental-vm-modules node dist/main.js",
+		"start": "NODE_OPTIONS=--experimental-vm-modules node dist/src/main.js",
 		"test": "NODE_OPTIONS=--experimental-vm-modules npx jest",
 		"test:watch": "NODE_OPTIONS=--experimental-vm-modules npx jest --watchAll --runInBand",
 		"build": "tsc"
