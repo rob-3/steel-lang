@@ -1,4 +1,4 @@
-import { Expr } from "./Expr";
+import { Expr } from "./Expr.js";
 
 export default class Ast {
 	exprs: Expr[];

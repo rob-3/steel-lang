@@ -1,8 +1,8 @@
 import { Either, Right, Left } from "purify-ts";
-import Token from "./Token";
-import Location from "./Location";
-import TokenType from "./TokenType";
-import StlNumber from "./StlNumber";
+import Token from "./Token.js";
+import Location from "./Location.js";
+import TokenType from "./TokenType.js";
+import StlNumber from "./StlNumber.js";
 
 let startIndex = 0;
 let currentIndex = 0;

@@ -1,6 +1,6 @@
-import { StlFunction } from "./StlFunction";
-import StlObject from "./StlObject";
-import StlNumber from "./StlNumber";
+import { StlFunction } from "./StlFunction.js";
+import StlObject from "./StlObject.js";
+import StlNumber from "./StlNumber.js";
 
 export class Box<T> {
 	value: T;

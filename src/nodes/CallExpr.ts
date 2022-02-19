@@ -1,10 +1,10 @@
-import { RuntimePanic } from "../Debug";
-import { Expr } from "../Expr";
-import { call } from "../Interpreter";
-import Scope from "../Scope";
-import { StlFunction } from "../StlFunction";
-import Token from "../Token";
-import { Value } from "../Value";
+import { RuntimePanic } from "../Debug.js";
+import { Expr } from "../Expr.js";
+import { call } from "../Interpreter.js";
+import Scope from "../Scope.js";
+import { StlFunction } from "../StlFunction.js";
+import Token from "../Token.js";
+import { Value } from "../Value.js";
 
 export default class CallExpr implements Expr {
 	callee: Expr;

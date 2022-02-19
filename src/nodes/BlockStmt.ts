@@ -1,7 +1,7 @@
-import { Expr } from "../Expr";
-import { execStmts } from "../Interpreter";
-import Scope from "../Scope";
-import Token from "../Token";
+import { Expr } from "../Expr.js";
+import { execStmts } from "../Interpreter.js";
+import Scope from "../Scope.js";
+import Token from "../Token.js";
 
 export default class BlockStmt implements Expr {
 	exprs: Expr[];

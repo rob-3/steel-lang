@@ -1,30 +1,30 @@
 import { Either, Left, Right } from "purify-ts";
-import { ParseError } from "./Debug";
-import { Expr } from "./Expr";
-import ArrayLiteral from "./nodes/ArrayLiteral";
-import BinaryExpr from "./nodes/BinaryExpr";
-import BlockStmt from "./nodes/BlockStmt";
-import CallExpr from "./nodes/CallExpr";
-import FunctionDefinition from "./nodes/FunctionDefinition";
-import FunctionExpr from "./nodes/FunctionExpr";
-import GroupingExpr from "./nodes/GroupingExpr";
-import IfStmt from "./nodes/IfStmt";
-import IndexExpr from "./nodes/IndexExpr";
-import MatchStmt, { MatchCase, UnderscoreExpr } from "./nodes/MatchStmt";
-import PrimaryExpr from "./nodes/PrimaryExpr";
-import ReturnStmt from "./nodes/ReturnStmt";
-import UnaryExpr from "./nodes/UnaryExpr";
+import { ParseError } from "./Debug.js";
+import { Expr } from "./Expr.js";
+import ArrayLiteral from "./nodes/ArrayLiteral.js";
+import BinaryExpr from "./nodes/BinaryExpr.js";
+import BlockStmt from "./nodes/BlockStmt.js";
+import CallExpr from "./nodes/CallExpr.js";
+import FunctionDefinition from "./nodes/FunctionDefinition.js";
+import FunctionExpr from "./nodes/FunctionExpr.js";
+import GroupingExpr from "./nodes/GroupingExpr.js";
+import IfStmt from "./nodes/IfStmt.js";
+import IndexExpr from "./nodes/IndexExpr.js";
+import MatchStmt, { MatchCase, UnderscoreExpr } from "./nodes/MatchStmt.js";
+import PrimaryExpr from "./nodes/PrimaryExpr.js";
+import ReturnStmt from "./nodes/ReturnStmt.js";
+import UnaryExpr from "./nodes/UnaryExpr.js";
 import VariableAssignmentStmt, {
 	isAssignmentLeft,
 	AssignmentLeft,
-} from "./nodes/VariableAssignmentStmt";
-import VariableDeclarationStmt from "./nodes/VariableDeclarationStmt";
-import VariableExpr from "./nodes/VariableExpr";
-import WhileStmt from "./nodes/WhileStmt";
-import Token from "./Token";
-import TokenType from "./TokenType";
-import { ObjectLiteral } from "./nodes/ObjectLiteral";
-import DotAccess from "./nodes/DotAccess";
+} from "./nodes/VariableAssignmentStmt.js";
+import VariableDeclarationStmt from "./nodes/VariableDeclarationStmt.js";
+import VariableExpr from "./nodes/VariableExpr.js";
+import WhileStmt from "./nodes/WhileStmt.js";
+import Token from "./Token.js";
+import TokenType from "./TokenType.js";
+import { ObjectLiteral } from "./nodes/ObjectLiteral.js";
+import DotAccess from "./nodes/DotAccess.js";
 
 let tokens: Token[];
 let start = 0;

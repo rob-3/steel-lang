@@ -1,8 +1,8 @@
-import { RuntimePanic } from "../Debug";
-import { Expr } from "../Expr";
-import Scope from "../Scope";
-import Token from "../Token";
-import { Value } from "../Value";
+import { RuntimePanic } from "../Debug.js";
+import { Expr } from "../Expr.js";
+import Scope from "../Scope.js";
+import Token from "../Token.js";
+import { Value } from "../Value.js";
 
 export default class IfStmt implements Expr {
 	condition: Expr;

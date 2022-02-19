@@ -1,24 +1,24 @@
-import Ast from "./Ast";
-import { Expr } from "./Expr";
-import ArrayLiteral from "./nodes/ArrayLiteral";
-import BinaryExpr from "./nodes/BinaryExpr";
-import BlockStmt from "./nodes/BlockStmt";
-import CallExpr from "./nodes/CallExpr";
-import FunctionDefinition from "./nodes/FunctionDefinition";
-import FunctionExpr from "./nodes/FunctionExpr";
-import GroupingExpr from "./nodes/GroupingExpr";
-import IfStmt from "./nodes/IfStmt";
-import IndexExpr from "./nodes/IndexExpr";
-import MatchStmt, { UnderscoreExpr } from "./nodes/MatchStmt";
-import PrimaryExpr from "./nodes/PrimaryExpr";
-import PrintStmt from "./nodes/PrintStmt";
-import ReturnStmt from "./nodes/ReturnStmt";
-import UnaryExpr from "./nodes/UnaryExpr";
-import VariableAssignmentStmt from "./nodes/VariableAssignmentStmt";
-import VariableDeclarationStmt from "./nodes/VariableDeclarationStmt";
-import VariableExpr from "./nodes/VariableExpr";
-import WhileStmt from "./nodes/WhileStmt";
-import Token from "./Token";
+import Ast from "./Ast.js";
+import { Expr } from "./Expr.js";
+import ArrayLiteral from "./nodes/ArrayLiteral.js";
+import BinaryExpr from "./nodes/BinaryExpr.js";
+import BlockStmt from "./nodes/BlockStmt.js";
+import CallExpr from "./nodes/CallExpr.js";
+import FunctionDefinition from "./nodes/FunctionDefinition.js";
+import FunctionExpr from "./nodes/FunctionExpr.js";
+import GroupingExpr from "./nodes/GroupingExpr.js";
+import IfStmt from "./nodes/IfStmt.js";
+import IndexExpr from "./nodes/IndexExpr.js";
+import MatchStmt, { UnderscoreExpr } from "./nodes/MatchStmt.js";
+import PrimaryExpr from "./nodes/PrimaryExpr.js";
+import PrintStmt from "./nodes/PrintStmt.js";
+import ReturnStmt from "./nodes/ReturnStmt.js";
+import UnaryExpr from "./nodes/UnaryExpr.js";
+import VariableAssignmentStmt from "./nodes/VariableAssignmentStmt.js";
+import VariableDeclarationStmt from "./nodes/VariableDeclarationStmt.js";
+import VariableExpr from "./nodes/VariableExpr.js";
+import WhileStmt from "./nodes/WhileStmt.js";
+import Token from "./Token.js";
 
 /*
  * The standard error format, shamelessly stolen from rust

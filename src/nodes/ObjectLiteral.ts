@@ -1,9 +1,9 @@
-import { Expr } from "../Expr";
-import Token from "../Token";
-import Scope from "../Scope";
-import { Value, Box } from "../Value";
-import StlObject from "../StlObject";
-import { RuntimePanic } from "../Debug";
+import { Expr } from "../Expr.js";
+import Token from "../Token.js";
+import Scope from "../Scope.js";
+import { Value, Box } from "../Value.js";
+import StlObject from "../StlObject.js";
+import { RuntimePanic } from "../Debug.js";
 
 export class ObjectLiteral implements Expr {
 	properties: Map<string, Expr>;

@@ -1,7 +1,7 @@
-import { Expr } from "../Expr";
-import Scope from "../Scope";
-import Token from "../Token";
-import VariableDeclarationStmt from "./VariableDeclarationStmt";
+import { Expr } from "../Expr.js";
+import Scope from "../Scope.js";
+import Token from "../Token.js";
+import VariableDeclarationStmt from "./VariableDeclarationStmt.js";
 
 export default class FunctionDefinition implements Expr {
 	definition: VariableDeclarationStmt;

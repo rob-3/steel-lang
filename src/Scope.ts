@@ -1,9 +1,9 @@
-import { RuntimePanic } from "./Debug";
-import { StlFunction } from "./StlFunction";
-import { Value, Box } from "./Value";
-import FunctionExpr from "./nodes/FunctionExpr";
-import PrintStmt from "./nodes/PrintStmt";
-import VariableExpr from "./nodes/VariableExpr";
+import { RuntimePanic } from "./Debug.js";
+import { StlFunction } from "./StlFunction.js";
+import { Value, Box } from "./Value.js";
+import FunctionExpr from "./nodes/FunctionExpr.js";
+import PrintStmt from "./nodes/PrintStmt.js";
+import VariableExpr from "./nodes/VariableExpr.js";
 
 /**
  * A Scope represents a lexical scope in the program. Each Scope has a set of

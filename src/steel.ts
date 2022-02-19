@@ -1,11 +1,11 @@
 import { Either, Left, Right } from "purify-ts";
-import { Expr } from "./Expr";
-import { exprEval } from "./Interpreter";
-import { stlPrint } from "./Logger";
-import parse from "./Parser";
-import Scope from "./Scope";
-import { StlFunction } from "./StlFunction";
-import tokenize from "./Tokenizer";
+import { Expr } from "./Expr.js";
+import { exprEval } from "./Interpreter.js";
+import { stlPrint } from "./Logger.js";
+import parse from "./Parser.js";
+import Scope from "./Scope.js";
+import { StlFunction } from "./StlFunction.js";
+import tokenize from "./Tokenizer.js";
 
 /**
  * This function uses the node.js readline api to set up a prompt for the REPL.

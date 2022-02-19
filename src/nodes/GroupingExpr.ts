@@ -1,6 +1,6 @@
-import { Expr } from "../Expr";
-import Scope from "../Scope";
-import Token from "../Token";
+import { Expr } from "../Expr.js";
+import Scope from "../Scope.js";
+import Token from "../Token.js";
 
 export default class GroupingExpr implements Expr {
 	expr: Expr;

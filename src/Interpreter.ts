@@ -1,14 +1,14 @@
 import { Either } from "purify-ts";
-import { RuntimePanic } from "./Debug";
-import { Expr } from "./Expr";
-import ReturnStmt from "./nodes/ReturnStmt";
-import parse from "./Parser";
-import Scope from "./Scope";
-import { StlFunction } from "./StlFunction";
-import tokenize from "./Tokenizer";
-import { Value, Box } from "./Value";
-import StlNumber from "./StlNumber";
-import StlObject from "./StlObject";
+import { RuntimePanic } from "./Debug.js";
+import { Expr } from "./Expr.js";
+import ReturnStmt from "./nodes/ReturnStmt.js";
+import parse from "./Parser.js";
+import Scope from "./Scope.js";
+import { StlFunction } from "./StlFunction.js";
+import tokenize from "./Tokenizer.js";
+import { Value, Box } from "./Value.js";
+import StlNumber from "./StlNumber.js";
+import StlObject from "./StlObject.js";
 
 export function execStmts(stmts: Expr[], scope: Scope): [Value, Scope] {
 	let value: Value | null = null;

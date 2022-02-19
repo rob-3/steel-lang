@@ -1,7 +1,7 @@
-import { exprEval } from "./Interpreter";
-import FunctionExpr from "./nodes/FunctionExpr";
-import Scope from "./Scope";
-import { Value } from "./Value";
+import { exprEval } from "./Interpreter.js";
+import FunctionExpr from "./nodes/FunctionExpr.js";
+import Scope from "./Scope.js";
+import { Value } from "./Value.js";
 
 export class StlFunction {
 	funExpr: FunctionExpr;

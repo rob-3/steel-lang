@@ -1,9 +1,9 @@
-import { Expr } from "../Expr";
-import { stlPrint } from "../Logger";
-import Scope from "../Scope";
-import Token from "../Token";
-import { Value } from "../Value";
-import { RuntimePanic } from "../Debug";
+import { Expr } from "../Expr.js";
+import { stlPrint } from "../Logger.js";
+import Scope from "../Scope.js";
+import Token from "../Token.js";
+import { Value } from "../Value.js";
+import { RuntimePanic } from "../Debug.js";
 
 // TODO: library function
 export default class PrintStmt implements Expr {

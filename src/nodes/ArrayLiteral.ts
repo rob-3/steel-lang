@@ -1,8 +1,8 @@
-import { Expr } from "../Expr";
-import Scope from "../Scope";
-import Token from "../Token";
-import { Value, Box } from "../Value";
-import { RuntimePanic } from "../Debug";
+import { Expr } from "../Expr.js";
+import Scope from "../Scope.js";
+import Token from "../Token.js";
+import { Value, Box } from "../Value.js";
+import { RuntimePanic } from "../Debug.js";
 
 export default class ArrayLiteral implements Expr {
 	exprs: Expr[];

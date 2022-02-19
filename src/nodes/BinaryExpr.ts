@@ -1,5 +1,5 @@
-import { RuntimePanic } from "../Debug";
-import { Expr } from "../Expr";
+import { RuntimePanic } from "../Debug.js";
+import { Expr } from "../Expr.js";
 import {
 	and,
 	equal,
@@ -14,11 +14,11 @@ import {
 	plusPlus,
 	slash,
 	star,
-} from "../Interpreter";
-import Scope from "../Scope";
-import Token from "../Token";
-import TokenType from "../TokenType";
-import { Value } from "../Value";
+} from "../Interpreter.js";
+import Scope from "../Scope.js";
+import Token from "../Token.js";
+import TokenType from "../TokenType.js";
+import { Value } from "../Value.js";
 
 export default class BinaryExpr implements Expr {
 	left: Expr;

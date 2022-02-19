@@ -1,13 +1,13 @@
-import { Expr } from "../Expr";
-import Scope from "../Scope";
-import Token from "../Token";
-import VariableExpr from "./VariableExpr";
-import DotAccess from "./DotAccess";
-import StlObject from "../StlObject";
-import { RuntimePanic } from "../Debug";
-import { Value, UnboxedValue } from "../Value";
-import IndexExpr from "./IndexExpr";
-import StlNumber from "../StlNumber";
+import { Expr } from "../Expr.js";
+import Scope from "../Scope.js";
+import Token from "../Token.js";
+import VariableExpr from "./VariableExpr.js";
+import DotAccess from "./DotAccess.js";
+import StlObject from "../StlObject.js";
+import { RuntimePanic } from "../Debug.js";
+import { Value, UnboxedValue } from "../Value.js";
+import IndexExpr from "./IndexExpr.js";
+import StlNumber from "../StlNumber.js";
 
 export type AssignmentLeft = VariableExpr | DotAccess | IndexExpr;
 

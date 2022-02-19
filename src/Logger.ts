@@ -1,4 +1,4 @@
-import { UnboxedValue } from "./Value";
+import { UnboxedValue } from "./Value.js";
 
 let printfn = (val: UnboxedValue) => console.log(toString(val));
 

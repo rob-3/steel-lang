@@ -1,5 +1,5 @@
-import Location from "./Location";
-import TokenType from "./TokenType";
+import Location from "./Location.js";
+import TokenType from "./TokenType.js";
 
 export default class Token {
 	type: TokenType;

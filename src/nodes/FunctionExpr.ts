@@ -1,8 +1,8 @@
-import { Expr } from "../Expr";
-import Scope from "../Scope";
-import { StlFunction } from "../StlFunction";
-import Token from "../Token";
-import { Value, Box } from "../Value";
+import { Expr } from "../Expr.js";
+import Scope from "../Scope.js";
+import { StlFunction } from "../StlFunction.js";
+import Token from "../Token.js";
+import { Value, Box } from "../Value.js";
 
 export default class FunctionExpr implements Expr {
 	args: string[];

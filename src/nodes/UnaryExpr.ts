@@ -1,10 +1,10 @@
-import { RuntimePanic } from "../Debug";
-import { Expr } from "../Expr";
-import { not, opposite } from "../Interpreter";
-import Scope from "../Scope";
-import Token from "../Token";
-import TokenType from "../TokenType";
-import { Value } from "../Value";
+import { RuntimePanic } from "../Debug.js";
+import { Expr } from "../Expr.js";
+import { not, opposite } from "../Interpreter.js";
+import Scope from "../Scope.js";
+import Token from "../Token.js";
+import TokenType from "../TokenType.js";
+import { Value } from "../Value.js";
 
 export default class UnaryExpr implements Expr {
 	operator: Token;

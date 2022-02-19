@@ -1,10 +1,10 @@
-import { RuntimePanic } from "../Debug";
-import { Expr } from "../Expr";
-import { equal } from "../Interpreter";
-import Scope from "../Scope";
-import Token from "../Token";
-import { Value } from "../Value";
-import PrimaryExpr from "./PrimaryExpr";
+import { RuntimePanic } from "../Debug.js";
+import { Expr } from "../Expr.js";
+import { equal } from "../Interpreter.js";
+import Scope from "../Scope.js";
+import Token from "../Token.js";
+import { Value } from "../Value.js";
+import PrimaryExpr from "./PrimaryExpr.js";
 
 export default class MatchStmt implements Expr {
 	expr: Expr;

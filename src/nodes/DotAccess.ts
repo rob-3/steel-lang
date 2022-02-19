@@ -1,9 +1,9 @@
-import { RuntimePanic } from "../Debug";
-import { Expr } from "../Expr";
-import Scope from "../Scope";
-import Token from "../Token";
-import { Value } from "../Value";
-import StlObject from "../StlObject";
+import { RuntimePanic } from "../Debug.js";
+import { Expr } from "../Expr.js";
+import Scope from "../Scope.js";
+import Token from "../Token.js";
+import { Value } from "../Value.js";
+import StlObject from "../StlObject.js";
 
 export default class DotAccess implements Expr {
 	left: Expr;
