@@ -1,5 +1,5 @@
-import parse from "../src/Parser";
-import tokenize from "../src/Tokenizer";
+import parse from "../src/Parser.js";
+import tokenize from "../src/Tokenizer.js";
 
 describe("parse()", () => {
 	it("should give proper error on unclosed array literal", () => {

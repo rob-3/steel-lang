@@ -1,13 +1,13 @@
-import Token from "../src/Token";
+import Token from "../src/Token.js";
 import _tokenize, {
 	isAlpha,
 	isAlphaNumeric,
 	isLegalIdentifierChar,
 	isNumber,
-} from "../src/Tokenizer";
-import Location from "../src/Location";
-import TokenType from "../src/TokenType";
-import StlNumber from "../src/StlNumber";
+} from "../src/Tokenizer.js";
+import Location from "../src/Location.js";
+import TokenType from "../src/TokenType.js";
+import StlNumber from "../src/StlNumber.js";
 
 const tokenize = (src: string) => _tokenize(src).unsafeCoerce();
 

@@ -1,13 +1,13 @@
 import { Either } from "purify-ts";
-import { Expr } from "../src/Expr";
-import { stlEval as _stlEval } from "../src/Interpreter";
-import { setPrintFn } from "../src/Logger";
-import parse from "../src/Parser";
-import Scope from "../src/Scope";
-import { run } from "../src/steel";
-import tokenize from "../src/Tokenizer";
-import { Value, UnboxedValue } from "../src/Value";
-import StlNumber from "../src/StlNumber";
+import { Expr } from "../src/Expr.js";
+import { stlEval as _stlEval } from "../src/Interpreter.js";
+import { setPrintFn } from "../src/Logger.js";
+import parse from "../src/Parser.js";
+import Scope from "../src/Scope.js";
+import { run } from "../src/steel.js";
+import tokenize from "../src/Tokenizer.js";
+import { Value, UnboxedValue } from "../src/Value.js";
+import StlNumber from "../src/StlNumber.js";
 import { jest } from "@jest/globals";
 
 // silence logs unless we're debugging

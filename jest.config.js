@@ -4,7 +4,7 @@ const config = {
     "^.+\\.[t|j]sx?$": "babel-jest",
   },
   extensionsToTreatAsEsm: [".ts"],
-	testPathIgnorePatterns: ["<rootDir>/dist"],
+	testPathIgnorePatterns: ["<rootDir>/test"],
 }
 
 export default config;

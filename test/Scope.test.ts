@@ -1,7 +1,7 @@
-import { stlEval } from "../src/Interpreter";
-import Scope from "../src/Scope";
-import { Box } from "../src/Value";
-import StlNumber from "../src/StlNumber";
+import { stlEval } from "../src/Interpreter.js";
+import Scope from "../src/Scope.js";
+import { Box } from "../src/Value.js";
+import StlNumber from "../src/StlNumber.js";
 
 describe("class Scope", () => {
 	it("should retrieve values with no parents", () => {

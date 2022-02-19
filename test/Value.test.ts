@@ -1,7 +1,7 @@
-import StlNumber, { gcd } from "../src/StlNumber";
-import { stlEval as _stlEval } from "../src/Interpreter";
-import Scope from "../src/Scope";
-import { UnboxedValue } from "../src/Value";
+import StlNumber, { gcd } from "../src/StlNumber.js";
+import { stlEval as _stlEval } from "../src/Interpreter.js";
+import Scope from "../src/Scope.js";
+import { UnboxedValue } from "../src/Value.js";
 
 const stlEval = (
 	src: string,

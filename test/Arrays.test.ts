@@ -1,7 +1,7 @@
-import parse from "../src/Parser";
-import StlNumber from "../src/StlNumber";
-import tokenize from "../src/Tokenizer";
-import { stlEval } from "./Interpreter.test";
+import parse from "../src/Parser.js";
+import StlNumber from "../src/StlNumber.js";
+import tokenize from "../src/Tokenizer.js";
+import { stlEval } from "./Interpreter.test.js";
 
 describe("Steel arrays", () => {
 	it("should not throw a parse error when assigning to array index", () => {
