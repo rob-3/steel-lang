@@ -3,9 +3,9 @@
 	"version": "1.0.0",
 	"main": "index.js",
 	"scripts": {
-		"start": "node dist/src/main.js",
-		"test": "jest",
-		"test:watch": "jest --watchAll --runInBand",
+		"start": "NODE_OPTIONS=--experimental-vm-modules node dist/main.js",
+		"test": "NODE_OPTIONS=--experimental-vm-modules npx jest",
+		"test:watch": "NODE_OPTIONS=--experimental-vm-modules npx jest --watchAll --runInBand",
 		"build": "tsc"
 	},
 	"keywords": [],
