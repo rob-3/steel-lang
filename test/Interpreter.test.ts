@@ -8,6 +8,7 @@ import { run } from "../src/steel";
 import tokenize from "../src/Tokenizer";
 import { Value, UnboxedValue } from "../src/Value";
 import StlNumber from "../src/StlNumber";
+import { jest } from "@jest/globals";
 
 // silence logs unless we're debugging
 console.log = () => {};
