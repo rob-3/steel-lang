@@ -2,6 +2,7 @@ import StlNumber, { gcd } from "../src/StlNumber.js";
 import { stlEval as _stlEval } from "../src/Interpreter.js";
 import Scope from "../src/Scope.js";
 import { UnboxedValue } from "../src/Value.js";
+import { describe, it, expect } from "vitest";
 
 const stlEval = (
 	src: string,

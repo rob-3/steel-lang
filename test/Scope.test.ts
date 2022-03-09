@@ -2,6 +2,7 @@ import { stlEval } from "../src/Interpreter.js";
 import Scope from "../src/Scope.js";
 import { Box } from "../src/Value.js";
 import StlNumber from "../src/StlNumber.js";
+import { describe, it, expect } from "vitest";
 
 describe("class Scope", () => {
 	it("should retrieve values with no parents", () => {

@@ -1,5 +1,6 @@
 import parse from "../src/Parser";
 import tokenize from "../src/Tokenizer";
+import { it, expect } from "vitest";
 
 it("should serialize anonymous function to standard string", () => {
 	expect(

@@ -2,6 +2,7 @@ import parse from "../src/Parser.js";
 import StlNumber from "../src/StlNumber.js";
 import tokenize from "../src/Tokenizer.js";
 import { stlEval } from "./Interpreter.test.js";
+import { describe, it, expect } from "vitest";
 
 describe("Steel arrays", () => {
 	it("should not throw a parse error when assigning to array index", () => {

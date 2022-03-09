@@ -1,5 +1,6 @@
 import parse from "../src/Parser.js";
 import tokenize from "../src/Tokenizer.js";
+import { describe, it, expect } from "vitest";
 
 describe("parse()", () => {
 	it("should give proper error on unclosed array literal", () => {

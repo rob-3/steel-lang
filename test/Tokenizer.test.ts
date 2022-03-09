@@ -8,6 +8,7 @@ import _tokenize, {
 import Location from "../src/Location.js";
 import TokenType from "../src/TokenType.js";
 import StlNumber from "../src/StlNumber.js";
+import { describe, it, expect } from "vitest";
 
 const tokenize = (src: string) => _tokenize(src).unsafeCoerce();
 
