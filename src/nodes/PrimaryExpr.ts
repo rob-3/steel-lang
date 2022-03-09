@@ -3,6 +3,7 @@ import Scope from "../Scope.js";
 import Token from "../Token.js";
 import { Value, Box } from "../Value.js";
 import StlNumber from "../StlNumber.js";
+import { Node, x } from "code-red";
 
 export default class PrimaryExpr implements Expr {
 	literal: StlNumber | boolean | string;
@@ -14,5 +15,22 @@ export default class PrimaryExpr implements Expr {
 
 	eval(scope: Scope): [Value, Scope] {
 		return [new Box(this.literal), scope];
+	}
+
+	estree(): Node {
+		switch (typeof this.literal) {
+			case "boolean":
+				return x`{stlValue: ${this.literal.toString()}}`;
+			case "string":
+				return x`{stlValue: "${this.literal.toString()}"}`;
+			default: {
+				return x`{
+					stlValue: {
+						top: ${`${this.literal.top.toString()}n`},
+						bottom: ${`${this.literal.bottom.toString()}n`}
+					}
+				}`;
+			}
+		}
 	}
 }
