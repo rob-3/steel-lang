@@ -17,7 +17,17 @@ it("should compile strings", () => {
 	assertEqual(node, x`{stlValue: "hello"}`);
 });
 
-it("should compile numbers", () => {
+it("should compile integers", () => {
 	const node: Node = new PrimaryExpr(StlNumber.of(5), []).estree();
 	assertEqual(node, x`{stlValue: {top: 5n, bottom: 1n}}`);
+});
+
+it("should compile decimals", () => {
+	const node: Node = new PrimaryExpr(StlNumber.of("5.56"), []).estree();
+	assertEqual(node, x`{stlValue: {top: 139n, bottom: 25n}}`);
+});
+
+it("should compile decimals with trailing zeros", () => {
+	const node: Node = new PrimaryExpr(StlNumber.of("5.560"), []).estree();
+	assertEqual(node, x`{stlValue: {top: 139n, bottom: 25n}}`);
 });
