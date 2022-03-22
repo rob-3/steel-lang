@@ -1,9 +1,11 @@
 import { Expr } from "./Expr.js";
 
-export default class Ast {
+export type Ast = {
 	exprs: Expr[];
+};
 
-	constructor(exprs: Expr[]) {
-		this.exprs = exprs;
-	}
-}
+export const Ast = (exprs: Expr[]) => {
+	return {
+		exprs,
+	};
+};

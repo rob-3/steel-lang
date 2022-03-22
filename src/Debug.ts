@@ -1,23 +1,5 @@
-import Ast from "./Ast.js";
+import { Ast } from "./Ast.js";
 import { Expr } from "./Expr.js";
-import ArrayLiteral from "./nodes/ArrayLiteral.js";
-import BinaryExpr from "./nodes/BinaryExpr.js";
-import BlockStmt from "./nodes/BlockStmt.js";
-import CallExpr from "./nodes/CallExpr.js";
-import FunctionDefinition from "./nodes/FunctionDefinition.js";
-import FunctionExpr from "./nodes/FunctionExpr.js";
-import GroupingExpr from "./nodes/GroupingExpr.js";
-import IfStmt from "./nodes/IfStmt.js";
-import IndexExpr from "./nodes/IndexExpr.js";
-import MatchStmt, { UnderscoreExpr } from "./nodes/MatchStmt.js";
-import PrimaryExpr from "./nodes/PrimaryExpr.js";
-import PrintStmt from "./nodes/PrintStmt.js";
-import ReturnStmt from "./nodes/ReturnStmt.js";
-import UnaryExpr from "./nodes/UnaryExpr.js";
-import VariableAssignmentStmt from "./nodes/VariableAssignmentStmt.js";
-import VariableDeclarationStmt from "./nodes/VariableDeclarationStmt.js";
-import VariableExpr from "./nodes/VariableExpr.js";
-import WhileStmt from "./nodes/WhileStmt.js";
 import Token from "./Token.js";
 
 /*
@@ -107,47 +89,53 @@ const commaDelimit = (first: string, second: string) => `${first}, ${second}`;
 function nodeToString(expr: Expr): string {
 	const t = nodeToString;
 	const i = indent;
-	if (expr instanceof VariableExpr) {
-		return `${expr.identifier}`;
-	} else if (expr instanceof BinaryExpr) {
-		return `BinaryExpr ${t(expr.left)} ${expr.operator.lexeme} ${t(
-			expr.right
-		)}`;
-	} else if (expr instanceof PrimaryExpr) {
-		return `Primary ${expr.literal}`;
-	} else if (expr instanceof UnaryExpr) {
-		return `UnaryExpr ${expr.operator}${expr.right}`;
-	} else if (expr instanceof GroupingExpr) {
-		return `GroupingExpr (${expr.expr})`;
-	} else if (expr instanceof CallExpr) {
-		return `CallExpr ${t(expr.callee)}(${expr.args.map(t)})`;
-	} else if (expr instanceof FunctionExpr) {
-		return `FunctionExpr (${expr.args.reduce(commaDelimit)}` + t(expr.body);
-	} else if (expr instanceof UnderscoreExpr) {
-		return `UnderscoreExpr`;
-	} else if (expr instanceof VariableDeclarationStmt) {
-		return `VariableDeclarationStmt`;
-	} else if (expr instanceof PrintStmt) {
-		return `PrintStmt`;
-	} else if (expr instanceof VariableAssignmentStmt) {
-		return `VariableAssignmentStmt`;
-	} else if (expr instanceof IfStmt) {
-		return `IfStmt`;
-	} else if (expr instanceof BlockStmt) {
-		return (
-			"{" + expr.exprs.reduce((acc, cur) => acc + "\n" + i(t(cur)) + "\n}", "")
-		);
-	} else if (expr instanceof WhileStmt) {
-		return `WhileStmt`;
-	} else if (expr instanceof ReturnStmt) {
-		return `ReturnStmt`;
-	} else if (expr instanceof MatchStmt) {
-		return `MatchStmt`;
-	} else if (expr instanceof FunctionDefinition) {
-		return `FnDef ${expr.definition.identifier} = ` + t(expr.definition.right);
-	} else if (expr instanceof IndexExpr) {
-		return `IndexExpr`;
-	} else if (expr instanceof ArrayLiteral) {
-		return `ArrayLiteral ${expr.exprs.map(t).reduce(commaDelimit)}]`;
-	} else throw Error("not an expr type");
+	switch (expr.type) {
+		case "VariableExpr":
+			return `${expr.identifier}`;
+		case "BinaryExpr":
+			return `BinaryExpr ${t(expr.left)} ${expr.operator.lexeme} ${t(
+				expr.right
+			)}`;
+		case "PrimaryExpr":
+			return `Primary ${expr.literal}`;
+		case "UnaryExpr":
+			return `UnaryExpr ${expr.operator}${expr.right}`;
+		case "GroupingExpr":
+			return `GroupingExpr (${expr.expr})`;
+		case "CallExpr":
+			return `CallExpr ${t(expr.callee)}(${expr.args.map(t)})`;
+		case "FunctionExpr":
+			return `FunctionExpr (${expr.args.reduce(commaDelimit)}` + t(expr.body);
+		case "UnderscoreExpr":
+			return `UnderscoreExpr`;
+		case "VariableDeclarationStmt":
+			return `VariableDeclarationStmt`;
+		case "PrintStmt":
+			return `PrintStmt`;
+		case "VariableAssignmentStmt":
+			return `VariableAssignmentStmt`;
+		case "IfStmt":
+			return `IfStmt`;
+		case "BlockStmt":
+			return (
+				"{" +
+				expr.exprs.reduce((acc, cur) => acc + "\n" + i(t(cur)) + "\n}", "")
+			);
+		case "WhileStmt":
+			return `WhileStmt`;
+		case "ReturnStmt":
+			return `ReturnStmt`;
+		case "MatchStmt":
+			return `MatchStmt`;
+		case "FunctionDefinition":
+			return (
+				`FnDef ${expr.definition.identifier} = ` + t(expr.definition.right)
+			);
+		case "IndexExpr":
+			return `IndexExpr`;
+		case "ArrayLiteral":
+			return `ArrayLiteral ${expr.exprs.map(t).reduce(commaDelimit)}]`;
+		default:
+			throw Error("not an expr type");
+	}
 }

@@ -1,5 +1,5 @@
 import { exprEval } from "./Interpreter.js";
-import FunctionExpr from "./nodes/FunctionExpr.js";
+import { FunctionExpr } from "./nodes/FunctionExpr.js";
 import Scope from "./Scope.js";
 import { Value } from "./Value.js";
 

@@ -1,7 +1,6 @@
 import { Either } from "purify-ts";
 import { RuntimePanic } from "./Debug.js";
 import { Expr } from "./Expr.js";
-import ReturnStmt from "./nodes/ReturnStmt.js";
 import parse from "./Parser.js";
 import Scope from "./Scope.js";
 import { StlFunction } from "./StlFunction.js";
@@ -14,7 +13,7 @@ export function execStmts(stmts: Expr[], scope: Scope): [Value, Scope] {
 	let value: Value | null = null;
 	for (const stmt of stmts) {
 		const [newValue, newScope] = exprEval(stmt, scope);
-		if (stmt instanceof ReturnStmt) {
+		if (stmt.type === "ReturnStmt") {
 			if (newValue === null) {
 				throw RuntimePanic("Return value cannot be nothing");
 			}

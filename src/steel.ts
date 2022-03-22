@@ -1,5 +1,5 @@
-import { Either, Left, Right } from "purify-ts";
-import { Expr } from "./Expr.js";
+import { Either } from "purify-ts";
+import { ExprBase } from "./Expr.js";
 import { exprEval } from "./Interpreter.js";
 import { stlPrint } from "./Logger.js";
 import parse from "./Parser.js";
@@ -53,14 +53,14 @@ export function run(
 		 * Last, we use the loop to run each statement sequentially.
 		 */
 		const tokens = tokenize(src, filename);
-		const ast: Either<Error[], Expr[]> = tokens.chain(parse);
+		const ast: Either<Error[], ExprBase[]> = tokens.chain(parse);
 		const finalScope: Scope = ast.caseOf({
 			Left: (badAst) => {
 				badAst.map((err) => stlPrint(err.message));
 				return scope;
 			},
 			Right: (goodAst) => {
-				return goodAst.reduce<Scope>((scope: Scope, expr: Expr) => {
+				return goodAst.reduce<Scope>((scope: Scope, expr: ExprBase) => {
 					const [val, newScope] = exprEval(expr, scope);
 					// Print if using REPL and if the expression evaluates to a value
 					if (repl && val !== undefined) {

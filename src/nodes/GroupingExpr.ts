@@ -1,16 +1,19 @@
-import { Expr } from "../Expr.js";
+import { ExprBase } from "../Expr.js";
 import Scope from "../Scope.js";
 import Token from "../Token.js";
 
-export default class GroupingExpr implements Expr {
+export type GroupingExpr = ExprBase & {
+	type: "GroupingExpr";
 	expr: Expr;
-	tokens: Token[];
-	constructor(expr: Expr, tokens: Token[]) {
-		this.expr = expr;
-		this.tokens = tokens;
-	}
+};
 
-	eval(scope: Scope) {
-		return this.expr.eval(scope);
-	}
-}
+export const GroupingExpr = (expr: Expr, tokens: Token[]): GroupingExpr => {
+	return {
+		type: "GroupingExpr",
+		expr,
+		tokens,
+		eval(scope: Scope) {
+			return this.expr.eval(scope);
+		},
+	};
+};

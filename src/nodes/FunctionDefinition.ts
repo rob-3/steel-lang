@@ -1,18 +1,23 @@
-import { Expr } from "../Expr.js";
+import { ExprBase } from "../Expr.js";
 import Scope from "../Scope.js";
 import Token from "../Token.js";
-import VariableDeclarationStmt from "./VariableDeclarationStmt.js";
+import { VariableDeclarationStmt } from "./VariableDeclarationStmt.js";
 
-export default class FunctionDefinition implements Expr {
+export type FunctionDefinition = ExprBase & {
+	type: "FunctionDefinition";
 	definition: VariableDeclarationStmt;
-	tokens: Token[];
+};
 
-	constructor(definition: VariableDeclarationStmt, tokens: Token[]) {
-		this.definition = definition;
-		this.tokens = tokens;
-	}
-
-	eval(scope: Scope) {
-		return this.definition.eval(scope);
-	}
-}
+export const FunctionDefinition = (
+	definition: VariableDeclarationStmt,
+	tokens: Token[]
+): FunctionDefinition => {
+	return {
+		type: "FunctionDefinition",
+		definition,
+		tokens,
+		eval(scope: Scope) {
+			return this.definition.eval(scope);
+		},
+	};
+};

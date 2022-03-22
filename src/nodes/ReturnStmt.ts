@@ -1,16 +1,19 @@
-import { Expr } from "../Expr.js";
+import { Expr, ExprBase } from "../Expr.js";
 import Scope from "../Scope.js";
 import Token from "../Token.js";
 
-export default class ReturnStmt implements Expr {
+export type ReturnStmt = ExprBase & {
+	type: "ReturnStmt";
 	value: Expr;
-	tokens: Token[];
-	constructor(value: Expr, tokens: Token[]) {
-		this.value = value;
-		this.tokens = tokens;
-	}
+};
 
-	eval(scope: Scope) {
-		return this.value.eval(scope);
-	}
-}
+export const ReturnStmt = (value: Expr, tokens: Token[]): ReturnStmt => {
+	return {
+		type: "ReturnStmt",
+		value,
+		tokens,
+		eval(scope: Scope) {
+			return this.value.eval(scope);
+		},
+	};
+};

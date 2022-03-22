@@ -1,30 +1,31 @@
 import { Either, Left, Right } from "purify-ts";
 import { ParseError } from "./Debug.js";
 import { Expr } from "./Expr.js";
-import ArrayLiteral from "./nodes/ArrayLiteral.js";
-import BinaryExpr from "./nodes/BinaryExpr.js";
-import BlockStmt from "./nodes/BlockStmt.js";
-import CallExpr from "./nodes/CallExpr.js";
-import FunctionDefinition from "./nodes/FunctionDefinition.js";
-import FunctionExpr from "./nodes/FunctionExpr.js";
-import GroupingExpr from "./nodes/GroupingExpr.js";
-import IfStmt from "./nodes/IfStmt.js";
-import IndexExpr from "./nodes/IndexExpr.js";
-import MatchStmt, { MatchCase, UnderscoreExpr } from "./nodes/MatchStmt.js";
-import PrimaryExpr from "./nodes/PrimaryExpr.js";
-import ReturnStmt from "./nodes/ReturnStmt.js";
-import UnaryExpr from "./nodes/UnaryExpr.js";
-import VariableAssignmentStmt, {
+import { ArrayLiteral } from "./nodes/ArrayLiteral.js";
+import { BinaryExpr } from "./nodes/BinaryExpr.js";
+import { BlockStmt } from "./nodes/BlockStmt.js";
+import { CallExpr } from "./nodes/CallExpr.js";
+import { FunctionDefinition } from "./nodes/FunctionDefinition.js";
+import { FunctionExpr } from "./nodes/FunctionExpr.js";
+import { GroupingExpr } from "./nodes/GroupingExpr.js";
+import { IfStmt } from "./nodes/IfStmt.js";
+import { IndexExpr } from "./nodes/IndexExpr.js";
+import { MatchStmt, MatchCase, UnderscoreExpr } from "./nodes/MatchStmt.js";
+import { PrimaryExpr, StlBoolExpr } from "./nodes/PrimaryExpr.js";
+import { ReturnStmt } from "./nodes/ReturnStmt.js";
+import { UnaryExpr } from "./nodes/UnaryExpr.js";
+import {
+	VariableAssignmentStmt,
 	isAssignmentLeft,
 	AssignmentLeft,
 } from "./nodes/VariableAssignmentStmt.js";
-import VariableDeclarationStmt from "./nodes/VariableDeclarationStmt.js";
-import VariableExpr from "./nodes/VariableExpr.js";
-import WhileStmt from "./nodes/WhileStmt.js";
+import { VariableDeclarationStmt } from "./nodes/VariableDeclarationStmt.js";
+import { VariableExpr } from "./nodes/VariableExpr.js";
+import { WhileStmt } from "./nodes/WhileStmt.js";
 import Token from "./Token.js";
 import TokenType from "./TokenType.js";
 import { ObjectLiteral } from "./nodes/ObjectLiteral.js";
-import DotAccess from "./nodes/DotAccess.js";
+import { DotAccess } from "./nodes/DotAccess.js";
 
 let tokens: Token[];
 let start = 0;
@@ -80,7 +81,7 @@ function eatUntilNewline(): void {
 
 function makeExpr(): Either<Error, Expr> {
 	if (matchType(TokenType.RETURN))
-		return makeExpr().chain((expr) => Right(new ReturnStmt(expr, getTokens())));
+		return makeExpr().chain((expr) => Right(ReturnStmt(expr, getTokens())));
 	if (matchType(TokenType.LET)) return finishVariableDeclaration();
 	if (matchType(TokenType.IF)) return finishIfStmt();
 	if (matchType(TokenType.WHILE)) return finishWhileStmt();
@@ -89,7 +90,7 @@ function makeExpr(): Either<Error, Expr> {
 	if (matchType(TokenType.IDENTIFIER)) {
 		if (matchType(TokenType.EQUAL)) {
 			const identifier = lookBehind(2).lexeme;
-			return finishAssignment(new VariableExpr(identifier, getTokens()));
+			return finishAssignment(VariableExpr(identifier, getTokens()));
 		} else {
 			backTrack();
 		}
@@ -110,14 +111,14 @@ function makeExpr(): Either<Error, Expr> {
 
 function finishArrayLiteral(): Either<Error, Expr> {
 	if (matchType(TokenType.CLOSE_BRACKET))
-		return Right(new ArrayLiteral([], getTokens()));
+		return Right(ArrayLiteral([], getTokens()));
 	const items: Either<Error, Expr[]> = readCommaDelimitedList();
 	if (!matchType(TokenType.CLOSE_BRACKET)) {
 		return Left(
 			ParseError(`Expected "]", got ${lookAhead().lexeme}`, lookAhead())
 		);
 	}
-	return items.map((items) => new ArrayLiteral(items, getTokens()));
+	return items.map((items) => ArrayLiteral(items, getTokens()));
 }
 
 function finishVariableDeclaration(): Either<Error, Expr> {
@@ -144,7 +145,7 @@ function finishVariableDeclaration(): Either<Error, Expr> {
 	return makeExpr().chain((stmt) => {
 		if (matchType(TokenType.NEWLINE) || atEnd()) {
 			return Right(
-				new VariableDeclarationStmt(identifier, isImmutable, stmt, getTokens())
+				VariableDeclarationStmt(identifier, isImmutable, stmt, getTokens())
 			);
 		} else {
 			return Left(ParseError("Expected a newline!", lookBehind()));
@@ -157,7 +158,7 @@ function finishImmutableDeclaration(identifier: string): Either<Error, Expr> {
 	return makeExpr().chain((expr) => {
 		if (matchType(TokenType.NEWLINE) || atEnd() || lookAhead().lexeme === "}") {
 			return Right(
-				new VariableDeclarationStmt(identifier, true, expr, getTokens())
+				VariableDeclarationStmt(identifier, true, expr, getTokens())
 			);
 		} else {
 			return Left(ParseError("Expected a newline!", lookAhead()));
@@ -181,7 +182,7 @@ function finishMatchStmt(): Either<Error, Expr> {
 			cases.push(makeMatchCase());
 		}
 		return Either.sequence(cases).chain((cases) =>
-			Right(new MatchStmt(expr, cases, getTokens()))
+			Right(MatchStmt(expr, cases, getTokens()))
 		);
 	});
 }
@@ -199,19 +200,17 @@ function makeMatchCase(): Either<Error, MatchCase> {
 				ParseError(`Expected a newline after match case.`, lookAhead())
 			);
 		}
-		return expr.map((expr) => new MatchCase(matchPrimary, expr));
+		return expr.map((expr) => MatchCase(matchPrimary, expr));
 	});
 }
 
 function makeMatchPrimary(): Either<Error, PrimaryExpr | UnderscoreExpr> {
-	if (matchType(TokenType.TRUE))
-		return Right(new PrimaryExpr(true, getTokens()));
-	if (matchType(TokenType.FALSE))
-		return Right(new PrimaryExpr(false, getTokens()));
+	if (matchType(TokenType.TRUE)) return Right(StlBoolExpr(true, getTokens()));
+	if (matchType(TokenType.FALSE)) return Right(StlBoolExpr(false, getTokens()));
 	if (matchType(TokenType.NUMBER, TokenType.STRING))
-		return Right(new PrimaryExpr(lookBehind().literal, getTokens()));
+		return Right(PrimaryExpr(lookBehind().literal, getTokens()));
 	if (matchType(TokenType.UNDERSCORE))
-		return Right(new UnderscoreExpr(getTokens()));
+		return Right(UnderscoreExpr(getTokens()));
 	return Left(
 		ParseError(
 			`"${
@@ -232,9 +231,7 @@ function finishWhileStmt(): Either<Error, Expr> {
 				)
 			);
 		}
-		return makeExpr().map(
-			(body) => new WhileStmt(condition, body, getTokens())
-		);
+		return makeExpr().map((body) => WhileStmt(condition, body, getTokens()));
 	});
 }
 
@@ -257,8 +254,8 @@ function finishFunctionDeclaration(): Either<Error, Expr> {
 		return Left(ParseError("Expected =", lookAhead()));
 	eatNewlines();
 	return makeLambda().map((lambda) => {
-		return new FunctionDefinition(
-			new VariableDeclarationStmt(fnName, true, lambda, getTokens()),
+		return FunctionDefinition(
+			VariableDeclarationStmt(fnName, true, lambda, getTokens()),
 			getTokens()
 		);
 	});
@@ -323,7 +320,7 @@ function finishBlockStmtOrObjectLiteral(): Either<
 			);
 			eatNewlines();
 			if (matchType(TokenType.CLOSE_BRACE)) {
-				return Right(new ObjectLiteral(object, getTokens()));
+				return Right(ObjectLiteral(object, getTokens()));
 			}
 		}
 		return Left(ParseError(`Unexpected token`, lookAhead()));
@@ -343,7 +340,7 @@ function finishBlockStmtOrObjectLiteral(): Either<
 		}
 		const maybeStmts: Either<Error, Expr[]> = Either.sequence(stmts);
 		const maybeBlock: Either<Error, BlockStmt> = maybeStmts.chain((stmts) =>
-			Right(new BlockStmt(stmts, getTokens()))
+			Right(BlockStmt(stmts, getTokens()))
 		);
 		return maybeBlock;
 	}
@@ -387,9 +384,7 @@ function finishIfStmt(): Either<Error, Expr> {
 				eatNewlines();
 				return condition.chain((condition) => {
 					return maybeBody.chain((maybeBody) => {
-						return Right(
-							new IfStmt(condition, maybeBody, elseBody, getTokens())
-						);
+						return Right(IfStmt(condition, maybeBody, elseBody, getTokens()));
 					});
 				});
 			})
@@ -404,7 +399,7 @@ function finishIfStmt(): Either<Error, Expr> {
 	}
 	return condition.chain((condition) => {
 		return maybeBody.chain((maybeBody) => {
-			return Right(new IfStmt(condition, maybeBody, null, getTokens()));
+			return Right(IfStmt(condition, maybeBody, null, getTokens()));
 		});
 	});
 }
@@ -412,8 +407,8 @@ function finishIfStmt(): Either<Error, Expr> {
 function finishAssignment(left: AssignmentLeft): Either<Error, Expr> {
 	// TODO check if identifier has already been declared
 	eatNewlines();
-	return makeExpr().map(
-		(right) => new VariableAssignmentStmt(left, right, getTokens())
+	return makeExpr().map((right) =>
+		VariableAssignmentStmt(left, right, getTokens())
 	);
 }
 
@@ -456,9 +451,7 @@ function makeMod(): Either<Error, Expr> {
 function makeUnary(): Either<Error, Expr> {
 	if (matchType(TokenType.MINUS, TokenType.NOT)) {
 		const operator = lookBehind();
-		return makeUnary().map(
-			(right) => new UnaryExpr(operator, right, getTokens())
-		);
+		return makeUnary().map((right) => UnaryExpr(operator, right, getTokens()));
 	}
 	return makeCallOrDotAccess();
 }
@@ -488,7 +481,7 @@ function makeCallOrDotAccessRecursive(callee: Expr): Either<Error, Expr> {
 			);
 		} else {
 			const propertyName = lookBehind().lexeme;
-			return Right(new DotAccess(callee, propertyName, getTokens())).chain(
+			return Right(DotAccess(callee, propertyName, getTokens())).chain(
 				makeCallOrDotAccessRecursive
 			);
 		}
@@ -505,7 +498,7 @@ function makeCallOrDotAccessRecursive(callee: Expr): Either<Error, Expr> {
 			}
 		}
 		return args
-			.map((goodArgs) => new CallExpr(callee, goodArgs, getTokens()))
+			.map((goodArgs) => CallExpr(callee, goodArgs, getTokens()))
 			.chain(makeCallOrDotAccessRecursive);
 	}
 }
@@ -513,12 +506,10 @@ function makeCallOrDotAccessRecursive(callee: Expr): Either<Error, Expr> {
 function makePrimary(): Either<Error, Expr> {
 	if (matchType(TokenType.OPEN_BRACKET)) return finishArrayLiteral();
 	if (matchType(TokenType.OPEN_BRACE)) return finishBlockStmtOrObjectLiteral();
-	if (matchType(TokenType.TRUE))
-		return Right(new PrimaryExpr(true, getTokens()));
-	if (matchType(TokenType.FALSE))
-		return Right(new PrimaryExpr(false, getTokens()));
+	if (matchType(TokenType.TRUE)) return Right(PrimaryExpr(true, getTokens()));
+	if (matchType(TokenType.FALSE)) return Right(PrimaryExpr(false, getTokens()));
 	if (matchType(TokenType.NUMBER, TokenType.STRING))
-		return Right(new PrimaryExpr(lookBehind().literal, getTokens()));
+		return Right(PrimaryExpr(lookBehind().literal, getTokens()));
 	if (matchType(TokenType.IDENTIFIER)) {
 		const id = lookBehind().lexeme;
 		if (matchType(TokenType.RIGHT_SINGLE_ARROW)) {
@@ -530,11 +521,11 @@ function makePrimary(): Either<Error, Expr> {
 						ParseError(`Expected "]", got ${lookAhead().lexeme}`, lookAhead())
 					);
 				}
-				return Right(new IndexExpr(id, expr, getTokens()));
+				return Right(IndexExpr(id, expr, getTokens()));
 			});
 		} else {
 			const identifier = lookBehind().lexeme;
-			return Right(new VariableExpr(identifier, getTokens()));
+			return Right(VariableExpr(identifier, getTokens()));
 		}
 	}
 
@@ -591,14 +582,14 @@ function makePrimary(): Either<Error, Expr> {
 
 function finishLambda(args: string[]): Either<Error, FunctionExpr> {
 	eatNewlines();
-	return makeExpr().map((body) => new FunctionExpr(args, body, getTokens()));
+	return makeExpr().map((body) => FunctionExpr(args, body, getTokens()));
 	// TODO: add checks and nice error messages
 }
 
 function finishGrouping(): Either<Error, Expr> {
 	return makeExpr().chain((expr) => {
 		if (matchType(TokenType.CLOSE_PAREN))
-			return Right(new GroupingExpr(expr, getTokens()));
+			return Right(GroupingExpr(expr, getTokens()));
 		else
 			return Left(
 				ParseError(`Expected ")", got "${lookAhead().lexeme}"`, lookAhead())
@@ -626,7 +617,7 @@ function makeBinaryExpr(
 		const right = higherPrecedenceOperation();
 		expr = expr.chain((expr) => {
 			return right.chain((right) => {
-				return Right(new BinaryExpr(expr, operator, right, getTokens()));
+				return Right(BinaryExpr(expr, operator, right, getTokens()));
 			});
 		});
 	}

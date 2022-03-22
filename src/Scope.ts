@@ -1,9 +1,9 @@
 import { RuntimePanic } from "./Debug.js";
 import { StlFunction } from "./StlFunction.js";
 import { Value, Box } from "./Value.js";
-import FunctionExpr from "./nodes/FunctionExpr.js";
-import PrintStmt from "./nodes/PrintStmt.js";
-import VariableExpr from "./nodes/VariableExpr.js";
+import { FunctionExpr } from "./nodes/FunctionExpr.js";
+import { PrintStmt } from "./nodes/PrintStmt.js";
+import { VariableExpr } from "./nodes/VariableExpr.js";
 
 /**
  * A Scope represents a lexical scope in the program. Each Scope has a set of
@@ -22,11 +22,7 @@ export default class Scope {
 		// library print function
 		// FIXME null token lists
 		const print = new StlFunction(
-			new FunctionExpr(
-				["value"],
-				new PrintStmt(new VariableExpr("value", []), []),
-				[]
-			),
+			FunctionExpr(["value"], PrintStmt(VariableExpr("value", []), []), []),
 			this
 		);
 		this.bindings.set("print", [new Box(print), false]);

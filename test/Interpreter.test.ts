@@ -1,5 +1,5 @@
 import { Either } from "purify-ts";
-import { Expr } from "../src/Expr.js";
+import { ExprBase } from "../src/Expr.js";
 import { stlEval as _stlEval } from "../src/Interpreter.js";
 import { setPrintFn } from "../src/Logger.js";
 import parse from "../src/Parser.js";
@@ -878,7 +878,7 @@ describe("debug", () => {
         setPrintFn(printfn);
         */
 		const tokens = tokenize("a = ", "filename");
-		const ast: Either<Error[], Expr[]> = tokens.chain(parse);
+		const ast: Either<Error[], ExprBase[]> = tokens.chain(parse);
 		expect(ast.isLeft()).toBe(true);
 		expect(
 			ast.mapLeft((errs) =>
