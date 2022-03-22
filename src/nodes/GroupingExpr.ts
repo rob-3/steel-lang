@@ -1,4 +1,4 @@
-import { ExprBase } from "../Expr.js";
+import { Expr, ExprBase } from "../Expr.js";
 import Scope from "../Scope.js";
 import Token from "../Token.js";
 
