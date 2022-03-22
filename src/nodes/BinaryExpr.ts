@@ -1,3 +1,4 @@
+import { Node, x } from "code-red";
 import { RuntimePanic } from "../Debug.js";
 import { ExprBase, Expr } from "../Expr.js";
 import {
@@ -25,6 +26,7 @@ export type BinaryExpr = ExprBase & {
 	left: Expr;
 	operator: Token;
 	right: Expr;
+	estree(): Node;
 };
 
 export const BinaryExpr = (
@@ -72,6 +74,42 @@ export const BinaryExpr = (
 					return [less(leftVal, rightVal), newScope2];
 				case TokenType.EQUAL_EQUAL:
 					return [equal(leftVal, rightVal), newScope2];
+				default:
+					throw RuntimePanic(
+						`FIXME: Unhandled operator type "${this.operator}"`
+					);
+			}
+		},
+		estree(): Node {
+			const leftVal = this.left.estree();
+			const rightVal = this.right.estree();
+			switch (this.operator.type) {
+				case TokenType.PLUS:
+					return x`stlAdd(${leftVal}, ${rightVal})`;
+				case TokenType.MINUS:
+					return x`stlSubtract(${leftVal}, ${rightVal})`;
+				case TokenType.PLUS_PLUS:
+					return x`stlConcat(${leftVal}, ${rightVal})`;
+				case TokenType.STAR:
+					return x`stlMultiply(${leftVal}, ${rightVal})`;
+				case TokenType.SLASH:
+					return x`stlDivide(${leftVal}, ${rightVal})`;
+				case TokenType.MOD:
+					return x`stlMod(${leftVal}, ${rightVal})`;
+				case TokenType.AND:
+					return x`stlLogicalAnd(${leftVal}, ${rightVal})`;
+				case TokenType.OR:
+					return x`stlLogicalOr(${leftVal}, ${rightVal})`;
+				case TokenType.GREATER_EQUAL:
+					return x`stlGreaterEqual(${leftVal}, ${rightVal})`;
+				case TokenType.GREATER:
+					return x`stlGreater(${leftVal}, ${rightVal})`;
+				case TokenType.LESS_EQUAL:
+					return x`stlLessEqual(${leftVal}, ${rightVal})`;
+				case TokenType.LESS:
+					return x`stlLess(${leftVal}, ${rightVal})`;
+				case TokenType.EQUAL_EQUAL:
+					return x`stlEqual(${leftVal}, ${rightVal})`;
 				default:
 					throw RuntimePanic(
 						`FIXME: Unhandled operator type "${this.operator}"`
