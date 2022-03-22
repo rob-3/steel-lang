@@ -1,10 +1,10 @@
 import { x } from "code-red";
-import { BinaryExpr } from "../src/nodes/BinaryExpr";
-import { StlBoolExpr, StlNumberExpr, StlStringExpr } from "../src/nodes/PrimaryExpr";
-import StlNumber from "../src/StlNumber";
-import Token from "../src/Token";
-import TokenType from "../src/TokenType";
-import { assertEqual } from "./Helpers";
+import { BinaryExpr } from "../../src/nodes/BinaryExpr";
+import { StlBoolExpr, StlNumberExpr, StlStringExpr } from "../../src/nodes/PrimaryExpr";
+import StlNumber from "../../src/StlNumber";
+import Token from "../../src/Token";
+import TokenType from "../../src/TokenType";
+import { assertEqual } from "../Helpers";
 import { it, describe } from "vitest";
 
 describe("BinaryExpr codegen", () => {

@@ -2,11 +2,11 @@ import {
 	StlBoolExpr,
 	StlNumberExpr,
 	StlStringExpr,
-} from "../src/nodes/PrimaryExpr.js";
+} from "../../src/nodes/PrimaryExpr.js";
 import { it, describe } from "vitest";
 import { Node, x } from "code-red";
-import StlNumber from "../src/StlNumber.js";
-import { assertEqual } from "./Helpers.js";
+import StlNumber from "../../src/StlNumber.js";
+import { assertEqual } from "../Helpers.js";
 
 describe("PrimaryExpr codegen", () => {
 	it("should compile booleans", () => {
