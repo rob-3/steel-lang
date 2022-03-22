@@ -21,5 +21,8 @@ describe("StlNumber", () => {
 			StlNumber.of("0.3")
 		);
 	});
-});
 
+	it("should normalize the negative", () => {
+		expect(new StlNumber(-1n, 2n)).toEqual(new StlNumber(1n, -2n));
+	});
+});
