@@ -4,6 +4,7 @@ import Token from "../Token.js";
 import { RuntimePanic } from "../Debug.js";
 
 export type VariableDeclarationStmt = Expr & {
+	type: "VariableDeclarationStmt";
 	immutable: boolean;
 	identifier: string;
 	right: Expr;
@@ -16,6 +17,7 @@ export const VariableDeclarationStmt = (
 	tokens: Token[]
 ): VariableDeclarationStmt => {
 	return {
+		type: "VariableDeclarationStmt",
 		identifier,
 		immutable,
 		right,

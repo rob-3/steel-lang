@@ -7,6 +7,7 @@ import TokenType from "../TokenType.js";
 import { Value } from "../Value.js";
 
 export type UnaryExpr = Expr & {
+	type: "UnaryExpr";
 	operator: Token;
 	right: Expr;
 };
@@ -17,6 +18,7 @@ export const UnaryExpr = (
 	tokens: Token[]
 ): UnaryExpr => {
 	return {
+		type: "UnaryExpr",
 		operator,
 		right,
 		tokens,

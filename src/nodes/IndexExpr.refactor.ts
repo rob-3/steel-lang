@@ -6,6 +6,7 @@ import { Value } from "../Value.js";
 import StlNumber from "../StlNumber.js";
 
 export type IndexExpr = Expr & {
+	type: "IndexExpr";
 	arr: string;
 	index: Expr;
 };
@@ -16,6 +17,7 @@ export const IndexExpr = (
 	tokens: Token[]
 ): IndexExpr => {
 	return {
+		type: "IndexExpr",
 		arr,
 		index,
 		tokens,

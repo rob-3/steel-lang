@@ -5,6 +5,7 @@ import Token from "../Token.js";
 import { Value, Box } from "../Value.js";
 
 export type FunctionExpr = Expr & {
+	type: "FunctionExpr";
 	args: string[];
 	body: Expr;
 	toString(): string;
@@ -16,6 +17,7 @@ export const FunctionExpr = (
 	tokens: Token[]
 ): FunctionExpr => {
 	return {
+		type: "FunctionExpr",
 		args,
 		body,
 		tokens,

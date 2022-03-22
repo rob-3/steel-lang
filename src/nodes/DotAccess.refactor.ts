@@ -6,6 +6,7 @@ import { Value } from "../Value.js";
 import StlObject from "../StlObject.js";
 
 export type DotAccess = Expr & {
+	type: "DotAccess";
 	left: Expr;
 	right: string;
 };
@@ -16,6 +17,7 @@ export const DotAccess = (
 	tokens: Token[]
 ): DotAccess => {
 	return {
+		type: "DotAccess",
 		left,
 		right,
 		tokens,

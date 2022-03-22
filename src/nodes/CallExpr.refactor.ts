@@ -7,6 +7,7 @@ import Token from "../Token.js";
 import { Value } from "../Value.js";
 
 export type CallExpr = Expr & {
+	type: "CallExpr";
 	callee: Expr;
 	args: Expr[];
 };
@@ -17,6 +18,7 @@ export const CallExpr = (
 	tokens: Token[]
 ): CallExpr => {
 	return {
+		type: "CallExpr",
 		callee,
 		args,
 		tokens,

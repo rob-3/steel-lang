@@ -21,6 +21,7 @@ import TokenType from "../TokenType.js";
 import { Value } from "../Value.js";
 
 export type BinaryExpr = Expr & {
+	type: "BinaryExpr";
 	left: Expr;
 	operator: Token;
 	right: Expr;
@@ -33,6 +34,7 @@ export const BinaryExpr = (
 	tokens: Token[]
 ): BinaryExpr => {
 	return {
+		type: "BinaryExpr",
 		left,
 		operator,
 		right,

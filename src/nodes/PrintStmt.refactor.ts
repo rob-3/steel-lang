@@ -6,12 +6,14 @@ import { Value } from "../Value.js";
 import { RuntimePanic } from "../Debug.js";
 
 export type PrintStmt = Expr & {
+	type: "PrintStmt";
 	thingToPrint: Expr;
 };
 
 // TODO: library function
 export const PrintStmt = (thingToPrint: Expr, tokens: Token[]): PrintStmt => {
 	return {
+		type: "PrintStmt",
 		thingToPrint,
 		tokens,
 		eval(scope: Scope): [Value, Scope] {

@@ -6,6 +6,7 @@ import StlObject from "../StlObject.js";
 import { RuntimePanic } from "../Debug.js";
 
 export type ObjectLiteral = Expr & {
+	type: "ObjectLiteral";
 	properties: Map<string, Expr>;
 };
 
@@ -14,6 +15,7 @@ export const ObjectLiteral = (
 	tokens: Token[]
 ): ObjectLiteral => {
 	return {
+		type: "ObjectLiteral",
 		properties,
 		tokens,
 		eval(scope: Scope): [Box<StlObject>, Scope] {

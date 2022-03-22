@@ -4,6 +4,7 @@ import Token from "../Token.js";
 import { Value } from "../Value.js";
 
 export type VariableExpr = Expr & {
+	type: "VariableExpr";
 	identifier: string;
 };
 
@@ -12,6 +13,7 @@ export const VariableExpr = (
 	tokens: Token[]
 ): VariableExpr => {
 	return {
+		type: "VariableExpr",
 		identifier,
 		tokens,
 		eval(scope: Scope): [Value, Scope] {

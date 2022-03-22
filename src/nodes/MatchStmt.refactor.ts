@@ -7,6 +7,7 @@ import { Value } from "../Value.js";
 import PrimaryExpr from "./PrimaryExpr.js";
 
 export type MatchStmt = Expr & {
+	type: "MatchStmt";
 	expr: Expr;
 	cases: MatchCase[];
 };
@@ -17,6 +18,7 @@ export const MatchStmt = (
 	tokens: Token[]
 ): MatchStmt => {
 	return {
+		type: "MatchStmt",
 		expr,
 		cases,
 		tokens,

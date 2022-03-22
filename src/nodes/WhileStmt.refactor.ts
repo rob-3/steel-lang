@@ -5,6 +5,7 @@ import { Value } from "../Value.js";
 import { RuntimePanic } from "../Debug.js";
 
 export type WhileStmt = Expr & {
+	type: "WhileStmt";
 	condition: Expr;
 	body: Expr;
 };
@@ -15,6 +16,7 @@ export const WhileStmt = (
 	tokens: Token[]
 ): WhileStmt => {
 	return {
+		type: "WhileStmt",
 		condition,
 		body,
 		tokens,

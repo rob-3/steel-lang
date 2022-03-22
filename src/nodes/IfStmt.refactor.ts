@@ -5,6 +5,7 @@ import Token from "../Token.js";
 import { Value } from "../Value.js";
 
 export type IfStmt = Expr & {
+	type: "IfStmt";
 	condition: Expr;
 	body: Expr;
 	elseBody: Expr | null;
@@ -17,6 +18,7 @@ export const IfStmt = (
 	tokens: Token[]
 ): IfStmt => {
 	return {
+		type: "IfStmt",
 		condition,
 		body,
 		elseBody,

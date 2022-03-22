@@ -20,6 +20,7 @@ export function isAssignmentLeft(expr: Expr): expr is AssignmentLeft {
 }
 
 export type VariableAssignmentStmt = Expr & {
+	type: "VariableAssignmentStmt";
 	left: AssignmentLeft;
 	right: Expr;
 };
@@ -30,6 +31,7 @@ export const VariableAssignmentStmt = (
 	tokens: Token[]
 ): VariableAssignmentStmt => {
 	return {
+		type: "VariableAssignmentStmt",
 		left,
 		right,
 		tokens,

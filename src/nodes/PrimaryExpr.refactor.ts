@@ -8,6 +8,7 @@ import { Node, x } from "code-red";
 export type PrimaryExpr = StlStringExpr | StlBoolExpr | StlNumberExpr;
 
 export type StlStringExpr = Expr & {
+	type: "PrimaryExpr";
 	literal: string;
 	estree(): Node;
 };
@@ -17,6 +18,7 @@ export const StlStringExpr = (
 	tokens: Token[]
 ): StlStringExpr => {
 	return {
+		type: "PrimaryExpr",
 		literal,
 		tokens,
 		eval(scope: Scope): [Value, Scope] {
@@ -29,12 +31,14 @@ export const StlStringExpr = (
 };
 
 export type StlBoolExpr = Expr & {
+	type: "PrimaryExpr";
 	literal: boolean;
 	estree(): Node;
 };
 
 export const StlBoolExpr = (literal: boolean, tokens: Token[]): StlBoolExpr => {
 	return {
+		type: "PrimaryExpr",
 		literal,
 		tokens,
 		eval(scope: Scope): [Value, Scope] {
@@ -47,6 +51,7 @@ export const StlBoolExpr = (literal: boolean, tokens: Token[]): StlBoolExpr => {
 };
 
 export type StlNumberExpr = Expr & {
+	type: "PrimaryExpr";
 	literal: StlNumber;
 	estree(): Node;
 };
@@ -56,6 +61,7 @@ export const StlNumberExpr = (
 	tokens: Token[]
 ): StlNumberExpr => {
 	return {
+		type: "PrimaryExpr",
 		literal,
 		tokens,
 		eval(scope: Scope): [Value, Scope] {
