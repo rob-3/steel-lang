@@ -13,7 +13,7 @@ export type WhileStmt = ExprBase & {
 export const WhileStmt = (
 	condition: Expr,
 	body: Expr,
-	tokens: Token[]
+	tokens: Token[] = []
 ): WhileStmt => {
 	return {
 		type: "WhileStmt",

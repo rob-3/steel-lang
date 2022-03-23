@@ -12,7 +12,7 @@ export type ObjectLiteral = ExprBase & {
 
 export const ObjectLiteral = (
 	properties: Map<string, Expr>,
-	tokens: Token[]
+	tokens: Token[] = []
 ): ObjectLiteral => {
 	return {
 		type: "ObjectLiteral",

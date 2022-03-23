@@ -10,7 +10,7 @@ export type VariableExpr = ExprBase & {
 
 export const VariableExpr = (
 	identifier: string,
-	tokens: Token[]
+	tokens: Token[] = []
 ): VariableExpr => {
 	return {
 		type: "VariableExpr",

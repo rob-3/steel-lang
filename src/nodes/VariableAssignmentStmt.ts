@@ -28,7 +28,7 @@ export type VariableAssignmentStmt = ExprBase & {
 export const VariableAssignmentStmt = (
 	left: AssignmentLeft,
 	right: Expr,
-	tokens: Token[]
+	tokens: Token[] = []
 ): VariableAssignmentStmt => {
 	return {
 		type: "VariableAssignmentStmt",

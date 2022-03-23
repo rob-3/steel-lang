@@ -11,7 +11,7 @@ export type PrintStmt = ExprBase & {
 };
 
 // TODO: library function
-export const PrintStmt = (thingToPrint: Expr, tokens: Token[]): PrintStmt => {
+export const PrintStmt = (thingToPrint: Expr, tokens: Token[] = []): PrintStmt => {
 	return {
 		type: "PrintStmt",
 		thingToPrint,

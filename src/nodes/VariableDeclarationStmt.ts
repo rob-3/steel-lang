@@ -14,7 +14,7 @@ export const VariableDeclarationStmt = (
 	identifier: string,
 	immutable: boolean,
 	right: Expr,
-	tokens: Token[]
+	tokens: Token[] = []
 ): VariableDeclarationStmt => {
 	return {
 		type: "VariableDeclarationStmt",

@@ -7,7 +7,7 @@ export type GroupingExpr = ExprBase & {
 	expr: Expr;
 };
 
-export const GroupingExpr = (expr: Expr, tokens: Token[]): GroupingExpr => {
+export const GroupingExpr = (expr: Expr, tokens: Token[] = []): GroupingExpr => {
 	return {
 		type: "GroupingExpr",
 		expr,

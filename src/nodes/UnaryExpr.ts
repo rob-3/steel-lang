@@ -17,7 +17,7 @@ export type UnaryExpr = ExprBase & {
 export const UnaryExpr = (
 	operator: Token,
 	right: Expr,
-	tokens: Token[]
+	tokens: Token[] = []
 ): UnaryExpr => {
 	return {
 		type: "UnaryExpr",

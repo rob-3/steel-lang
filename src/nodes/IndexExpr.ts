@@ -14,7 +14,7 @@ export type IndexExpr = ExprBase & {
 export const IndexExpr = (
 	arr: string,
 	index: Expr,
-	tokens: Token[]
+	tokens: Token[] = []
 ): IndexExpr => {
 	return {
 		type: "IndexExpr",

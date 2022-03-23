@@ -7,7 +7,7 @@ import { Node, x } from "code-red";
 
 export type PrimaryExpr = StlStringExpr | StlBoolExpr | StlNumberExpr;
 
-export const PrimaryExpr = (literal: StlNumber | string | boolean, tokens: Token[]): PrimaryExpr => {
+export const PrimaryExpr = (literal: StlNumber | string | boolean, tokens: Token[] = []): PrimaryExpr => {
 	switch (typeof literal) {
 		case "string":
 			return StlStringExpr(literal, tokens);
@@ -26,7 +26,7 @@ export type StlStringExpr = ExprBase & {
 
 export const StlStringExpr = (
 	literal: string,
-	tokens: Token[]
+	tokens: Token[] = []
 ): StlStringExpr => {
 	return {
 		type: "PrimaryExpr",
@@ -47,7 +47,7 @@ export type StlBoolExpr = ExprBase & {
 	estree(): Node;
 };
 
-export const StlBoolExpr = (literal: boolean, tokens: Token[]): StlBoolExpr => {
+export const StlBoolExpr = (literal: boolean, tokens: Token[] = []): StlBoolExpr => {
 	return {
 		type: "PrimaryExpr",
 		literal,
@@ -69,7 +69,7 @@ export type StlNumberExpr = ExprBase & {
 
 export const StlNumberExpr = (
 	literal: StlNumber,
-	tokens: Token[]
+	tokens: Token[] = []
 ): StlNumberExpr => {
 	return {
 		type: "PrimaryExpr",

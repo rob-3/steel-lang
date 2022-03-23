@@ -10,7 +10,7 @@ export type FunctionDefinition = ExprBase & {
 
 export const FunctionDefinition = (
 	definition: VariableDeclarationStmt,
-	tokens: Token[]
+	tokens: Token[] = []
 ): FunctionDefinition => {
 	return {
 		type: "FunctionDefinition",

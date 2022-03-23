@@ -11,7 +11,7 @@ export type ArrayLiteral = ExprBase & {
 	estree(): Node;
 };
 
-export const ArrayLiteral = (exprs: Expr[], tokens: Token[]): ArrayLiteral => {
+export const ArrayLiteral = (exprs: Expr[], tokens: Token[] = []): ArrayLiteral => {
 	return {
 		type: "ArrayLiteral",
 		exprs,

@@ -33,7 +33,7 @@ export const BinaryExpr = (
 	left: Expr,
 	operator: Token,
 	right: Expr,
-	tokens: Token[]
+	tokens: Token[] = []
 ): BinaryExpr => {
 	return {
 		type: "BinaryExpr",

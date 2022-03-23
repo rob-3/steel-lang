@@ -15,7 +15,7 @@ export type CallExpr = ExprBase & {
 export const CallExpr = (
 	callee: Expr,
 	args: Expr[],
-	tokens: Token[]
+	tokens: Token[] = []
 ): CallExpr => {
 	return {
 		type: "CallExpr",

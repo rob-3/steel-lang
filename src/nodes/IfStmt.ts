@@ -15,7 +15,7 @@ export const IfStmt = (
 	condition: Expr,
 	body: Expr,
 	elseBody: Expr | null,
-	tokens: Token[]
+	tokens: Token[] = []
 ): IfStmt => {
 	return {
 		type: "IfStmt",

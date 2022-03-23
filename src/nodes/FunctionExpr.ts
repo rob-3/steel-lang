@@ -14,7 +14,7 @@ export type FunctionExpr = ExprBase & {
 export const FunctionExpr = (
 	args: string[],
 	body: Expr,
-	tokens: Token[]
+	tokens: Token[] = []
 ): FunctionExpr => {
 	return {
 		type: "FunctionExpr",

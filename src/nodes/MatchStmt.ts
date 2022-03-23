@@ -15,7 +15,7 @@ export type MatchStmt = ExprBase & {
 export const MatchStmt = (
 	expr: Expr,
 	cases: MatchCase[],
-	tokens: Token[]
+	tokens: Token[] = []
 ): MatchStmt => {
 	return {
 		type: "MatchStmt",
@@ -64,7 +64,7 @@ export type UnderscoreExpr = ExprBase & {
 	type: "UnderscoreExpr";
 };
 
-export const UnderscoreExpr = (tokens: Token[]): UnderscoreExpr => {
+export const UnderscoreExpr = (tokens: Token[] = []): UnderscoreExpr => {
 	return {
 		type: "UnderscoreExpr",
 		tokens,

@@ -14,7 +14,7 @@ export type DotAccess = ExprBase & {
 export const DotAccess = (
 	left: Expr,
 	right: string,
-	tokens: Token[]
+	tokens: Token[] = []
 ): DotAccess => {
 	return {
 		type: "DotAccess",

@@ -7,7 +7,7 @@ export type ReturnStmt = ExprBase & {
 	value: Expr;
 };
 
-export const ReturnStmt = (value: Expr, tokens: Token[]): ReturnStmt => {
+export const ReturnStmt = (value: Expr, tokens: Token[] = []): ReturnStmt => {
 	return {
 		type: "ReturnStmt",
 		value,
