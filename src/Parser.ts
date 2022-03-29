@@ -617,7 +617,7 @@ function makeBinaryExpr(
 		const right = higherPrecedenceOperation();
 		expr = expr.chain((expr) => {
 			return right.chain((right) => {
-				return Right(BinaryExpr(expr, operator, right, getTokens()));
+				return Right(BinaryExpr(expr, operator.type, right, getTokens()));
 			});
 		});
 	}

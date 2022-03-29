@@ -5,7 +5,6 @@ import { PrimaryExpr } from "../../src/nodes/PrimaryExpr";
 import { VariableAssignmentStmt } from "../../src/nodes/VariableAssignmentStmt";
 import { VariableExpr } from "../../src/nodes/VariableExpr";
 import StlNumber from "../../src/StlNumber";
-import Token from "../../src/Token";
 import TokenType from "../../src/TokenType";
 import { assertEqual } from "../Helpers";
 
@@ -15,7 +14,7 @@ describe("VariableExpr codegen", () => {
 			VariableExpr("a"),
 			BinaryExpr(
 				PrimaryExpr(StlNumber.of(2)),
-				{ type: TokenType.PLUS } as Token,
+				TokenType.PLUS,
 				PrimaryExpr(StlNumber.of(2))
 			)
 		).estree();

@@ -24,14 +24,14 @@ import { Value } from "../Value.js";
 export type BinaryExpr = ExprBase & {
 	type: "BinaryExpr";
 	left: Expr;
-	operator: Token;
+	operator: TokenType;
 	right: Expr;
 	estree(): Node;
 };
 
 export const BinaryExpr = (
 	left: Expr,
-	operator: Token,
+	operator: TokenType,
 	right: Expr,
 	tokens: Token[] = []
 ): BinaryExpr => {
@@ -47,7 +47,7 @@ export const BinaryExpr = (
 			if (leftVal === null || rightVal === null) {
 				throw RuntimePanic("Operand cannot evaluate to nothing");
 			}
-			switch (this.operator.type) {
+			switch (this.operator) {
 				case TokenType.PLUS:
 					return [plus(leftVal, rightVal), newScope2];
 				case TokenType.MINUS:
@@ -83,7 +83,7 @@ export const BinaryExpr = (
 		estree(): Node {
 			const leftVal = this.left.estree();
 			const rightVal = this.right.estree();
-			switch (this.operator.type) {
+			switch (this.operator) {
 				case TokenType.PLUS:
 					return x`stlAdd(${leftVal}, ${rightVal})`;
 				case TokenType.MINUS:

@@ -93,7 +93,7 @@ function nodeToString(expr: Expr): string {
 		case "VariableExpr":
 			return `${expr.identifier}`;
 		case "BinaryExpr":
-			return `BinaryExpr ${t(expr.left)} ${expr.operator.lexeme} ${t(
+			return `BinaryExpr ${t(expr.left)} ${expr.operator} ${t(
 				expr.right
 			)}`;
 		case "PrimaryExpr":

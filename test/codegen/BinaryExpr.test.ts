@@ -2,7 +2,6 @@ import { x } from "code-red";
 import { BinaryExpr } from "../../src/nodes/BinaryExpr";
 import { StlBoolExpr, StlNumberExpr, StlStringExpr } from "../../src/nodes/PrimaryExpr";
 import StlNumber from "../../src/StlNumber";
-import Token from "../../src/Token";
 import TokenType from "../../src/TokenType";
 import { assertEqual } from "../Helpers";
 import { it, describe } from "vitest";
@@ -11,7 +10,7 @@ describe("BinaryExpr codegen", () => {
 	it("should compile additions", () => {
 		const node = BinaryExpr(
 			StlNumberExpr(StlNumber.of(2), []),
-			{ type: TokenType.PLUS } as Token,
+			TokenType.PLUS,
 			StlNumberExpr(StlNumber.of(2), []),
 			[]
 		).estree();
@@ -24,7 +23,7 @@ describe("BinaryExpr codegen", () => {
 	it("should compile subtractions", () => {
 		const node = BinaryExpr(
 			StlNumberExpr(StlNumber.of(2), []),
-			{ type: TokenType.MINUS } as Token,
+			TokenType.MINUS,
 			StlNumberExpr(StlNumber.of(2), []),
 			[]
 		).estree();
@@ -37,7 +36,7 @@ describe("BinaryExpr codegen", () => {
 	it("should compile multiplications", () => {
 		const node = BinaryExpr(
 			StlNumberExpr(StlNumber.of(2), []),
-			{ type: TokenType.STAR } as Token,
+			TokenType.STAR,
 			StlNumberExpr(StlNumber.of(2), []),
 			[]
 		).estree();
@@ -50,7 +49,7 @@ describe("BinaryExpr codegen", () => {
 	it("should compile divisions", () => {
 		const node = BinaryExpr(
 			StlNumberExpr(StlNumber.of(2), []),
-			{ type: TokenType.SLASH } as Token,
+			TokenType.SLASH,
 			StlNumberExpr(StlNumber.of(2), []),
 			[]
 		).estree();
@@ -63,7 +62,7 @@ describe("BinaryExpr codegen", () => {
 	it("should compile modulus", () => {
 		const node = BinaryExpr(
 			StlNumberExpr(StlNumber.of(2), []),
-			{ type: TokenType.MOD } as Token,
+			TokenType.MOD,
 			StlNumberExpr(StlNumber.of(2), []),
 			[]
 		).estree();
@@ -76,7 +75,7 @@ describe("BinaryExpr codegen", () => {
 	it("should compile logical AND", () => {
 		const node = BinaryExpr(
 			StlBoolExpr(true, []),
-			{ type: TokenType.AND } as Token,
+			TokenType.AND,
 			StlBoolExpr(false, []),
 			[]
 		).estree();
@@ -89,7 +88,7 @@ describe("BinaryExpr codegen", () => {
 	it("should compile logical OR", () => {
 		const node = BinaryExpr(
 			StlBoolExpr(true, []),
-			{ type: TokenType.OR } as Token,
+			TokenType.OR,
 			StlBoolExpr(false, []),
 			[]
 		).estree();
@@ -102,7 +101,7 @@ describe("BinaryExpr codegen", () => {
 	it("should compile concatenation", () => {
 		const node = BinaryExpr(
 			StlStringExpr("hello, ", []),
-			{ type: TokenType.PLUS_PLUS } as Token,
+			TokenType.PLUS_PLUS,
 			StlStringExpr("world", []),
 			[]
 		).estree();
@@ -115,7 +114,7 @@ describe("BinaryExpr codegen", () => {
 	it("should compile greater equal", () => {
 		const node = BinaryExpr(
 			StlNumberExpr(StlNumber.of(2), []),
-			{ type: TokenType.GREATER_EQUAL } as Token,
+			TokenType.GREATER_EQUAL,
 			StlNumberExpr(StlNumber.of(2), []),
 			[]
 		).estree();
@@ -128,7 +127,7 @@ describe("BinaryExpr codegen", () => {
 	it("should compile greater", () => {
 		const node = BinaryExpr(
 			StlNumberExpr(StlNumber.of(2), []),
-			{ type: TokenType.GREATER } as Token,
+			TokenType.GREATER,
 			StlNumberExpr(StlNumber.of(2), []),
 			[]
 		).estree();
@@ -141,7 +140,7 @@ describe("BinaryExpr codegen", () => {
 	it("should compile less", () => {
 		const node = BinaryExpr(
 			StlNumberExpr(StlNumber.of(2), []),
-			{ type: TokenType.LESS } as Token,
+			TokenType.LESS,
 			StlNumberExpr(StlNumber.of(2), []),
 			[]
 		).estree();
@@ -154,7 +153,7 @@ describe("BinaryExpr codegen", () => {
 	it("should compile less equal", () => {
 		const node = BinaryExpr(
 			StlNumberExpr(StlNumber.of(2), []),
-			{ type: TokenType.LESS_EQUAL } as Token,
+			TokenType.LESS_EQUAL,
 			StlNumberExpr(StlNumber.of(2), []),
 			[]
 		).estree();
@@ -167,7 +166,7 @@ describe("BinaryExpr codegen", () => {
 	it("should compile equality", () => {
 		const node = BinaryExpr(
 			StlNumberExpr(StlNumber.of(2), []),
-			{ type: TokenType.EQUAL_EQUAL } as Token,
+			TokenType.EQUAL_EQUAL,
 			StlNumberExpr(StlNumber.of(2), []),
 			[]
 		).estree();
