@@ -22,7 +22,7 @@ export const VariableExpr = (
 			return [scope.lookup(this.identifier), scope];
 		},
 		estree(): Node {
-			return x`${identifier}`;
+			return x`${this.identifier}`;
 		},
 	};
 };
