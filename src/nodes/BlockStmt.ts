@@ -1,4 +1,4 @@
-import {b, Node, x} from "code-red";
+import { b, Node, x } from "code-red";
 import { Expr, ExprBase } from "../Expr.js";
 import { execStmts } from "../Interpreter.js";
 import Scope from "../Scope.js";
@@ -20,11 +20,13 @@ export const BlockStmt = (exprs: Expr[], tokens: Token[] = []): BlockStmt => {
 			return execStmts(this.exprs, scope);
 		},
 		estree(): Node {
-			const exprs: Node[] = this.exprs.map(x => x.estree());
+			const exprs: Node[] = this.exprs
+				.slice(0, -1)
+				.flatMap((x) => b`${x.estree()};`);
 			return x`(() => {
-				${exprs.slice(0, -1)}
-				${b`return ${exprs.at(-1)}`}
-			})()`
-		}
-	}
-}
+				${exprs}
+				${b`return ${this.exprs.at(-1)?.estree()}`}
+			})()`;
+		},
+	};
+};
