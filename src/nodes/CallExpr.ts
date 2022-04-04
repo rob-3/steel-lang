@@ -1,3 +1,4 @@
+import { Node, x } from "code-red";
 import { RuntimePanic } from "../Debug.js";
 import { Expr, ExprBase } from "../Expr.js";
 import { call } from "../Interpreter.js";
@@ -10,6 +11,7 @@ export type CallExpr = ExprBase & {
 	type: "CallExpr";
 	callee: Expr;
 	args: Expr[];
+	estree(): Node;
 };
 
 export const CallExpr = (
@@ -31,6 +33,9 @@ export const CallExpr = (
 					`Can't call ${maybeFn?.value} because it is not a function.`
 				);
 			}
+		},
+		estree(): Node {
+			return x`${this.callee.estree()}(${this.args.map((x) => x.estree())})`;
 		},
 	};
 };
