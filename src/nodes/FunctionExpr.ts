@@ -24,7 +24,6 @@ export const FunctionExpr = (
 		eval(scope: Scope): [Value, Scope] {
 			return [new Box(new StlFunction(this, scope)), scope];
 		},
-
 		toString() {
 			return "[anonymous function]";
 		},
