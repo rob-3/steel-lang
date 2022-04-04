@@ -25,4 +25,35 @@ describe("BlockStmt codegen", () => {
 			})()`
 		);
 	});
+
+	it("should handle a block with multiple lines of math", () => {
+		const node: Node = BlockStmt([
+			VariableAssignmentStmt(
+				VariableExpr("a"),
+				BinaryExpr(
+					PrimaryExpr(StlNumber.of(2)),
+					TokenType.PLUS,
+					PrimaryExpr(StlNumber.of(2))
+				)
+			),
+			VariableAssignmentStmt(
+				VariableExpr("b"),
+				BinaryExpr(
+					VariableExpr("a"),
+					TokenType.MINUS,
+					PrimaryExpr(StlNumber.of(2))
+				)
+			),
+			PrimaryExpr(StlNumber.of(2)),
+		]).estree();
+
+		assertEqual(
+			node,
+			x`(() => {
+				a = stlAdd({stlValue: {top: 2n, bottom: 1n}}, {stlValue: {top: 2n, bottom: 1n}});
+				b = stlSubtract(a, {stlValue: {top: 2n, bottom: 1n}});
+				return {stlValue: {top: 2n, bottom: 1n}};
+			})()`
+		);
+	});
 });
