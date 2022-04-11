@@ -1,14 +1,16 @@
+import { Node, x } from "code-red";
 import { RuntimePanic } from "../Debug.js";
 import { Expr, ExprBase } from "../Expr.js";
 import Scope from "../Scope.js";
+import StlNumber from "../StlNumber.js";
 import Token from "../Token.js";
 import { Value } from "../Value.js";
-import StlNumber from "../StlNumber.js";
 
 export type IndexExpr = ExprBase & {
 	type: "IndexExpr";
 	arr: string;
 	index: Expr;
+	estree(): Node;
 };
 
 export const IndexExpr = (
@@ -37,6 +39,9 @@ export const IndexExpr = (
 				throw RuntimePanic(`Index is out of bounds!`);
 			}
 			return [indexResult, newScope];
+		},
+		estree() {
+			return x`stlUnwrap(${this.arr})[stlUnwrap(${this.index.estree()})]`;
 		},
 	};
 };
