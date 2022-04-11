@@ -1,14 +1,16 @@
+import { Node, x } from "code-red";
 import { RuntimePanic } from "../Debug.js";
 import { Expr, ExprBase } from "../Expr.js";
 import Scope from "../Scope.js";
+import StlObject from "../StlObject.js";
 import Token from "../Token.js";
 import { Value } from "../Value.js";
-import StlObject from "../StlObject.js";
 
 export type DotAccess = ExprBase & {
 	type: "DotAccess";
 	left: Expr;
 	right: string;
+	estree(): Node;
 };
 
 export const DotAccess = (
@@ -39,6 +41,9 @@ export const DotAccess = (
 				}
 				return [value, newScope];
 			}
+		},
+		estree() {
+			return x`(${this.left.estree()}).stlValue.${this.right}`;
 		},
 	};
 };
