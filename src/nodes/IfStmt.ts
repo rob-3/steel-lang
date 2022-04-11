@@ -1,3 +1,4 @@
+import { Node, x } from "code-red";
 import { RuntimePanic } from "../Debug.js";
 import { Expr, ExprBase } from "../Expr.js";
 import Scope from "../Scope.js";
@@ -9,6 +10,7 @@ export type IfStmt = ExprBase & {
 	condition: Expr;
 	body: Expr;
 	elseBody: Expr | null;
+	estree(): Node;
 };
 
 export const IfStmt = (
@@ -37,6 +39,13 @@ export const IfStmt = (
 				// FIXME: hack we need to address
 				return [null, newScope];
 			}
+		},
+		estree() {
+			return x`
+				stlUnwrap(${this.condition.estree()}) ? 
+					${this.body.estree()} :
+					${this.elseBody?.estree() ?? "null"}
+			`;
 		},
 	};
 };
