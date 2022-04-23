@@ -1,3 +1,4 @@
+import { Node, x } from "code-red";
 import { RuntimePanic } from "../Debug.js";
 import { Expr, ExprBase } from "../Expr.js";
 import { equal } from "../Interpreter.js";
@@ -10,6 +11,7 @@ export type MatchStmt = ExprBase & {
 	type: "MatchStmt";
 	expr: Expr;
 	cases: MatchCase[];
+	estree(): Node | Error;
 };
 
 export const MatchStmt = (
@@ -41,6 +43,41 @@ export const MatchStmt = (
 				}
 			}
 			throw RuntimePanic("Pattern match failed.");
+		},
+		estree(): Node | Error {
+			if (this.cases.length === 0) {
+				return Error("Cannot be no cases!");
+			}
+			/*
+			for (const matchCase of this.cases.slice(0, -1)) {
+				if (matchCase.matchExpr.type === "UnderscoreExpr") {
+					return Error("UnderscoreExpr must be last in match statement");
+				}
+			}
+			*/
+			const hasUnderscore =
+				this.cases.at(-1)?.matchExpr.type === "UnderscoreExpr";
+			const skeletonCode = [
+				"((val) => { if (stlEqual(val, ",
+				")) return ",
+				...Array(this.cases.length - (hasUnderscore ? 2 : 1))
+					.fill([";if (stlEqual(val, ", ")) return "])
+					.flat(),
+			];
+			skeletonCode.push(";return ");
+			skeletonCode.push(";})(");
+			skeletonCode.push(")");
+			const subEstrees = this.cases.flatMap(({ matchExpr, expr }, i, arr) => {
+				if (matchExpr.type === "UnderscoreExpr" && i === arr.length - 1) {
+						return [expr.estree()];
+				}
+				return [matchExpr.estree(), expr.estree()];
+			});
+			if (!hasUnderscore) {
+				subEstrees.push(x`null`);
+			}
+			subEstrees.push(this.expr.estree());
+			return x(skeletonCode as unknown as TemplateStringsArray, ...subEstrees);
 		},
 	};
 };
