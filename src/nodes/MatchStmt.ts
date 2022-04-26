@@ -99,6 +99,7 @@ export const MatchCase = (
 
 export type UnderscoreExpr = ExprBase & {
 	type: "UnderscoreExpr";
+	estree(): Node;
 };
 
 export const UnderscoreExpr = (tokens: Token[] = []): UnderscoreExpr => {
@@ -109,5 +110,8 @@ export const UnderscoreExpr = (tokens: Token[] = []): UnderscoreExpr => {
 			// FIXME
 			throw RuntimePanic("Tried to evaluate an UnderscoreExpr");
 		},
+		estree() {
+			throw Error("Cannot compile an UnderscoreExpr");
+		}
 	};
 };
