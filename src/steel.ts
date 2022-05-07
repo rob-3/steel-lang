@@ -1,3 +1,4 @@
+import { print } from "code-red";
 import { Either } from "purify-ts";
 import { Expr } from "./Expr.js";
 import { exprEval } from "./Interpreter.js";
@@ -82,4 +83,27 @@ export function run(
 		console.log((e as Error).message);
 		return scope;
 	}
+}
+
+export function compile(src: string, filename: string) {
+	const output = tokenize(src, filename).chain(parse);
+	return output.caseOf<Error[] | string>({
+		Left: (err) => {
+			return err;
+		},
+		Right: (exprs) => {
+			const exprStrings = exprs
+				.map((expr) => {
+					const jsCode = expr.estree();
+					if (jsCode instanceof Error) {
+						throw jsCode;
+					} else {
+						return print(jsCode).code;
+					}
+				})
+				.filter((x) => x !== "");
+			const outputJS = exprStrings.join("");
+			return outputJS;
+		},
+	});
 }
