@@ -1,3 +1,4 @@
+import { Node } from "code-red";
 import { ArrayLiteral } from "./nodes/ArrayLiteral.js";
 import { BinaryExpr } from "./nodes/BinaryExpr.js";
 import { BlockStmt } from "./nodes/BlockStmt.js";
@@ -25,6 +26,7 @@ import { Value } from "./Value.js";
 export type ExprBase = {
 	tokens: Token[];
 	eval(scope: Scope): [Value | null, Scope];
+	estree(): Node | Error;
 };
 
 export type Expr =

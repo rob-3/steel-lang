@@ -1,4 +1,4 @@
-import { Node, x } from "code-red";
+import { x } from "code-red";
 import { describe, it } from "vitest";
 import { BinaryExpr } from "../../src/nodes/BinaryExpr";
 import { FunctionDefinition } from "../../src/nodes/FunctionDefinition";
@@ -10,7 +10,7 @@ import { assertEqual } from "../Helpers";
 
 describe("FunctionDefinition codegen", () => {
 	it("should compile function definitions", () => {
-		const node: Node = FunctionDefinition(
+		const node = FunctionDefinition(
 			VariableDeclarationStmt(
 				"sum",
 				true,

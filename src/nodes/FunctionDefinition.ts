@@ -1,4 +1,3 @@
-import { Node } from "code-red";
 import { ExprBase } from "../Expr.js";
 import Scope from "../Scope.js";
 import Token from "../Token.js";
@@ -7,7 +6,6 @@ import { VariableDeclarationStmt } from "./VariableDeclarationStmt.js";
 export type FunctionDefinition = ExprBase & {
 	type: "FunctionDefinition";
 	definition: VariableDeclarationStmt;
-	estree(): Node;
 };
 
 export const FunctionDefinition = (
