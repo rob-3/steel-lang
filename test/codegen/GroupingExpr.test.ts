@@ -10,13 +10,16 @@ import { assertEqual } from "../Helpers";
 // FIXME
 describe("GroupingExpr codegen", () => {
 	it("should compile parenthesized expressions", () => {
-		const node: Node = GroupingExpr(
+		const node = GroupingExpr(
 			BinaryExpr(
 				PrimaryExpr(StlNumber.of(2)),
 				TokenType.PLUS,
 				PrimaryExpr(StlNumber.of(2))
 			)
 		).estree();
+		if (node instanceof Error) {
+			throw node;
+		}
 		assertEqual(
 			node,
 			x`stlAdd({stlValue: {top: 2n, bottom: 1n}}, {stlValue: {top: 2n, bottom: 1n}})`

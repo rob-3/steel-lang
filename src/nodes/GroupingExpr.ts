@@ -6,7 +6,7 @@ import Token from "../Token.js";
 export type GroupingExpr = ExprBase & {
 	type: "GroupingExpr";
 	expr: Expr;
-	estree(): Node;
+	estree(): Node | Error;
 };
 
 export const GroupingExpr = (
