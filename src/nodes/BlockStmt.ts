@@ -8,7 +8,6 @@ export type BlockStmt = ExprBase & {
 	type: "BlockStmt";
 	exprs: Expr[];
 	tokens: Token[];
-	estree(): Node;
 };
 
 export const BlockStmt = (exprs: Expr[], tokens: Token[] = []): BlockStmt => {
@@ -19,14 +18,16 @@ export const BlockStmt = (exprs: Expr[], tokens: Token[] = []): BlockStmt => {
 		eval(scope: Scope) {
 			return execStmts(this.exprs, scope);
 		},
-		estree(): Node {
+		estree() {
 			const exprs: Node[] = this.exprs
 				.slice(0, -1)
-				.flatMap((x) => b`${x.estree()};`);
-			return x`(() => {
-				${exprs}
-				${b`return ${this.exprs.at(-1)?.estree()}`}
-			})()`;
+				.flatMap((x) => b`${x.estree().node};`);
+			return {
+				node: x`(() => {
+						${exprs}
+						${b`return ${this.exprs.at(-1)?.estree().node}`}
+					})()`,
+			};
 		},
 	};
 };

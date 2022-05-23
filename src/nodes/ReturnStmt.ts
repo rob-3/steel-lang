@@ -1,4 +1,4 @@
-import { b, Node } from "code-red";
+import { b } from "code-red";
 import { Expr, ExprBase } from "../Expr.js";
 import Scope from "../Scope.js";
 import Token from "../Token.js";
@@ -6,7 +6,6 @@ import Token from "../Token.js";
 export type ReturnStmt = ExprBase & {
 	type: "ReturnStmt";
 	value: Expr;
-	estree(): Node;
 };
 
 export const ReturnStmt = (value: Expr, tokens: Token[] = []): ReturnStmt => {
@@ -17,8 +16,10 @@ export const ReturnStmt = (value: Expr, tokens: Token[] = []): ReturnStmt => {
 		eval(scope: Scope) {
 			return this.value.eval(scope);
 		},
-		estree(): Node {
-			return b`return ${this.value.estree()}`[0];
+		estree() {
+			return {
+				node: b`return ${this.value.estree().node}`[0]
+			};
 		},
 	};
 };

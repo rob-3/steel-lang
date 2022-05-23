@@ -1,4 +1,4 @@
-import { Node, x } from "code-red";
+import { x } from "code-red";
 import { ExprBase } from "../Expr.js";
 import Scope from "../Scope.js";
 import Token from "../Token.js";
@@ -7,7 +7,6 @@ import { Value } from "../Value.js";
 export type VariableExpr = ExprBase & {
 	type: "VariableExpr";
 	identifier: string;
-	estree(): Node;
 };
 
 export const VariableExpr = (
@@ -21,8 +20,10 @@ export const VariableExpr = (
 		eval(scope: Scope): [Value, Scope] {
 			return [scope.lookup(this.identifier), scope];
 		},
-		estree(): Node {
-			return x`${this.identifier}`;
+		estree() {
+			return {
+				node: x`${this.identifier}`
+			};
 		},
 	};
 };

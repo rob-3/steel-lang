@@ -1,4 +1,4 @@
-import { Node, x } from "code-red";
+import { x } from "code-red";
 import { RuntimePanic } from "../Debug.js";
 import { Expr, ExprBase } from "../Expr.js";
 import Scope from "../Scope.js";
@@ -10,7 +10,6 @@ export type DotAccess = ExprBase & {
 	type: "DotAccess";
 	left: Expr;
 	right: string;
-	estree(): Node;
 };
 
 export const DotAccess = (
@@ -43,7 +42,9 @@ export const DotAccess = (
 			}
 		},
 		estree() {
-			return x`(${this.left.estree()}).stlValue.${this.right}`;
+			return {
+				node: x`(${this.left.estree().node}).stlValue.${this.right}`,
+			};
 		},
 	};
 };

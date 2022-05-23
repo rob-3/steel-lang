@@ -1,4 +1,4 @@
-import { Node, x } from "code-red";
+import { x } from "code-red";
 import { describe, it } from "vitest";
 import { BinaryExpr } from "../../src/nodes/BinaryExpr";
 import { BlockStmt } from "../../src/nodes/BlockStmt";
@@ -11,7 +11,7 @@ import { assertEqual } from "../Helpers";
 
 describe("BlockStmt codegen", () => {
 	it("should compile a block of one statement", () => {
-		const node: Node = BlockStmt([
+		const node = BlockStmt([
 			BinaryExpr(
 				PrimaryExpr(StlNumber.of(2)),
 				TokenType.PLUS,
@@ -27,7 +27,7 @@ describe("BlockStmt codegen", () => {
 	});
 
 	it("should handle a block with multiple lines of math", () => {
-		const node: Node = BlockStmt([
+		const node = BlockStmt([
 			VariableAssignmentStmt(
 				VariableExpr("a"),
 				BinaryExpr(

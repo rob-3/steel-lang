@@ -11,7 +11,6 @@ export type MatchStmt = ExprBase & {
 	type: "MatchStmt";
 	expr: Expr;
 	cases: MatchCase[];
-	estree(): Node | Error;
 };
 
 export const MatchStmt = (
@@ -44,7 +43,8 @@ export const MatchStmt = (
 			}
 			throw RuntimePanic("Pattern match failed.");
 		},
-		estree(): Node | Error {
+		estree() {
+			// FIXME this should be accounted for
 			if (this.cases.length === 0) {
 				return Error("Cannot be no cases!");
 			}
@@ -69,15 +69,28 @@ export const MatchStmt = (
 			skeletonCode.push(")");
 			const subEstrees = this.cases.flatMap(({ matchExpr, expr }, i, arr) => {
 				if (matchExpr.type === "UnderscoreExpr" && i === arr.length - 1) {
-						return [expr.estree()];
+					return [expr.estree()];
 				}
 				return [matchExpr.estree(), expr.estree()];
 			});
 			if (!hasUnderscore) {
-				subEstrees.push(x`null`);
+				subEstrees.push({ node: x`null` });
 			}
 			subEstrees.push(this.expr.estree());
-			return x(skeletonCode as unknown as TemplateStringsArray, ...subEstrees);
+			// SAFETY: return an Error if any part is an error
+			for (const estree of subEstrees) {
+				// FIXME we should send multiple errors back
+				if (estree instanceof Error) return estree;
+			}
+			const subEstreesChecked: { node: Node }[] = subEstrees as {
+				node: Node;
+			}[];
+			return {
+				node: x(
+					skeletonCode as unknown as TemplateStringsArray,
+					...subEstreesChecked.map((x) => x.node)
+				),
+			};
 		},
 	};
 };
@@ -99,7 +112,6 @@ export const MatchCase = (
 
 export type UnderscoreExpr = ExprBase & {
 	type: "UnderscoreExpr";
-	estree(): Node;
 };
 
 export const UnderscoreExpr = (tokens: Token[] = []): UnderscoreExpr => {
@@ -112,6 +124,6 @@ export const UnderscoreExpr = (tokens: Token[] = []): UnderscoreExpr => {
 		},
 		estree() {
 			throw Error("Cannot compile an UnderscoreExpr");
-		}
+		},
 	};
 };

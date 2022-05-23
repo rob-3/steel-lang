@@ -3,11 +3,14 @@ import Scope from "../Scope.js";
 import Token from "../Token.js";
 import { Value, Box } from "../Value.js";
 import StlNumber from "../StlNumber.js";
-import { Node, x } from "code-red";
+import { x } from "code-red";
 
 export type PrimaryExpr = StlStringExpr | StlBoolExpr | StlNumberExpr;
 
-export const PrimaryExpr = (literal: StlNumber | string | boolean, tokens: Token[] = []): PrimaryExpr => {
+export const PrimaryExpr = (
+	literal: StlNumber | string | boolean,
+	tokens: Token[] = []
+): PrimaryExpr => {
 	switch (typeof literal) {
 		case "string":
 			return StlStringExpr(literal, tokens);
@@ -16,12 +19,11 @@ export const PrimaryExpr = (literal: StlNumber | string | boolean, tokens: Token
 		case "object":
 			return StlNumberExpr(literal, tokens);
 	}
-}
+};
 
 export type StlStringExpr = ExprBase & {
 	type: "PrimaryExpr";
 	literal: string;
-	estree(): Node;
 };
 
 export const StlStringExpr = (
@@ -35,8 +37,8 @@ export const StlStringExpr = (
 		eval(scope: Scope): [Value, Scope] {
 			return [new Box(this.literal), scope];
 		},
-		estree(): Node {
-			return x`{stlValue: "${this.literal.toString()}"}`;
+		estree() {
+			return { node: x`{stlValue: "${this.literal.toString()}"}` };
 		},
 	};
 };
@@ -44,10 +46,12 @@ export const StlStringExpr = (
 export type StlBoolExpr = ExprBase & {
 	type: "PrimaryExpr";
 	literal: boolean;
-	estree(): Node;
 };
 
-export const StlBoolExpr = (literal: boolean, tokens: Token[] = []): StlBoolExpr => {
+export const StlBoolExpr = (
+	literal: boolean,
+	tokens: Token[] = []
+): StlBoolExpr => {
 	return {
 		type: "PrimaryExpr",
 		literal,
@@ -55,8 +59,8 @@ export const StlBoolExpr = (literal: boolean, tokens: Token[] = []): StlBoolExpr
 		eval(scope: Scope): [Value, Scope] {
 			return [new Box(this.literal), scope];
 		},
-		estree(): Node {
-			return x`{stlValue: ${this.literal.toString()}}`;
+		estree() {
+			return { node: x`{stlValue: ${this.literal.toString()}}` };
 		},
 	};
 };
@@ -64,7 +68,6 @@ export const StlBoolExpr = (literal: boolean, tokens: Token[] = []): StlBoolExpr
 export type StlNumberExpr = ExprBase & {
 	type: "PrimaryExpr";
 	literal: StlNumber;
-	estree(): Node;
 };
 
 export const StlNumberExpr = (
@@ -78,13 +81,15 @@ export const StlNumberExpr = (
 		eval(scope: Scope): [Value, Scope] {
 			return [new Box(this.literal), scope];
 		},
-		estree(): Node {
-			return x`{
+		estree() {
+			return {
+				node: x`{
 					stlValue: {
 						top: ${`${this.literal.top.toString()}n`},
 						bottom: ${`${this.literal.bottom.toString()}n`}
 					}
-				}`;
+				}`,
+			};
 		},
 	};
 };

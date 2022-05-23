@@ -4,12 +4,11 @@ import Scope from "../Scope.js";
 import { Value, Box } from "../Value.js";
 import StlObject from "../StlObject.js";
 import { RuntimePanic } from "../Debug.js";
-import { Node, x } from "code-red";
+import { x } from "code-red";
 
 export type ObjectLiteral = ExprBase & {
 	type: "ObjectLiteral";
 	properties: Map<string, Expr>;
-	estree(): Node;
 };
 
 export const ObjectLiteral = (
@@ -37,15 +36,17 @@ export const ObjectLiteral = (
 		estree() {
 			const pairs = Array.from(this.properties.entries());
 			if (pairs.length === 0) {
-				return x`{stlValue: {}}`;
+				return { node: x`{stlValue: {}}` };
 			}
 			const colonsAndCommas = Array(pairs.length).fill([":", ","]).flat();
 			colonsAndCommas.pop();
 			const strings = ["{stlValue: {", ...colonsAndCommas, "}}"];
-			return x(
-				strings as unknown as TemplateStringsArray,
-				...pairs.flatMap(([key, value]) => [key, value.estree()])
-			);
+			return {
+				node: x(
+					strings as unknown as TemplateStringsArray,
+					...pairs.flatMap(([key, value]) => [key, value.estree().node])
+				),
+			};
 		},
 	};
 };

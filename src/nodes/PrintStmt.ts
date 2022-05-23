@@ -9,7 +9,6 @@ import { Node, x } from "code-red";
 export type PrintStmt = ExprBase & {
 	type: "PrintStmt";
 	thingToPrint: Expr;
-	estree(): Node;
 };
 
 // TODO: library function
@@ -30,7 +29,9 @@ export const PrintStmt = (
 			return [printValue, newScope];
 		},
 		estree() {
-			return x`stlPrint(${this.thingToPrint.estree()})`;
+			return {
+				node: x`stlPrint(${this.thingToPrint.estree().node})`,
+			};
 		},
 	};
 };

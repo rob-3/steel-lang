@@ -3,13 +3,12 @@ import Scope from "../Scope.js";
 import Token from "../Token.js";
 import { Value } from "../Value.js";
 import { RuntimePanic } from "../Debug.js";
-import { Node, x } from "code-red";
+import { x } from "code-red";
 
 export type WhileStmt = ExprBase & {
 	type: "WhileStmt";
 	condition: Expr;
 	body: Expr;
-	estree(): Node;
 };
 
 export const WhileStmt = (
@@ -38,13 +37,15 @@ export const WhileStmt = (
 			return [value, scope];
 		},
 		estree() {
-			return x`(() => {
-				let ret;
-				while (${this.condition.estree()}) {
-					ret = ${this.body.estree()}
-				}
-				return ret;
-			})()`;
+			return {
+				node: x`(() => {
+					let ret;
+					while (${this.condition.estree().node}) {
+						ret = ${this.body.estree().node}
+					}
+					return ret;
+				})()`
+			};
 		},
 	};
 };

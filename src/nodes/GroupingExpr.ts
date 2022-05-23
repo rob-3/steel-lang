@@ -1,4 +1,3 @@
-import { Node } from "code-red";
 import { Expr, ExprBase } from "../Expr.js";
 import Scope from "../Scope.js";
 import Token from "../Token.js";
@@ -6,7 +5,6 @@ import Token from "../Token.js";
 export type GroupingExpr = ExprBase & {
 	type: "GroupingExpr";
 	expr: Expr;
-	estree(): Node | Error;
 };
 
 export const GroupingExpr = (

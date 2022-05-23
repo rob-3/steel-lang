@@ -1,6 +1,6 @@
 import { Node, x } from "code-red";
 import { RuntimePanic } from "../Debug.js";
-import { ExprBase, Expr } from "../Expr.js";
+import { Expr, ExprBase } from "../Expr.js";
 import {
 	and,
 	equal,
@@ -26,7 +26,6 @@ export type BinaryExpr = ExprBase & {
 	left: Expr;
 	operator: TokenType;
 	right: Expr;
-	estree(): Node;
 };
 
 export const BinaryExpr = (
@@ -80,41 +79,56 @@ export const BinaryExpr = (
 					);
 			}
 		},
-		estree(): Node {
-			const leftVal = this.left.estree();
-			const rightVal = this.right.estree();
+		estree() {
+			const leftVal = this.left.estree().node;
+			const rightVal = this.right.estree().node;
+			let node: Node;
 			switch (this.operator) {
 				case TokenType.PLUS:
-					return x`stlAdd(${leftVal}, ${rightVal})`;
+					node = x`stlAdd(${leftVal}, ${rightVal})`;
+					break;
 				case TokenType.MINUS:
-					return x`stlSubtract(${leftVal}, ${rightVal})`;
+					node = x`stlSubtract(${leftVal}, ${rightVal})`;
+					break;
 				case TokenType.PLUS_PLUS:
-					return x`stlConcat(${leftVal}, ${rightVal})`;
+					node = x`stlConcat(${leftVal}, ${rightVal})`;
+					break;
 				case TokenType.STAR:
-					return x`stlMultiply(${leftVal}, ${rightVal})`;
+					node = x`stlMultiply(${leftVal}, ${rightVal})`;
+					break;
 				case TokenType.SLASH:
-					return x`stlDivide(${leftVal}, ${rightVal})`;
+					node = x`stlDivide(${leftVal}, ${rightVal})`;
+					break;
 				case TokenType.MOD:
-					return x`stlMod(${leftVal}, ${rightVal})`;
+					node = x`stlMod(${leftVal}, ${rightVal})`;
+					break;
 				case TokenType.AND:
-					return x`stlLogicalAnd(${leftVal}, ${rightVal})`;
+					node = x`stlLogicalAnd(${leftVal}, ${rightVal})`;
+					break;
 				case TokenType.OR:
-					return x`stlLogicalOr(${leftVal}, ${rightVal})`;
+					node = x`stlLogicalOr(${leftVal}, ${rightVal})`;
+					break;
 				case TokenType.GREATER_EQUAL:
-					return x`stlGreaterEqual(${leftVal}, ${rightVal})`;
+					node = x`stlGreaterEqual(${leftVal}, ${rightVal})`;
+					break;
 				case TokenType.GREATER:
-					return x`stlGreater(${leftVal}, ${rightVal})`;
+					node = x`stlGreater(${leftVal}, ${rightVal})`;
+					break;
 				case TokenType.LESS_EQUAL:
-					return x`stlLessEqual(${leftVal}, ${rightVal})`;
+					node = x`stlLessEqual(${leftVal}, ${rightVal})`;
+					break;
 				case TokenType.LESS:
-					return x`stlLess(${leftVal}, ${rightVal})`;
+					node = x`stlLess(${leftVal}, ${rightVal})`;
+					break;
 				case TokenType.EQUAL_EQUAL:
-					return x`stlEqual(${leftVal}, ${rightVal})`;
+					node = x`stlEqual(${leftVal}, ${rightVal})`;
+					break;
 				default:
 					throw RuntimePanic(
 						`FIXME: Unhandled operator type "${this.operator}"`
 					);
 			}
+			return { node };
 		},
 	};
 };

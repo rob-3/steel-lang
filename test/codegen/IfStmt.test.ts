@@ -1,4 +1,4 @@
-import { Node, x } from "code-red";
+import { x } from "code-red";
 import { describe, it } from "vitest";
 import { IfStmt } from "../../src/nodes/IfStmt";
 import { PrimaryExpr } from "../../src/nodes/PrimaryExpr";
@@ -7,7 +7,7 @@ import { assertEqual } from "../Helpers";
 
 describe("IfStmt codegen", () => {
 	it("should compile an if statement with else", () => {
-		const node: Node = IfStmt(
+		const node = IfStmt(
 			PrimaryExpr(true),
 			PrimaryExpr(StlNumber.of(2)),
 			PrimaryExpr(StlNumber.of(3))

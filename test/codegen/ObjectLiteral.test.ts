@@ -1,4 +1,4 @@
-import { Node, x } from "code-red";
+import { x } from "code-red";
 import { describe, it } from "vitest";
 import { ObjectLiteral } from "../../src/nodes/ObjectLiteral";
 import { PrimaryExpr } from "../../src/nodes/PrimaryExpr";
@@ -7,12 +7,12 @@ import { assertEqual } from "../Helpers";
 
 describe("ObjectLiteral codegen", () => {
 	it("should compile an empty object literal", () => {
-		const node: Node = ObjectLiteral(new Map()).estree();
+		const node = ObjectLiteral(new Map()).estree();
 		assertEqual(node, x`{stlValue: {}}`);
 	});
 
 	it("should compile a non-empty object literal", () => {
-		const node: Node = ObjectLiteral(
+		const node = ObjectLiteral(
 			new Map([
 				["sky", PrimaryExpr("blue")],
 				["grass", PrimaryExpr("green")],

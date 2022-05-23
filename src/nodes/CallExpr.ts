@@ -1,4 +1,4 @@
-import { Node, x } from "code-red";
+import { x } from "code-red";
 import { RuntimePanic } from "../Debug.js";
 import { Expr, ExprBase } from "../Expr.js";
 import { call } from "../Interpreter.js";
@@ -11,7 +11,6 @@ export type CallExpr = ExprBase & {
 	type: "CallExpr";
 	callee: Expr;
 	args: Expr[];
-	estree(): Node;
 };
 
 export const CallExpr = (
@@ -34,8 +33,10 @@ export const CallExpr = (
 				);
 			}
 		},
-		estree(): Node {
-			return x`${this.callee.estree()}(${this.args.map((x) => x.estree())})`;
+		estree() {
+			return {
+				node: x`${this.callee.estree().node}(${this.args.map((x) => x.estree().node)})`,
+			};
 		},
 	};
 };

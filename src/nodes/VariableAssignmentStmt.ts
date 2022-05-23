@@ -8,7 +8,7 @@ import { RuntimePanic } from "../Debug.js";
 import { Value, UnboxedValue } from "../Value.js";
 import { IndexExpr } from "./IndexExpr.js";
 import StlNumber from "../StlNumber.js";
-import { Node, x } from "code-red";
+import { x } from "code-red";
 
 export type AssignmentLeft = VariableExpr | DotAccess | IndexExpr;
 
@@ -24,7 +24,6 @@ export type VariableAssignmentStmt = ExprBase & {
 	type: "VariableAssignmentStmt";
 	left: AssignmentLeft;
 	right: Expr;
-	estree(): Node;
 };
 
 export const VariableAssignmentStmt = (
@@ -110,8 +109,10 @@ export const VariableAssignmentStmt = (
 				throw RuntimePanic("Unsupported left side of expression");
 			}
 		},
-		estree(): Node {
-			return x`${this.left.estree()} = ${this.right.estree()}`;
+		estree() {
+			return {
+				node: x`${this.left.estree().node} = ${this.right.estree().node}`
+			};
 		},
 	};
 };

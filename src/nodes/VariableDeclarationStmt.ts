@@ -9,7 +9,6 @@ export type VariableDeclarationStmt = ExprBase & {
 	immutable: boolean;
 	identifier: string;
 	right: Expr;
-	estree(): Node;
 };
 
 export const VariableDeclarationStmt = (
@@ -33,9 +32,9 @@ export const VariableDeclarationStmt = (
 			}
 			return newScope.define(this.identifier, rightVal, this.immutable);
 		},
-		estree(): Node {
+		estree() {
 			// FIXME we need to signal that a top level variable declaration is needed
-			return x`${this.identifier} = ${this.right.estree()}`;
+			return { node: x`${this.identifier} = ${this.right.estree().node}` };
 		},
 	};
 };

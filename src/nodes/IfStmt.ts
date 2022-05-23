@@ -1,4 +1,4 @@
-import { Node, x } from "code-red";
+import { x } from "code-red";
 import { RuntimePanic } from "../Debug.js";
 import { Expr, ExprBase } from "../Expr.js";
 import Scope from "../Scope.js";
@@ -10,7 +10,6 @@ export type IfStmt = ExprBase & {
 	condition: Expr;
 	body: Expr;
 	elseBody: Expr | null;
-	estree(): Node;
 };
 
 export const IfStmt = (
@@ -41,11 +40,13 @@ export const IfStmt = (
 			}
 		},
 		estree() {
-			return x`
-				stlUnwrap(${this.condition.estree()}) ? 
-					${this.body.estree()} :
-					${this.elseBody?.estree() ?? "null"}
-			`;
+			return {
+				node: x`
+				stlUnwrap(${this.condition.estree().node}) ? 
+					${this.body.estree().node} :
+					${this.elseBody?.estree().node ?? "null"}
+				`,
+			};
 		},
 	};
 };

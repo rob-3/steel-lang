@@ -98,7 +98,7 @@ export function compile(src: string, filename: string) {
 					if (jsCode instanceof Error) {
 						throw jsCode;
 					} else {
-						return print(jsCode).code;
+						return print(jsCode.node).code;
 					}
 				})
 				.filter((x) => x !== "");

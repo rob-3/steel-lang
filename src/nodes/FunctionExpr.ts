@@ -10,7 +10,6 @@ export type FunctionExpr = ExprBase & {
 	args: string[];
 	body: Expr;
 	toString(): string;
-	estree(): Node;
 };
 
 export const FunctionExpr = (
@@ -29,9 +28,11 @@ export const FunctionExpr = (
 		toString() {
 			return "[anonymous function]";
 		},
-		estree(): Node {
+		estree() {
 			const args: Node[] = this.args.map((id) => x`${id}`);
-			return x`(${args}) => ${this.body.estree()}`;
+			return {
+				node: x`(${args}) => ${this.body.estree().node}`,
+			};
 		},
 	};
 };

@@ -1,4 +1,4 @@
-import { Node, x } from "code-red";
+import { x } from "code-red";
 import { describe, it } from "vitest";
 import { DotAccess } from "../../src/nodes/DotAccess.js";
 import { ObjectLiteral } from "../../src/nodes/ObjectLiteral.js";
@@ -8,7 +8,7 @@ import { assertEqual } from "../Helpers.js";
 
 describe("DotAccess codegen", () => {
 	it("should compile dot notation", () => {
-		const node: Node = DotAccess(
+		const node = DotAccess(
 			ObjectLiteral(
 				new Map([
 					["alpha", PrimaryExpr(StlNumber.of(0))],

@@ -1,4 +1,4 @@
-import { Node, x } from "code-red";
+import { x } from "code-red";
 import { describe, it } from "vitest";
 import { BinaryExpr } from "../../src/nodes/BinaryExpr";
 import { GroupingExpr } from "../../src/nodes/GroupingExpr";

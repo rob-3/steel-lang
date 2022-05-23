@@ -1,4 +1,4 @@
-import { Node, x } from "code-red";
+import { x } from "code-red";
 import { RuntimePanic } from "../Debug.js";
 import { Expr, ExprBase } from "../Expr.js";
 import { not, opposite } from "../Interpreter.js";
@@ -11,7 +11,6 @@ export type UnaryExpr = ExprBase & {
 	type: "UnaryExpr";
 	operator: Token;
 	right: Expr;
-	estree(): Node;
 };
 
 export const UnaryExpr = (
@@ -37,12 +36,12 @@ export const UnaryExpr = (
 			}
 			throw RuntimePanic("Unsupported operator type in UnaryExpr");
 		},
-		estree(): Node {
+		estree() {
 			switch (this.operator.type) {
 				case TokenType.MINUS:
-					return x`{stlValue: stlOpposite(${this.right.estree()})}`;
+					return { node: x`{stlValue: stlOpposite(${this.right.estree().node})}` };
 				case TokenType.NOT:
-					return x`{stlValue: stlNot(${this.right.estree()})}`;
+					return { node: x`{stlValue: stlNot(${this.right.estree().node})}` };
 			}
 			// FIXME
 			throw RuntimePanic("Cannot compile unsupported operator type");

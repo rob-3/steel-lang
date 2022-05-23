@@ -1,17 +1,19 @@
-import { ExprBase, Expr } from "../Expr.js";
+import { x } from "code-red";
+import { RuntimePanic } from "../Debug.js";
+import { Expr, ExprBase } from "../Expr.js";
 import Scope from "../Scope.js";
 import Token from "../Token.js";
-import { Value, Box } from "../Value.js";
-import { RuntimePanic } from "../Debug.js";
-import { Node, x } from "code-red";
+import { Box, Value } from "../Value.js";
 
 export type ArrayLiteral = ExprBase & {
 	type: "ArrayLiteral";
 	exprs: Expr[];
-	estree(): Node;
 };
 
-export const ArrayLiteral = (exprs: Expr[], tokens: Token[] = []): ArrayLiteral => {
+export const ArrayLiteral = (
+	exprs: Expr[],
+	tokens: Token[] = []
+): ArrayLiteral => {
 	return {
 		type: "ArrayLiteral",
 		exprs,
@@ -28,9 +30,11 @@ export const ArrayLiteral = (exprs: Expr[], tokens: Token[] = []): ArrayLiteral 
 			}, scope);
 			return [new Box(resolved), newScope];
 		},
-		estree(): Node {
-			const estrees = this.exprs.map((e) => e.estree());
-			return x`{stlValue: [${estrees}]}`;
+		estree() {
+			const estrees = this.exprs.map((e) => e.estree().node);
+			return {
+				node: x`{stlValue: [${estrees}]}`,
+			};
 		},
 	};
 };

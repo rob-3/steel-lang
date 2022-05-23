@@ -1,4 +1,4 @@
-import { Node, x } from "code-red";
+import { x } from "code-red";
 import { describe, it } from "vitest";
 import { IndexExpr } from "../../src/nodes/IndexExpr";
 import { PrimaryExpr } from "../../src/nodes/PrimaryExpr";
@@ -7,7 +7,7 @@ import { assertEqual } from "../Helpers";
 
 describe("IndexExpr codegen", () => {
 	it("should compile a basic literal index", () => {
-		const node: Node = IndexExpr(
+		const node = IndexExpr(
 			"array",
 			PrimaryExpr(StlNumber.of(2))
 		).estree();

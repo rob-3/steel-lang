@@ -1,4 +1,4 @@
-import { Node, x } from "code-red";
+import { x } from "code-red";
 import { RuntimePanic } from "../Debug.js";
 import { Expr, ExprBase } from "../Expr.js";
 import Scope from "../Scope.js";
@@ -10,7 +10,6 @@ export type IndexExpr = ExprBase & {
 	type: "IndexExpr";
 	arr: string;
 	index: Expr;
-	estree(): Node;
 };
 
 export const IndexExpr = (
@@ -41,7 +40,9 @@ export const IndexExpr = (
 			return [indexResult, newScope];
 		},
 		estree() {
-			return x`stlUnwrap(${this.arr})[stlUnwrap(${this.index.estree()})]`;
+			return {
+				node: x`stlUnwrap(${this.arr})[stlUnwrap(${this.index.estree().node})]`,
+			};
 		},
 	};
 };
