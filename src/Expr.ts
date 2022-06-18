@@ -26,7 +26,11 @@ import { Value } from "./Value.js";
 export type ExprBase = {
 	tokens: Token[];
 	eval(scope: Scope): [Value | null, Scope];
-	estree(): { node?: Node, errors?: Error[] };
+	estree(): {
+		node?: Node;
+		errors?: Error[];
+		identifierDeclarations?: { identifier: string; immutable: boolean }[];
+	};
 };
 
 export type Expr =

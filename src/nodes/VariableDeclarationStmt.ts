@@ -2,7 +2,7 @@ import { Expr, ExprBase } from "../Expr.js";
 import Scope from "../Scope.js";
 import Token from "../Token.js";
 import { RuntimePanic } from "../Debug.js";
-import { Node, x } from "code-red";
+import { x } from "code-red";
 
 export type VariableDeclarationStmt = ExprBase & {
 	type: "VariableDeclarationStmt";
@@ -33,8 +33,11 @@ export const VariableDeclarationStmt = (
 			return newScope.define(this.identifier, rightVal, this.immutable);
 		},
 		estree() {
-			// FIXME we need to signal that a top level variable declaration is needed
-			return { node: x`${this.identifier} = ${this.right.estree().node}` };
+			const { identifier, right, immutable } = this;
+			return {
+				node: x`${identifier} = ${right.estree().node}`,
+				identifierDeclarations: [{ identifier, immutable }],
+			};
 		},
 	};
 };
