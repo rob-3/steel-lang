@@ -95,10 +95,10 @@ export function compile(src: string, filename: string) {
 			const exprStrings = exprs
 				.map((expr) => {
 					const jsCode = expr.estree();
-					if (jsCode instanceof Error) {
-						throw jsCode;
+					if (jsCode.errors) {
+						throw jsCode.errors;
 					} else {
-						return print(jsCode.node).code;
+						return jsCode.node ? print(jsCode.node).code : Error("No node!");
 					}
 				})
 				.filter((x) => x !== "");

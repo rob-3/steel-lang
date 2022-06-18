@@ -46,7 +46,7 @@ export const MatchStmt = (
 		estree() {
 			// FIXME this should be accounted for
 			if (this.cases.length === 0) {
-				return Error("Cannot be no cases!");
+				return { errors: [Error("Cannot be no cases!")] };
 			}
 			/*
 			for (const matchCase of this.cases.slice(0, -1)) {
@@ -80,7 +80,7 @@ export const MatchStmt = (
 			// SAFETY: return an Error if any part is an error
 			for (const estree of subEstrees) {
 				// FIXME we should send multiple errors back
-				if (estree instanceof Error) return estree;
+				if (Array.isArray(estree)) return estree;
 			}
 			const subEstreesChecked: { node: Node }[] = subEstrees as {
 				node: Node;

@@ -16,7 +16,6 @@ describe("MatchStmt codegen", () => {
 			MatchCase(PrimaryExpr(StlNumber.of(3)), PrimaryExpr("it was 3")),
 			MatchCase(UnderscoreExpr(), PrimaryExpr("it was not 2")),
 		]).estree();
-		if (node instanceof Error) throw node;
 		assertEqual(
 			node,
 			x`((val) => {
@@ -32,7 +31,6 @@ describe("MatchStmt codegen", () => {
 			MatchCase(PrimaryExpr(StlNumber.of(2)), PrimaryExpr("it was 2")),
 			MatchCase(PrimaryExpr(StlNumber.of(3)), PrimaryExpr("it was 3")),
 		]).estree();
-		if (node instanceof Error) throw node;
 		assertEqual(
 			node,
 			x`((val) => {
@@ -58,7 +56,7 @@ describe("MatchStmt codegen", () => {
 	});
 
 	it("should not compile match statements with no items", () => {
-		const err = MatchStmt(PrimaryExpr(StlNumber.of(3)), []).estree();
-		expect(err instanceof Error).toBe(true);
+		const { errors } = MatchStmt(PrimaryExpr(StlNumber.of(3)), []).estree();
+		expect(errors && errors.length > 0).toBe(true);
 	});
 });
