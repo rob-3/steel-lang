@@ -22,7 +22,11 @@ export default class Scope {
 		// library print function
 		// FIXME null token lists
 		const print = new StlFunction(
-			FunctionExpr(["value"], PrintStmt(VariableExpr("value", []), []), []),
+			FunctionExpr(
+				[{ name: "value", isImmutable: true }],
+				PrintStmt(VariableExpr("value", []), []),
+				[]
+			),
 			this
 		);
 		this.bindings.set("print", [new Box(print), false]);

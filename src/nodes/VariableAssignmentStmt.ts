@@ -78,11 +78,15 @@ export const VariableAssignmentStmt = (
 					}
 				}
 			} else if (this.left.type === "IndexExpr") {
-				const array: UnboxedValue = scope.lookup(this.left.arr).value;
+				const pair = scope.getPair(this.left.arr);
+				if (!pair) {
+					throw RuntimePanic(`Array "${this.left.arr}" does not exist.`);
+				}
+				const [{ value: array }, isImmutable] = pair;
 				if (!Array.isArray(array)) {
 					throw RuntimePanic(`${this.left.arr} is not an array!`);
 				}
-				if (this.left.arr.slice(0, 1) !== "~") {
+				if (isImmutable) {
 					throw RuntimePanic(
 						`Cannot assign to index of immutable array "${this.left.arr}"`
 					);

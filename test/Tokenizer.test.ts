@@ -144,8 +144,8 @@ describe("tokenize()", () => {
 		]);
 	});
 
-	it("should use LET TokenType and NEWLINE", () => {
-		const src = "a = 23\nlet b = 46";
+	it("should use VAR TokenType and NEWLINE", () => {
+		const src = "a = 23\nvar b <- 46";
 		let result = tokenize(src);
 		expect(result).toEqual([
 			new Token(
@@ -173,8 +173,8 @@ describe("tokenize()", () => {
 				new Location([1, 7], [1, 8], "<anonymous>", src)
 			),
 			new Token(
-				TokenType.LET,
-				"let",
+				TokenType.VAR,
+				"var",
 				null,
 				new Location([2, 1], [2, 4], "<anonymous>", src)
 			),
@@ -185,22 +185,22 @@ describe("tokenize()", () => {
 				new Location([2, 5], [2, 6], "<anonymous>", src)
 			),
 			new Token(
-				TokenType.EQUAL,
-				"=",
+				TokenType.LEFT_SINGLE_ARROW,
+				"<-",
 				null,
-				new Location([2, 7], [2, 8], "<anonymous>", src)
+				new Location([2, 7], [2, 9], "<anonymous>", src)
 			),
 			new Token(
 				TokenType.NUMBER,
 				"46",
 				new StlNumber(46n),
-				new Location([2, 9], [2, 11], "<anonymous>", src)
+				new Location([2, 10], [2, 12], "<anonymous>", src)
 			),
 			new Token(
 				TokenType.EOF,
 				"EOF",
 				null,
-				new Location([2, 11], [2, 12], "<anonymous>", src)
+				new Location([2, 12], [2, 13], "<anonymous>", src)
 			),
 		]);
 	});

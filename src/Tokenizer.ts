@@ -132,7 +132,7 @@ function scanToken(): Either<Error, Token> {
 		default:
 			if (isNumber(char)) {
 				return Right(makeNumber());
-			} else if (isAlpha(char) || char === "~") {
+			} else if (isAlpha(char)) {
 				return Right(makeIdentifierOrKeyword());
 			} else {
 				return Left(
@@ -184,8 +184,10 @@ function makeIdentifierOrKeyword(): Token {
 	}
 	const lexeme = source.slice(startIndex, currentIndex);
 	switch (lexeme) {
-		case "let":
-			return makeToken(TokenType.LET);
+		//case "let":
+			//return makeToken(TokenType.LET);
+		case "var":
+			return makeToken(TokenType.VAR);
 		case "true":
 			return makeToken(TokenType.TRUE, true);
 		case "false":

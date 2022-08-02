@@ -1,44 +1,15 @@
 import { Either } from "purify-ts";
 import { ExprBase } from "../src/Expr.js";
-import { stlEval as _stlEval } from "../src/Interpreter.js";
-import { setPrintFn } from "../src/Logger.js";
 import parse from "../src/Parser.js";
 import Scope from "../src/Scope.js";
 import { run } from "../src/steel.js";
 import tokenize from "../src/Tokenizer.js";
-import { Value, UnboxedValue } from "../src/Value.js";
 import StlNumber from "../src/StlNumber.js";
 import { describe, it, expect, vi as jest } from "vitest";
+import { stlEval, stlExec } from "./Helpers.js"
 
 // silence logs unless we're debugging
 console.log = () => {};
-
-export const stlEval = (
-	src: string,
-	scope: Scope = new Scope()
-): UnboxedValue | undefined => {
-	const val = _stlEval(src, scope);
-	try {
-		return val.unsafeCoerce()[0]?.value;
-	} catch (e) {
-		console.log(val);
-		throw e;
-	}
-};
-
-const stlExec = (
-	src: string,
-	printfn: ((a: any) => void) | null = null
-): [Value | null, Scope] => {
-	if (printfn !== null) setPrintFn(printfn);
-	const val = _stlEval(src, new Scope());
-	try {
-		return val.unsafeCoerce();
-	} catch (e) {
-		console.log(val);
-		throw e;
-	}
-};
 
 describe("stlEval()", () => {
 	describe("literals", () => {
@@ -162,8 +133,8 @@ describe("stlEval()", () => {
 		it("should evaluate block stmts", () => {
 			const src = `
             {
-                let a = 5
-                let b = -3
+                a = 5
+                b = -3
                 a + b
             }
             `;
@@ -174,7 +145,7 @@ describe("stlEval()", () => {
 			expect(
 				stlEval(
 					`
-                let a = 5
+                a = 5
                 if a == 5 {
                     6
                 } else {
@@ -189,9 +160,9 @@ describe("stlEval()", () => {
 			expect(
 				stlEval(
 					`
-                let ~a = 0
-                while ~a < 5 {
-                    ~a = ~a + 1
+                var a <- 0
+                while a < 5 {
+                    a <- a + 1
                 }
                 `
 				)
@@ -201,18 +172,18 @@ describe("stlEval()", () => {
 
 	describe("arrays", () => {
 		it("should not throw on empty array literal", () => {
-			expect(() => stlEval(`let arr = []`)).not.toThrow();
+			expect(() => stlEval(`arr = []`)).not.toThrow();
 		});
 
 		it("should allow nonempty array literals", () => {
-			expect(() => stlEval("let arr = [1, 2, 3]")).not.toThrow();
+			expect(() => stlEval("arr = [1, 2, 3]")).not.toThrow();
 		});
 
 		it("should allow indexing arrays with zero", () => {
 			expect(
 				stlEval(
 					`
-                let a = [1, 2, 3]
+                a = [1, 2, 3]
                 a[0]
                 `
 				)
@@ -223,7 +194,7 @@ describe("stlEval()", () => {
 			expect(
 				stlEval(
 					`
-                let a = [1, 2, 3]
+                a = [1, 2, 3]
                 a[2]
                 `
 				)
@@ -296,7 +267,7 @@ describe("exec()", () => {
 			expect(
 				stlEval(
 					`
-                let a = if false then 5 else 6
+                a = if false then 5 else 6
                 `
 				)
 			).toEqual(new StlNumber(6n));
@@ -305,10 +276,10 @@ describe("exec()", () => {
 
 	describe("while loops", () => {
 		const src = `
-        let ~a = 0
-        while (~a < 10) {
-            print(~a)
-            ~a = ~a + 1
+        var a <- 0
+        while (a < 10) {
+            print(a)
+            a <- a + 1
         }
         `;
 		it("should loop until the condition is met", () => {
@@ -320,21 +291,21 @@ describe("exec()", () => {
 
 	describe("variables", () => {
 		it("should be able to access a variable", () => {
-			const src = "let ~a = 14";
+			const src = "var a <- 14";
 			const scope: Scope = stlExec(src)[1];
-			expect(stlEval("~a", scope)).toEqual(new StlNumber(14n));
+			expect(stlEval("a", scope)).toEqual(new StlNumber(14n));
 		});
 
 		it("should be able to assign to a variable", () => {
-			const scope = stlExec("let ~a = 14\n~a = 15")[1];
-			expect(stlEval("~a", scope)).toEqual(new StlNumber(15n));
+			const scope = stlExec("var a <- 14\na <- 15")[1];
+			expect(stlEval("a", scope)).toEqual(new StlNumber(15n));
 		});
 
 		it("should allow a variable declaration to spill over lines", () => {
 			expect(
 				stlEval(
 					`
-                let ~x =
+                var x <-
                     42 + 13 + 3
                 `
 				)
@@ -345,10 +316,10 @@ describe("exec()", () => {
 			expect(
 				stlEval(
 					`
-                    let ~x = 3
-                    ~x = 
+                    var x <- 3
+                    x <-
                         6
-                    ~x
+                    x
                     `
 				)
 			).toEqual(new StlNumber(6n));
@@ -358,10 +329,10 @@ describe("exec()", () => {
 			const spy = jest.fn();
 			stlExec(
 				` 
-                let a = 4 
-                let b = 6
-                let addTwo = (n) -> {
-                    let a = 2
+                a = 4 
+                b = 6
+                addTwo = (n) -> {
+                    a = 2
                     a + n
                 }
                 print(addTwo(13))
@@ -379,8 +350,8 @@ describe("exec()", () => {
 			expect(() =>
 				stlEval(
 					`
-                let a = 4
-                let a = 5
+                a = 4
+                a = 5
                 `
 				)
 			).toThrow();
@@ -436,8 +407,8 @@ describe("exec()", () => {
 				expect(() =>
 					stlEval(
 						`
-                    let print_a = () -> print(a)
-                    let a = 4
+                    print_a = () -> print(a)
+                    a = 4
                     print_a()
                     `
 					)
@@ -469,8 +440,8 @@ describe("exec()", () => {
 
 			it("should have the correct scope", () => {
 				const src = `
-                let a = 42
-                let b = 16
+                a = 42
+                b = 16
                 fun sum = (a, b) -> {
                     a + b
                 }
@@ -531,7 +502,7 @@ describe("exec()", () => {
 		describe("lambdas", () => {
 			it("should permit anonymous function style declaration", () => {
 				const src = `
-               let a = (a, b) -> {
+               a = (a, b) -> {
                    a * b
                }
 
@@ -544,8 +515,8 @@ describe("exec()", () => {
 				expect(
 					stlEval(
 						`
-                    let a = 4
-                    let getA = () -> a
+                    a = 4
+                    getA = () -> a
                     getA()
                     `
 					)
@@ -554,7 +525,7 @@ describe("exec()", () => {
 
 			it("should allow anonymous functions to be passed inline", () => {
 				const src = `
-                let math = (a, b, c) -> {
+                math = (a, b, c) -> {
                     a(b) * c
                 }
 
@@ -567,7 +538,7 @@ describe("exec()", () => {
 				expect(
 					stlEval(
 						`
-                let double = a -> a * 2
+                double = a -> a * 2
 
                 double(2)
                 `
@@ -579,7 +550,7 @@ describe("exec()", () => {
 				expect(
 					stlEval(
 						`
-                let double = (a) -> a * 2
+                double = (a) -> a * 2
 
                 double(2)
                 `
@@ -591,7 +562,7 @@ describe("exec()", () => {
 				expect(
 					stlEval(
 						`
-                let sum = (a, b) -> a + b
+                sum = (a, b) -> a + b
 
                 sum(2, 6)
                 `
@@ -644,7 +615,7 @@ describe("exec()", () => {
 			expect(() =>
 				stlEval(
 					`
-                let x = 15
+                x = 15
                 match x {
                     15 => "correct"
                     _ => "wrong"
@@ -658,7 +629,7 @@ describe("exec()", () => {
 			expect(
 				stlEval(
 					`
-                let x = 15
+                x = 15
                 match x {
                     15 => "correct"
                     _ => "wrong"
@@ -672,9 +643,9 @@ describe("exec()", () => {
 			const spy = jest.fn();
 			stlExec(
 				`
-                let a = 4
-                let b = a - 2
-                let c = a/b
+                a = 4
+                b = a - 2
+                c = a/b
                 print(match c {
                     3 => "nope"
                     4 => "def nope"
@@ -690,7 +661,7 @@ describe("exec()", () => {
 			expect(
 				stlEval(
 					`
-                let x = "hello"
+                x = "hello"
                 match x {
                     "hello" => "correct"
                     _ => "incorrect"
@@ -720,7 +691,7 @@ describe("exec()", () => {
 			expect(() =>
 				stlEval(
 					`
-                let obj = {
+                obj = {
                     a: 72
                 }
                 `
@@ -732,7 +703,7 @@ describe("exec()", () => {
 			expect(() =>
 				stlEval(
 					`
-                let obj = {
+                obj = {
                     a: 72,
                     b: 73
                 }
@@ -745,7 +716,7 @@ describe("exec()", () => {
 			expect(() =>
 				stlEval(
 					`
-                let obj = {
+                obj = {
                     a: 72,
                     b: 73,
                 }
@@ -758,7 +729,7 @@ describe("exec()", () => {
 			expect(() =>
 				stlEval(
 					`
-                let obj = {
+                obj = {
                     obj: 72
                 }
                 `
@@ -783,7 +754,7 @@ describe("exec()", () => {
 			expect(
 				stlEval(
 					`
-                    let obj = {
+                    obj = {
                         a: 72
                     }
                     obj.a
@@ -796,7 +767,7 @@ describe("exec()", () => {
 			expect(() =>
 				stlEval(
 					`
-                    let obj = {
+                    obj = {
                         a: 42
                     }
                     obj.a = 43
@@ -809,11 +780,11 @@ describe("exec()", () => {
 			expect(
 				stlEval(
 					`
-                    let ~obj = {
+                    var obj <- {
                         a: 42
                     }
-                    ~obj.a = 43
-                    ~obj.a
+                    obj.a <- 43
+                    obj.a
                     `
 				)
 			).toEqual(new StlNumber(43n));
@@ -824,10 +795,10 @@ describe("exec()", () => {
 		it("should properly handle assignment within a function", () => {
 			expect(
 				stlEval(`
-                    let ~val = 5
-                    let addTwo = ~a -> ~a = ~a + 2
-                    addTwo(~val)
-                    ~val
+                    var val <- 5
+                    addTwo = (var a) -> a <- a + 2
+                    addTwo(val)
+                    val
                `)
 			).toEqual(new StlNumber(7n));
 		});
@@ -835,10 +806,10 @@ describe("exec()", () => {
 		it("should not allow assignment to an immutable argument", () => {
 			expect(() =>
 				stlEval(`
-                    let ~val = 5
-                    let addTwo = a -> a = a + 2
-                    addTwo(~val)
-                    ~val
+                    val = 5
+                    addTwo = a -> a <- a + 2
+                    addTwo(val)
+                    val
                `)
 			).toThrow(`Cannot assign to immutable variable "a"`);
 		});
@@ -855,7 +826,7 @@ describe("debug", () => {
 	});
 
 	it("should not allow reassignment to an immutable variable", () => {
-		expect(() => stlEval("let a = 5\na = 6")).toThrow(
+		expect(() => stlEval("a = 5\na <- 6")).toThrow(
 			`Cannot assign to immutable variable "a".`
 		);
 	});

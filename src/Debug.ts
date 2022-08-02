@@ -93,9 +93,7 @@ function nodeToString(expr: Expr): string {
 		case "VariableExpr":
 			return `${expr.identifier}`;
 		case "BinaryExpr":
-			return `BinaryExpr ${t(expr.left)} ${expr.operator} ${t(
-				expr.right
-			)}`;
+			return `BinaryExpr ${t(expr.left)} ${expr.operator} ${t(expr.right)}`;
 		case "PrimaryExpr":
 			return `Primary ${expr.literal}`;
 		case "UnaryExpr":
@@ -105,7 +103,11 @@ function nodeToString(expr: Expr): string {
 		case "CallExpr":
 			return `CallExpr ${t(expr.callee)}(${expr.args.map(t)})`;
 		case "FunctionExpr":
-			return `FunctionExpr (${expr.args.reduce(commaDelimit)}` + t(expr.body);
+			return (
+				`FunctionExpr (${expr.args
+					.map(({ name, isImmutable }) => `${isImmutable ? "" : "var "}${name}`)
+					.reduce(commaDelimit)}` + t(expr.body)
+			);
 		case "UnderscoreExpr":
 			return `UnderscoreExpr`;
 		case "VariableDeclarationStmt":

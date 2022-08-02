@@ -15,34 +15,34 @@ describe("parse()", () => {
 		]);
 	});
 	it("should give proper error on unfinished assignment", () => {
-		expect(tokenize("let a = ").chain(parse).swap().unsafeCoerce()).toEqual([
+		expect(tokenize("var a <- ").chain(parse).swap().unsafeCoerce()).toEqual([
 			Error(
 				`parse error: Reached EOF before reading a primary
  --> <anonymous>:1:7
   |
-1 |    let a = 
-  |          ^`
+1 |    var a <- 
+  |          ^^`
 			),
 		]);
 	});
-	it("should give proper error on let all alone", () => {
-		expect(tokenize("let").chain(parse).swap().unsafeCoerce()).toEqual([
+	it("should give proper error on var all alone", () => {
+		expect(tokenize("var").chain(parse).swap().unsafeCoerce()).toEqual([
 			Error(
-				`parse error: "let" is used to create a variable, but instead you put "EOF"
+				`parse error: "var" is used to create a variable, but instead you put "EOF"
  --> <anonymous>:1:4
   |
-1 |    let
+1 |    var
   |       ^`
 			),
 		]);
 	});
-	it("should give proper error on using let as variable", () => {
-		expect(tokenize("let let =").chain(parse).swap().unsafeCoerce()).toEqual([
+	it("should give proper error on using var as variable", () => {
+		expect(tokenize("var var <-").chain(parse).swap().unsafeCoerce()).toEqual([
 			Error(
-				`parse error: Using "let" as a variable name is not allowed
+				`parse error: Using "var" as a variable name is not allowed
  --> <anonymous>:1:5
   |
-1 |    let let =
+1 |    var var <-
   |        ^^^`
 			),
 		]);

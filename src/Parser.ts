@@ -82,13 +82,16 @@ function eatUntilNewline(): void {
 function makeExpr(): Either<Error, Expr> {
 	if (matchType(TokenType.RETURN))
 		return makeExpr().chain((expr) => Right(ReturnStmt(expr, getTokens())));
-	if (matchType(TokenType.LET)) return finishVariableDeclaration();
+	if (matchType(TokenType.VAR)) return finishVariableDeclaration();
 	if (matchType(TokenType.IF)) return finishIfStmt();
 	if (matchType(TokenType.WHILE)) return finishWhileStmt();
 	if (matchType(TokenType.FUN)) return finishFunctionDeclaration();
 	if (matchType(TokenType.MATCH)) return finishMatchStmt();
 	if (matchType(TokenType.IDENTIFIER)) {
 		if (matchType(TokenType.EQUAL)) {
+			const identifier = lookBehind(2).lexeme;
+			return finishImmutableDeclaration(identifier);
+		} else if (matchType(TokenType.LEFT_SINGLE_ARROW)) {
 			const identifier = lookBehind(2).lexeme;
 			return finishAssignment(VariableExpr(identifier, getTokens()));
 		} else {
@@ -102,7 +105,7 @@ function makeExpr(): Either<Error, Expr> {
 	const expr = makeBinaryLogical();
 	return expr.chain((e) => {
 		// FIXME add error messages for invalid assignments
-		if (isAssignmentLeft(e) && matchType(TokenType.EQUAL)) {
+		if (isAssignmentLeft(e) && matchType(TokenType.LEFT_SINGLE_ARROW)) {
 			return finishAssignment(e);
 		}
 		return expr;
@@ -127,25 +130,24 @@ function finishVariableDeclaration(): Either<Error, Expr> {
 		eatUntilNewline();
 		return Left(
 			ParseError(
-				next.type === TokenType.LET
-					? `Using "let" as a variable name is not allowed`
-					: `"let" is used to create a variable, but instead you put "${next.lexeme}"`,
+				next.type === TokenType.VAR
+					? `Using "var" as a variable name is not allowed`
+					: `"var" is used to create a variable, but instead you put "${next.lexeme}"`,
 				next
 			)
 		);
 	}
 	const identifier: string = lookBehind().lexeme;
-	if (!matchType(TokenType.EQUAL)) {
+	if (!matchType(TokenType.LEFT_SINGLE_ARROW)) {
 		return Left(
-			ParseError(`Expected "=", got "${lookAhead().lexeme}"`, lookAhead())
+			ParseError(`Expected "<-" got "${lookAhead().lexeme}"`, lookAhead())
 		);
 	}
 	eatNewlines();
-	const isImmutable = identifier[0] !== "~";
 	return makeExpr().chain((stmt) => {
 		if (matchType(TokenType.NEWLINE) || atEnd()) {
 			return Right(
-				VariableDeclarationStmt(identifier, isImmutable, stmt, getTokens())
+				VariableDeclarationStmt(identifier, false, stmt, getTokens())
 			);
 		} else {
 			return Left(ParseError("Expected a newline!", lookBehind()));
@@ -155,7 +157,8 @@ function finishVariableDeclaration(): Either<Error, Expr> {
 
 function finishImmutableDeclaration(identifier: string): Either<Error, Expr> {
 	eatNewlines();
-	return makeExpr().chain((expr) => {
+	const expr = makeExpr();
+	return expr.chain((expr) => {
 		if (matchType(TokenType.NEWLINE) || atEnd() || lookAhead().lexeme === "}") {
 			return Right(
 				VariableDeclarationStmt(identifier, true, expr, getTokens())
@@ -261,10 +264,27 @@ function finishFunctionDeclaration(): Either<Error, Expr> {
 	});
 }
 
+export type Binding = {
+	name: string;
+	isImmutable: boolean;
+};
+
 function makeLambda(): Either<Error, FunctionExpr> {
-	let args: Either<Error, string[]>;
+	let args: Either<Error, Binding[]>;
 	if (matchType(TokenType.IDENTIFIER)) {
-		args = Right([lookBehind().lexeme]);
+		args = Right([
+			{
+				name: lookBehind().lexeme,
+				isImmutable: true,
+			},
+		]);
+	} else if (matchType(TokenType.VAR) && matchType(TokenType.IDENTIFIER)) {
+		args = Right([
+			{
+				name: lookBehind().lexeme,
+				isImmutable: false,
+			},
+		]);
 	} else if (matchType(TokenType.OPEN_PAREN)) {
 		args = finishFunctDecArgs();
 	} else {
@@ -277,10 +297,22 @@ function makeLambda(): Either<Error, FunctionExpr> {
 	return args.chain(finishLambda);
 }
 
-function finishFunctDecArgs(): Either<Error, string[]> {
-	const args: string[] = [];
-	while (matchType(TokenType.IDENTIFIER)) {
-		args.push(lookBehind().lexeme);
+function finishFunctDecArgs(): Either<Error, Binding[]> {
+	const args: Binding[] = [];
+	while (true) {
+		if (matchType(TokenType.IDENTIFIER)) {
+			args.push({
+				name: lookBehind().lexeme,
+				isImmutable: true,
+			});
+		} else if (matchType(TokenType.VAR) && matchType(TokenType.IDENTIFIER)) {
+			args.push({
+				name: lookBehind().lexeme,
+				isImmutable: false,
+			});
+		} else {
+			break;
+		}
 		matchType(TokenType.COMMA);
 		eatNewlines();
 		//FIXME checks are needed
@@ -513,7 +545,10 @@ function makePrimary(): Either<Error, Expr> {
 	if (matchType(TokenType.IDENTIFIER)) {
 		const id = lookBehind().lexeme;
 		if (matchType(TokenType.RIGHT_SINGLE_ARROW)) {
-			return finishLambda([lookBehind(2).lexeme]);
+			return finishLambda([{
+				name: lookBehind(2).lexeme,
+				isImmutable: true
+			}]);
 		} else if (matchType(TokenType.OPEN_BRACKET)) {
 			return makeExpr().chain((expr) => {
 				if (!matchType(TokenType.CLOSE_BRACKET)) {
@@ -552,11 +587,28 @@ function makePrimary(): Either<Error, Expr> {
 			matchType(TokenType.RIGHT_SINGLE_ARROW)
 		) {
 			return finishLambda([]);
-		}
-		// be careful moving this statement
-		// the state machine above is subtle
-		return finishGrouping();
-	}
+		} else if (
+      // this is a buggy and bad idea
+			matchType(TokenType.VAR) &&
+			matchType(TokenType.IDENTIFIER)
+		) {
+      current -= 2;
+      return finishFunctDecArgs().chain((args) => {
+        if (!matchType(TokenType.RIGHT_SINGLE_ARROW)) {
+          return Left(
+            ParseError(
+              `Expected "->", got "${lookAhead().lexeme}"`,
+              lookAhead()
+            )
+          );
+        }
+        return finishLambda(args);
+      });
+    }
+    // be careful moving this statement
+    // the state machine above is subtle
+    return finishGrouping();
+  }
 
 	if (matchType(TokenType.OPEN_BRACKET)) {
 		return finishArrayLiteral();
@@ -580,7 +632,7 @@ function makePrimary(): Either<Error, Expr> {
 	}
 }
 
-function finishLambda(args: string[]): Either<Error, FunctionExpr> {
+function finishLambda(args: Binding[]): Either<Error, FunctionExpr> {
 	eatNewlines();
 	return makeExpr().map((body) => FunctionExpr(args, body, getTokens()));
 	// TODO: add checks and nice error messages

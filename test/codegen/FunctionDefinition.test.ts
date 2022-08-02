@@ -15,7 +15,10 @@ describe("FunctionDefinition codegen", () => {
 				"sum",
 				true,
 				FunctionExpr(
-					["a", "b"],
+					[
+						{ name: "a", isImmutable: true },
+						{ name: "b", isImmutable: true },
+					],
 					BinaryExpr(VariableExpr("a"), TokenType.PLUS, VariableExpr("b"))
 				)
 			)

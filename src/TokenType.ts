@@ -38,7 +38,8 @@ enum TokenType {
 	NEWLINE,
 
 	// keywords
-	LET,
+	//LET,
+	VAR,
 	IF,
 	THEN,
 	ELSE,

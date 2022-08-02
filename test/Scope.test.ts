@@ -25,9 +25,9 @@ describe("class Scope", () => {
 
 	it("should throw an error when reassigning to an immutable value", () => {
 		const src: string = `
-        let a = 5
-        let b = 10
-        a = 6
+        a = 5
+        b = 10
+        a <- 6
         `;
 		const scope = new Scope();
 		expect(() => stlEval(src, scope)).toThrow(

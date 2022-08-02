@@ -1,5 +1,6 @@
 import { Node, x } from "code-red";
 import { Expr, ExprBase } from "../Expr.js";
+import { Binding } from "../Parser.js";
 import Scope from "../Scope.js";
 import { StlFunction } from "../StlFunction.js";
 import Token from "../Token.js";
@@ -7,13 +8,13 @@ import { Box, Value } from "../Value.js";
 
 export type FunctionExpr = ExprBase & {
 	type: "FunctionExpr";
-	args: string[];
+	args: Binding[];
 	body: Expr;
 	toString(): string;
 };
 
 export const FunctionExpr = (
-	args: string[],
+	args: Binding[],
 	body: Expr,
 	tokens: Token[] = []
 ): FunctionExpr => {
@@ -29,7 +30,7 @@ export const FunctionExpr = (
 			return "[anonymous function]";
 		},
 		estree() {
-			const args: Node[] = this.args.map((id) => x`${id}`);
+			const args: Node[] = this.args.map(({ name }) => x`${name}`);
 			return {
 				node: x`(${args}) => ${this.body.estree().node}`,
 			};

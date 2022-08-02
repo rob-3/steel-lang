@@ -92,18 +92,54 @@ export function compile(src: string, filename: string) {
 			return err;
 		},
 		Right: (exprs) => {
+			const names: { identifier: string, immutable: boolean }[] = [];
 			const exprStrings = exprs
 				.map((expr) => {
 					const jsCode = expr.estree();
 					if (jsCode.errors) {
 						throw jsCode.errors;
 					} else {
+						if (jsCode.identifierDeclarations) {
+							names.push(...jsCode.identifierDeclarations);
+						}
 						return jsCode.node ? print(jsCode.node).code : Error("No node!");
 					}
 				})
 				.filter((x) => x !== "");
-			const outputJS = exprStrings.join("");
-			return outputJS;
+			const letDecls = names.map(({ identifier }) => `let ${identifier};`).join("\n");
+			const outputJS = exprStrings.join(";\n");
+			return `const stlEqual = (a, b) =>
+	a.stlValue.top === b.stlValue.top && a.stlValue.bottom === b.stlValue.bottom;
+const stlAdd = (a, b) => ({
+	stlValue: {
+		top: a.stlValue.top + b.stlValue.top,
+		bottom: a.stlValue.bottom,
+	},
+});
+const stlSubtract = (a, b) => ({
+	stlValue: {
+		top: a.stlValue.top - b.stlValue.top,
+		bottom: a.stlValue.bottom,
+	},
+});
+const print = (arg) => {
+  const { stlValue } = arg;
+  if (typeof arg === "function") {
+    console.log("<lambda>");
+  } else if (typeof stlValue === "string" || typeof stlValue === "boolean") {
+    console.log(stlValue);
+  } else if ('top' in stlValue) {
+    if (stlValue.bottom === 1n) {
+      console.log(stlValue.top.toString());
+    } else {
+      console.log(\`\${stlValue.top}/\${stlValue.bottom}\`);
+    }
+  } else {
+    console.log(stlValue);
+  }
+};
+${letDecls}
+${outputJS}`;
 		},
 	});
 }
