@@ -8,9 +8,6 @@ import StlNumber from "../src/StlNumber.js";
 import { describe, it, expect, vi as jest } from "vitest";
 import { stlEval, stlExec } from "./Helpers.js";
 
-// silence logs unless we're debugging
-console.log = () => {};
-
 describe("stlEval()", () => {
 	describe("literals", () => {
 		it("should evaluate number literals", () => {
