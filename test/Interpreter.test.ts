@@ -2,7 +2,6 @@ import { Either } from "purify-ts";
 import { ExprBase } from "../src/Expr.js";
 import parse from "../src/Parser.js";
 import Scope from "../src/Scope.js";
-import { run } from "../src/steel.js";
 import tokenize from "../src/Tokenizer.js";
 import StlNumber from "../src/StlNumber.js";
 import { describe, it, expect, vi as jest } from "vitest";
@@ -819,33 +818,13 @@ describe("debug", () => {
 		expect(a).toEqual([Error(`Variable "hi" is not defined.`)]);
 	});
 
-	it("should return old scope if error occurs", () => {
-		expect(run("a", false, new Scope(), "<anonymous>")).toBeDefined();
-	});
-
 	it("should not allow reassignment to an immutable variable", () => {
 		expect(stlEval("a = 5\na <- 6")).toEqual([
 			Error(`Cannot assign to immutable variable "a".`),
 		]);
 	});
 
-	it("should not loop if parsing fails", () => {
-		// will hang if this test fails
-		try {
-			stlEval(")");
-		} catch {}
-	});
-
 	it("should show the correct filename on a test", () => {
-		/* FIXME remove
-        let wasAnonymous = true;
-        const printfn = (v: Value) => {
-            console.log(v);
-            console.log((<string>v).includes("anonymous"));
-            wasAnonymous = (<string>v).includes("anonymous");
-        };
-        setPrintFn(printfn);
-        */
 		const tokens = tokenize("a = ", "filename");
 		const ast: Either<Error[], ExprBase[]> = tokens.chain(parse);
 		expect(ast.isLeft()).toBe(true);
@@ -857,7 +836,5 @@ describe("debug", () => {
 					.reduce((acc, cur) => acc && cur, true)
 			)
 		);
-		// FIXME remove
-		//expect(wasAnonymous).toBe.false;
 	});
 });
