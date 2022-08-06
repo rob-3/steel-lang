@@ -36,7 +36,6 @@ export const stlExec = (
 	try {
 		return val.unsafeCoerce();
 	} catch (e) {
-		console.log(val);
 		throw e;
 	}
 };
