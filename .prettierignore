@@ -2,3 +2,4 @@ node_modules
 *.md
 *.steel
 dist
+coverage
