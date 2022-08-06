@@ -1,4 +1,4 @@
-import { Either } from "purify-ts";
+import { Either, Left } from "purify-ts";
 import { RuntimePanic } from "./Debug.js";
 import { Expr } from "./Expr.js";
 import parse from "./Parser.js";
@@ -42,17 +42,21 @@ export function stlEval(
 	filename: string = "<anonymous>"
 ): Either<Error[], [Value | null, Scope]> {
 	const ast = tokenize(src, filename).chain(parse);
-	return ast.map((goodAst: Expr[]) => {
-		let value: Value | null = null;
-		let curScope = scope;
-		for (const stmt of goodAst) {
-			const [newVal, newScope] = stmt.eval(curScope);
-			value = newVal;
-			curScope = newScope;
-		}
-		const pair: [Value | null, Scope] = [value, curScope];
-		return pair;
-	});
+	try {
+		return ast.map((goodAst: Expr[]) => {
+			let value: Value | null = null;
+			let curScope = scope;
+			for (const stmt of goodAst) {
+				const [newVal, newScope] = stmt.eval(curScope);
+				value = newVal;
+				curScope = newScope;
+			}
+			const pair: [Value | null, Scope] = [value, curScope];
+			return pair;
+		});
+	} catch (e: any) {
+		return Left([e]);
+	}
 }
 
 /*

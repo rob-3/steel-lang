@@ -347,14 +347,12 @@ describe("exec()", () => {
 		});
 
 		it("should prohibit local shadowing", () => {
-			expect(() =>
-				stlEval(
-					`
+			expect(stlEval(
+				`
                 a = 4
                 a = 5
                 `
-				)
-			).toThrow();
+			)).toEqual([Error(`Cannot redefine immutable variable a.`)]);
 		});
 	});
 
@@ -404,15 +402,13 @@ describe("exec()", () => {
 			});
 
 			it("should not be able to access variable declared after", () => {
-				expect(() =>
-					stlEval(
+				expect(stlEval(
 						`
                     print_a = () -> print(a)
                     a = 4
                     print_a()
                     `
-					)
-				).toThrow(`Variable "a" is not defined.`);
+				)).toEqual([Error(`Variable "a" is not defined.`)]);
 			});
 		});
 		describe("functions with arguments", () => {
@@ -587,8 +583,8 @@ describe("exec()", () => {
 			});
 
 			it("should throw if a noncallable object is called", () => {
-				expect(() => stlEval("5()")).toThrow(
-					"Can't call 5 because it is not a function."
+				expect(stlEval("5()")).toEqual(
+					[Error("Can't call 5 because it is not a function.")]
 				);
 			});
 		});
@@ -764,16 +760,14 @@ describe("exec()", () => {
 		});
 
 		it("should not allow assignment to an immutable object's properties", () => {
-			expect(() =>
-				stlEval(
-					`
-                    obj = {
-                        a: 42
-                    }
-                    obj.a = 43
-                    `
-				)
-			).toThrow();
+			expect(stlEval(
+				`
+				obj = {
+					a: 42
+				}
+				obj.a <- 43
+				`
+			)).toEqual([Error(`Cannot assign to property of immutable object!`)]);
 		});
 
 		it("should allow assignment to a mutable object's properties", () => {
@@ -804,21 +798,20 @@ describe("exec()", () => {
 		});
 
 		it("should not allow assignment to an immutable argument", () => {
-			expect(() =>
-				stlEval(`
-                    val = 5
-                    addTwo = a -> a <- a + 2
-                    addTwo(val)
-                    val
-               `)
-			).toThrow(`Cannot assign to immutable variable "a"`);
+			expect(stlEval(`
+				val = 5
+				addTwo = a -> a <- a + 2
+				addTwo(val)
+				val
+		   `)).toEqual([Error(`Cannot assign to immutable variable "a".`)]);
 		});
 	});
 });
 
 describe("debug", () => {
 	it("should print an error correctly", () => {
-		expect(() => stlEval("print(hi)")).toThrow(`Variable "hi" is not defined.`);
+		const a = stlEval("print(hi)");
+		expect(a).toEqual([Error(`Variable "hi" is not defined.`)]);
 	});
 
 	it("should return old scope if error occurs", () => {
@@ -826,8 +819,8 @@ describe("debug", () => {
 	});
 
 	it("should not allow reassignment to an immutable variable", () => {
-		expect(() => stlEval("a = 5\na <- 6")).toThrow(
-			`Cannot assign to immutable variable "a".`
+		expect(stlEval("a = 5\na <- 6")).toEqual(
+			[Error(`Cannot assign to immutable variable "a".`)]
 		);
 	});
 

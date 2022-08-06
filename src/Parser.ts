@@ -560,6 +560,10 @@ function makePrimary(): Either<Error, Expr> {
 			});
 		} else {
 			const identifier = lookBehind().lexeme;
+			if (matchType(TokenType.IDENTIFIER)) {
+				eatUntilNewline();
+				return Left(ParseError(`Unexpected identifier ahead`, getTokens()[1]));
+			}
 			return Right(VariableExpr(identifier, getTokens()));
 		}
 	}

@@ -16,14 +16,12 @@ export const assertEqual = (node1: { node?: Node, errors?: Error[] } | Error, no
 export const stlEval = (
 	src: string,
 	scope: Scope = new Scope()
-): UnboxedValue | undefined => {
+): UnboxedValue | undefined | Error[] => {
 	const val = _stlEval(src, scope);
-	try {
-		return val.unsafeCoerce()[0]?.value;
-	} catch (e) {
-		console.log(val);
-		throw e;
-	}
+	return val.caseOf<UnboxedValue | undefined | Error[]>({
+		Right: ([val]) => val?.value,
+		Left: err => err,
+	})
 };
 
 export const stlExec = (

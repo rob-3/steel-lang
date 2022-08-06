@@ -1,4 +1,4 @@
-import { stlEval } from "../src/Interpreter.js";
+import { stlEval } from "./Helpers.js";
 import Scope from "../src/Scope.js";
 import { Box } from "../src/Value.js";
 import StlNumber from "../src/StlNumber.js";
@@ -25,13 +25,12 @@ describe("class Scope", () => {
 
 	it("should throw an error when reassigning to an immutable value", () => {
 		const src: string = `
-        a = 5
-        b = 10
-        a <- 6
+			a = 5
+			b = 10
+			a <- 6
         `;
-		const scope = new Scope();
-		expect(() => stlEval(src, scope)).toThrow(
-			'Cannot assign to immutable variable "a".'
+		expect(stlEval(src, new Scope())).toEqual(
+			[Error('Cannot assign to immutable variable "a".')]
 		);
 	});
 });
