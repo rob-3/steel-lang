@@ -47,4 +47,13 @@ describe("parse()", () => {
 			),
 		]);
 	});
+	it("should error on multiple adjacent identifiers", () => {
+		expect(tokenize("hi hi").chain(parse).extract()).toEqual([
+			Error(`parse error: Unexpected identifier ahead
+ --> <anonymous>:1:4
+  |
+1 |    hi hi
+  |       ^^`),
+		]);
+	});
 });
