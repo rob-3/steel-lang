@@ -1,20 +1,6 @@
 import { stlEval as _stlEval } from "../src/Interpreter.js";
-import Scope from "../src/Scope.js";
-import { UnboxedValue } from "../src/Value.js";
 import { describe, it, expect } from "vitest";
-
-const stlEval = (
-	src: string,
-	scope: Scope = new Scope()
-): UnboxedValue | undefined => {
-	const val = _stlEval(src, scope);
-	try {
-		return val.unsafeCoerce()[0]?.value;
-	} catch (e) {
-		console.log(val);
-		throw e;
-	}
-};
+import { stlEval } from "./Helpers.js";
 
 describe("objects", () => {
 	it("should use deep equality by default", () => {
