@@ -92,7 +92,7 @@ export function compile(src: string, filename: string) {
 			return err;
 		},
 		Right: (exprs) => {
-			const names: { identifier: string, immutable: boolean }[] = [];
+			const names: { identifier: string; immutable: boolean }[] = [];
 			const exprStrings = exprs
 				.map((expr) => {
 					const jsCode = expr.estree();
@@ -106,7 +106,9 @@ export function compile(src: string, filename: string) {
 					}
 				})
 				.filter((x) => x !== "");
-			const letDecls = names.map(({ identifier }) => `let ${identifier};`).join("\n");
+			const letDecls = names
+				.map(({ identifier }) => `let ${identifier};`)
+				.join("\n");
 			const outputJS = exprStrings.join(";\n");
 			return `const stlEqual = (a, b) =>
 	a.stlValue.top === b.stlValue.top && a.stlValue.bottom === b.stlValue.bottom;

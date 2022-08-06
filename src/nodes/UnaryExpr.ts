@@ -39,7 +39,9 @@ export const UnaryExpr = (
 		estree() {
 			switch (this.operator.type) {
 				case TokenType.MINUS:
-					return { node: x`{stlValue: stlOpposite(${this.right.estree().node})}` };
+					return {
+						node: x`{stlValue: stlOpposite(${this.right.estree().node})}`,
+					};
 				case TokenType.NOT:
 					return { node: x`{stlValue: stlNot(${this.right.estree().node})}` };
 			}

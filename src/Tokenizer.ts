@@ -185,7 +185,7 @@ function makeIdentifierOrKeyword(): Token {
 	const lexeme = source.slice(startIndex, currentIndex);
 	switch (lexeme) {
 		//case "let":
-			//return makeToken(TokenType.LET);
+		//return makeToken(TokenType.LET);
 		case "var":
 			return makeToken(TokenType.VAR);
 		case "true":

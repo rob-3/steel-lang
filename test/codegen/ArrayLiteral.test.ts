@@ -8,9 +8,15 @@ import StlNumber from "../../src/StlNumber";
 describe("ArrayLiteral codegen", () => {
 	it("should compile arrays", () => {
 		const node = ArrayLiteral(
-			[StlNumberExpr(StlNumber.of("2.5"), []), StlNumberExpr(StlNumber.of(5), [])],
+			[
+				StlNumberExpr(StlNumber.of("2.5"), []),
+				StlNumberExpr(StlNumber.of(5), []),
+			],
 			[]
 		).estree();
-		assertEqual(node, x`{stlValue: [{stlValue: {top: 5n, bottom: 2n}}, {stlValue: {top: 5n, bottom: 1n}}]}`);
+		assertEqual(
+			node,
+			x`{stlValue: [{stlValue: {top: 5n, bottom: 2n}}, {stlValue: {top: 5n, bottom: 1n}}]}`
+		);
 	});
 });

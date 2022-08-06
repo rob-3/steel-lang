@@ -6,7 +6,10 @@ import { stlEval as _stlEval } from "../src/Interpreter.js";
 import { Value } from "../src/Value.js";
 import { setPrintFn } from "../src/Logger.js";
 
-export const assertEqual = (node1: { node?: Node, errors?: Error[] } | Error, node2: Node) => {
+export const assertEqual = (
+	node1: { node?: Node; errors?: Error[] } | Error,
+	node2: Node
+) => {
 	if (node1 instanceof Error) throw node1;
 	if (!node1.node) throw Error("Node was empty!");
 	if (node1.errors && node1.errors.length > 0) throw node1.errors;
@@ -20,8 +23,8 @@ export const stlEval = (
 	const val = _stlEval(src, scope);
 	return val.caseOf<UnboxedValue | undefined | Error[]>({
 		Right: ([val]) => val?.value,
-		Left: err => err,
-	})
+		Left: (err) => err,
+	});
 };
 
 export const stlExec = (
@@ -37,4 +40,3 @@ export const stlExec = (
 		throw e;
 	}
 };
-

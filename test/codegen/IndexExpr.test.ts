@@ -7,10 +7,7 @@ import { assertEqual } from "../Helpers";
 
 describe("IndexExpr codegen", () => {
 	it("should compile a basic literal index", () => {
-		const node = IndexExpr(
-			"array",
-			PrimaryExpr(StlNumber.of(2))
-		).estree();
+		const node = IndexExpr("array", PrimaryExpr(StlNumber.of(2))).estree();
 		assertEqual(
 			node,
 			x`stlUnwrap(array)[stlUnwrap({stlValue: {top: 2n, bottom: 1n}})]`

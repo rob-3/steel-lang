@@ -115,7 +115,7 @@ export const VariableAssignmentStmt = (
 		},
 		estree() {
 			return {
-				node: x`${this.left.estree().node} = ${this.right.estree().node}`
+				node: x`${this.left.estree().node} = ${this.right.estree().node}`,
 			};
 		},
 	};

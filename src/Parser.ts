@@ -545,10 +545,12 @@ function makePrimary(): Either<Error, Expr> {
 	if (matchType(TokenType.IDENTIFIER)) {
 		const id = lookBehind().lexeme;
 		if (matchType(TokenType.RIGHT_SINGLE_ARROW)) {
-			return finishLambda([{
-				name: lookBehind(2).lexeme,
-				isImmutable: true
-			}]);
+			return finishLambda([
+				{
+					name: lookBehind(2).lexeme,
+					isImmutable: true,
+				},
+			]);
 		} else if (matchType(TokenType.OPEN_BRACKET)) {
 			return makeExpr().chain((expr) => {
 				if (!matchType(TokenType.CLOSE_BRACKET)) {
@@ -592,27 +594,27 @@ function makePrimary(): Either<Error, Expr> {
 		) {
 			return finishLambda([]);
 		} else if (
-      // this is a buggy and bad idea
+			// this is a buggy and bad idea
 			matchType(TokenType.VAR) &&
 			matchType(TokenType.IDENTIFIER)
 		) {
-      current -= 2;
-      return finishFunctDecArgs().chain((args) => {
-        if (!matchType(TokenType.RIGHT_SINGLE_ARROW)) {
-          return Left(
-            ParseError(
-              `Expected "->", got "${lookAhead().lexeme}"`,
-              lookAhead()
-            )
-          );
-        }
-        return finishLambda(args);
-      });
-    }
-    // be careful moving this statement
-    // the state machine above is subtle
-    return finishGrouping();
-  }
+			current -= 2;
+			return finishFunctDecArgs().chain((args) => {
+				if (!matchType(TokenType.RIGHT_SINGLE_ARROW)) {
+					return Left(
+						ParseError(
+							`Expected "->", got "${lookAhead().lexeme}"`,
+							lookAhead()
+						)
+					);
+				}
+				return finishLambda(args);
+			});
+		}
+		// be careful moving this statement
+		// the state machine above is subtle
+		return finishGrouping();
+	}
 
 	if (matchType(TokenType.OPEN_BRACKET)) {
 		return finishArrayLiteral();

@@ -16,10 +16,7 @@ export class StlFunction {
 		for (let i = 0; i < this.funExpr.args.length; i++) {
 			// FIXME typecheck args
 			const { name, isImmutable } = this.funExpr.args[i];
-			funScope.setLocal(name, [
-				callArgs[i],
-				isImmutable
-			]);
+			funScope.setLocal(name, [callArgs[i], isImmutable]);
 		}
 
 		return exprEval(this.funExpr.body, funScope)[0];

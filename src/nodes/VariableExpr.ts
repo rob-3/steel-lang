@@ -22,7 +22,7 @@ export const VariableExpr = (
 		},
 		estree() {
 			return {
-				node: x`${this.identifier}`
+				node: x`${this.identifier}`,
 			};
 		},
 	};

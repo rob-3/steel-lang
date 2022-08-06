@@ -18,7 +18,7 @@ export const ReturnStmt = (value: Expr, tokens: Token[] = []): ReturnStmt => {
 		},
 		estree() {
 			return {
-				node: b`return ${this.value.estree().node}`[0]
+				node: b`return ${this.value.estree().node}`[0],
 			};
 		},
 	};

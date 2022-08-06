@@ -18,6 +18,9 @@ describe("UnaryExpr codegen", () => {
 
 	it("should compile opposite", () => {
 		const node = UnaryExpr(TokenType.MINUS, StlNumber.of(42)).estree();
-		assertEqual(node, x`{stlValue: stlOpposite({stlValue: {top: 42n, bottom: 1n}})}`);
+		assertEqual(
+			node,
+			x`{stlValue: stlOpposite({stlValue: {top: 42n, bottom: 1n}})}`
+		);
 	});
 });

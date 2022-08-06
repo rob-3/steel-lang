@@ -44,7 +44,7 @@ export const WhileStmt = (
 						ret = ${this.body.estree().node}
 					}
 					return ret;
-				})()`
+				})()`,
 			};
 		},
 	};

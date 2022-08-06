@@ -1,6 +1,10 @@
 import { x } from "code-red";
 import { BinaryExpr } from "../../src/nodes/BinaryExpr";
-import { StlBoolExpr, StlNumberExpr, StlStringExpr } from "../../src/nodes/PrimaryExpr";
+import {
+	StlBoolExpr,
+	StlNumberExpr,
+	StlStringExpr,
+} from "../../src/nodes/PrimaryExpr";
 import StlNumber from "../../src/StlNumber";
 import TokenType from "../../src/TokenType";
 import { assertEqual } from "../Helpers";
@@ -79,10 +83,7 @@ describe("BinaryExpr codegen", () => {
 			StlBoolExpr(false, []),
 			[]
 		).estree();
-		assertEqual(
-			node,
-			x`stlLogicalAnd({stlValue: true}, {stlValue: false})`
-		);
+		assertEqual(node, x`stlLogicalAnd({stlValue: true}, {stlValue: false})`);
 	});
 
 	it("should compile logical OR", () => {
@@ -92,10 +93,7 @@ describe("BinaryExpr codegen", () => {
 			StlBoolExpr(false, []),
 			[]
 		).estree();
-		assertEqual(
-			node,
-			x`stlLogicalOr({stlValue: true}, {stlValue: false})`
-		);
+		assertEqual(node, x`stlLogicalOr({stlValue: true}, {stlValue: false})`);
 	});
 
 	it("should compile concatenation", () => {
@@ -105,10 +103,7 @@ describe("BinaryExpr codegen", () => {
 			StlStringExpr("world", []),
 			[]
 		).estree();
-		assertEqual(
-			node,
-			x`stlConcat({stlValue: "hello, "}, {stlValue: "world"})`
-		);
+		assertEqual(node, x`stlConcat({stlValue: "hello, "}, {stlValue: "world"})`);
 	});
 
 	it("should compile greater equal", () => {

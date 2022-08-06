@@ -29,8 +29,8 @@ describe("class Scope", () => {
 			b = 10
 			a <- 6
         `;
-		expect(stlEval(src, new Scope())).toEqual(
-			[Error('Cannot assign to immutable variable "a".')]
-		);
+		expect(stlEval(src, new Scope())).toEqual([
+			Error('Cannot assign to immutable variable "a".'),
+		]);
 	});
 });

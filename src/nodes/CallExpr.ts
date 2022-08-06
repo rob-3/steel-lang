@@ -35,7 +35,9 @@ export const CallExpr = (
 		},
 		estree() {
 			return {
-				node: x`${this.callee.estree().node}(${this.args.map((x) => x.estree().node)})`,
+				node: x`${this.callee.estree().node}(${this.args.map(
+					(x) => x.estree().node
+				)})`,
 			};
 		},
 	};
