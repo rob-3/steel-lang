@@ -335,16 +335,13 @@ function finishBlockStmtOrObjectLiteral(): Either<
 		lookAhead(2).type === TokenType.COLON
 	) {
 		const object: Map<string, Expr> = new Map();
-		let failed = false;
 		while (
 			lookAhead().type === TokenType.IDENTIFIER &&
 			lookAhead(2).type === TokenType.COLON
 		) {
 			const pair = makeStringExprPair();
 			pair.bimap(
-				(_: Error) => {
-					failed = true;
-				},
+				(_: Error) => {},
 				([key, value]) => {
 					object.set(key, value);
 					matchType(TokenType.COMMA);

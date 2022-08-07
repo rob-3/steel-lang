@@ -69,8 +69,6 @@ ${" ".repeat(pad + 1)}|    ${" ".repeat(startColumn)}${"^".repeat(
 	)}`);
 }
 
-export function lexError(message: string, token: Token) {}
-
 export function printAst(ast: Ast) {
 	const exprs: Expr[] = ast.exprs;
 	let str = "";
