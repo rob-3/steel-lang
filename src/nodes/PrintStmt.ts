@@ -4,7 +4,7 @@ import Scope from "../Scope.js";
 import Token from "../Token.js";
 import { Value } from "../Value.js";
 import { RuntimePanic } from "../Debug.js";
-import { Node, x } from "code-red";
+import { x } from "code-red";
 
 export type PrintStmt = ExprBase & {
 	type: "PrintStmt";
