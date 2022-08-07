@@ -118,7 +118,7 @@ export const UnderscoreExpr = (tokens: Token[] = []): UnderscoreExpr => {
 	return {
 		type: "UnderscoreExpr",
 		tokens,
-		eval(scope: Scope): [Value, Scope] {
+		eval(_: Scope): [Value, Scope] {
 			// FIXME
 			throw RuntimePanic("Tried to evaluate an UnderscoreExpr");
 		},
