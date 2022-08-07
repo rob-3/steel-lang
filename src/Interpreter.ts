@@ -29,17 +29,13 @@ export function execStmts(stmts: Expr[], scope: Scope): [Value, Scope] {
 	return [value, scope];
 }
 
-/**
- * Evaluates some given source code in the context of the given Scope.
- *
- * @param src string to eval
- * @param scope Scope to evaluate src in
- * @return pair of resultant Value and Scope
- */
+/** Evaluates some given source code in the context of the given Scope. */
 export function stlEval(
 	src: string,
-	scope: Scope,
-	filename: string = "<anonymous>"
+	{
+		scope = new Scope(),
+		filename = "<anonymous>",
+	}: { scope?: Scope; filename?: string } = {}
 ): Either<Error[], [Value | null, Scope]> {
 	const ast = tokenize(src, filename).chain(parse);
 	try {

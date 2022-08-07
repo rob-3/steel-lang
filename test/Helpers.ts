@@ -20,7 +20,7 @@ export const stlEval = (
 	src: string,
 	scope: Scope = new Scope()
 ): UnboxedValue | undefined | Error[] => {
-	const val = _stlEval(src, scope);
+	const val = _stlEval(src, { scope });
 	return val.caseOf<UnboxedValue | undefined | Error[]>({
 		Right: ([val]) => val?.value,
 		Left: (err) => err,
@@ -32,7 +32,7 @@ export const stlExec = (
 	printfn: ((a: any) => void) | null = null
 ): [Value | null, Scope] => {
 	if (printfn !== null) setPrintFn(printfn);
-	const val = _stlEval(src, new Scope());
+	const val = _stlEval(src);
 	try {
 		return val.unsafeCoerce();
 	} catch (e) {
