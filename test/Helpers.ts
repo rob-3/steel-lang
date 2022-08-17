@@ -4,7 +4,6 @@ import Scope from "../src/Scope";
 import { UnboxedValue } from "../src/Value";
 import { stlEval as _stlEval } from "../src/Interpreter.js";
 import { Value } from "../src/Value.js";
-import { setPrintFn } from "../src/Logger.js";
 
 export const assertEqual = (
 	node1: { node?: Node; errors?: Error[] } | Error,
@@ -29,10 +28,9 @@ export const stlEval = (
 
 export const stlExec = (
 	src: string,
-	printfn: ((a: any) => void) | null = null
+	printfn?: (a: UnboxedValue) => void
 ): [Value | null, Scope] => {
-	if (printfn !== null) setPrintFn(printfn);
-	const val = _stlEval(src);
+	const val = _stlEval(src, { scope: new Scope(null, printfn) });
 	try {
 		return val.unsafeCoerce();
 	} catch (e) {

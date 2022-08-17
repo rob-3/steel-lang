@@ -2,24 +2,24 @@ import { print } from "code-red";
 import { Either } from "purify-ts";
 import { Expr } from "./Expr.js";
 import { exprEval } from "./Interpreter.js";
-import { stlPrint } from "./Logger.js";
 import parse from "./Parser.js";
 import Scope from "./Scope.js";
 import { StlFunction } from "./StlFunction.js";
 import tokenize from "./Tokenizer.js";
+import { UnboxedValue } from "./Value.js";
 
 /**
  * This function uses the node.js readline api to set up a prompt for the REPL.
  *
  * @param rl readline module from node
  */
-export function startRepl(rl: any) {
+export function startRepl(rl: any, stlPrint: (value: UnboxedValue) => void) {
 	let scope = new Scope();
 	rl.setPrompt("> ");
 	rl.prompt();
 	rl.on("line", (input: string) => {
 		try {
-			scope = run(input, true, scope);
+			scope = run(input, true, scope, stlPrint);
 		} catch (err) {
 			console.log(err);
 		}
@@ -42,6 +42,7 @@ export function run(
 	src: string,
 	repl: boolean,
 	scope: Scope,
+	stlPrint: (value: UnboxedValue) => void,
 	filename: string = "<anonymous>"
 ): Scope {
 	try {

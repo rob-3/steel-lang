@@ -1,9 +1,10 @@
 import { RuntimePanic } from "./Debug.js";
 import { StlFunction } from "./StlFunction.js";
-import { Value, Box } from "./Value.js";
+import { Value, Box, UnboxedValue } from "./Value.js";
 import { FunctionExpr } from "./nodes/FunctionExpr.js";
 import { PrintStmt } from "./nodes/PrintStmt.js";
 import { VariableExpr } from "./nodes/VariableExpr.js";
+import { toString } from "./Logger.js";
 
 /**
  * A Scope represents a lexical scope in the program. Each Scope has a set of
@@ -16,15 +17,21 @@ export default class Scope {
 	// FIXME this should probably be two separate hashmaps
 	bindings: Map<string, [Value, boolean]>;
 	parent: Scope | null;
-	constructor(parent: Scope | null = null) {
+	printfn: (value: UnboxedValue) => void;
+	constructor(
+		parent: Scope | null = null,
+		printfn?: (value: UnboxedValue) => void
+	) {
 		this.bindings = new Map();
 		this.parent = parent;
+		printfn = printfn ?? parent?.printfn ?? ((x) => console.log(toString(x)));
+		this.printfn = printfn;
 		// library print function
 		// FIXME null token lists
 		const print = new StlFunction(
 			FunctionExpr(
 				[{ name: "value", isImmutable: true }],
-				PrintStmt(VariableExpr("value", []), []),
+				PrintStmt(printfn)(VariableExpr("value", []), []),
 				[]
 			),
 			this

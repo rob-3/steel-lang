@@ -1,8 +1,7 @@
 import { Expr, ExprBase } from "../Expr.js";
-import { stlPrint } from "../Logger.js";
 import Scope from "../Scope.js";
 import Token from "../Token.js";
-import { Value } from "../Value.js";
+import { UnboxedValue, Value } from "../Value.js";
 import { RuntimePanic } from "../Debug.js";
 import { x } from "code-red";
 
@@ -12,26 +11,25 @@ export type PrintStmt = ExprBase & {
 };
 
 // TODO: library function
-export const PrintStmt = (
-	thingToPrint: Expr,
-	tokens: Token[] = []
-): PrintStmt => {
-	return {
-		type: "PrintStmt",
-		thingToPrint,
-		tokens,
-		eval(scope: Scope): [Value, Scope] {
-			const [printValue, newScope] = this.thingToPrint.eval(scope);
-			if (printValue === null) {
-				throw RuntimePanic("Can't print nothing!");
-			}
-			stlPrint(printValue.value);
-			return [printValue, newScope];
-		},
-		estree() {
-			return {
-				node: x`stlPrint(${this.thingToPrint.estree().node})`,
-			};
-		},
+export const PrintStmt =
+	(stlPrint: (value: UnboxedValue) => void) =>
+	(thingToPrint: Expr, tokens: Token[] = []): PrintStmt => {
+		return {
+			type: "PrintStmt",
+			thingToPrint,
+			tokens,
+			eval(scope: Scope): [Value, Scope] {
+				const [printValue, newScope] = this.thingToPrint.eval(scope);
+				if (printValue === null) {
+					throw RuntimePanic("Can't print nothing!");
+				}
+				stlPrint(printValue.value);
+				return [printValue, newScope];
+			},
+			estree() {
+				return {
+					node: x`stlPrint(${this.thingToPrint.estree().node})`,
+				};
+			},
+		};
 	};
-};

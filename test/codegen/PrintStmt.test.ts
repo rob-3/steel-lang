@@ -7,7 +7,7 @@ import { assertEqual } from "../Helpers";
 
 describe("PrintStmt codegen", () => {
 	it("should compile a print statement", () => {
-		const node = PrintStmt(PrimaryExpr(StlNumber.of(5))).estree();
+		const node = PrintStmt(() => {})(PrimaryExpr(StlNumber.of(5))).estree();
 		assertEqual(node, x`stlPrint({stlValue: {top: 5n, bottom: 1n}})`);
 	});
 });
