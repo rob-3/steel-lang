@@ -1,11 +1,11 @@
 import { Either } from "purify-ts";
 import { ExprBase } from "../src/Expr.js";
 import parse from "../src/Parser.js";
-import Scope from "../src/Scope.js";
 import tokenize from "../src/Tokenizer.js";
 import StlNumber from "../src/StlNumber.js";
 import { describe, it, expect, vi as jest } from "vitest";
-import { stlEval, stlExec } from "./Helpers.js";
+import { stlEval, stlEvalMockPrint } from "./Helpers.js";
+import { stlEval as fullStlEval } from "../src/Interpreter.js";
 
 describe("stlEval()", () => {
 	describe("literals", () => {
@@ -204,7 +204,7 @@ describe("exec()", () => {
 		it("should execute an if stmt with true condition", () => {
 			const src = "if (true) {\nprint(5)\n}";
 			const spy = jest.fn();
-			stlExec(src, spy);
+			stlEvalMockPrint(src, spy);
 			expect(spy.mock.calls).toEqual([[new StlNumber(5n)]]);
 		});
 
@@ -215,7 +215,7 @@ describe("exec()", () => {
             }
             `;
 			const spy = jest.fn();
-			stlExec(src, spy);
+			stlEvalMockPrint(src, spy);
 			expect(spy.mock.calls).toEqual([]);
 		});
 
@@ -228,7 +228,7 @@ describe("exec()", () => {
             }
             `;
 			const spy = jest.fn();
-			stlExec(src, spy);
+			stlEvalMockPrint(src, spy);
 			expect(spy.mock.calls).toEqual([[new StlNumber(6n)]]);
 		});
 
@@ -241,7 +241,7 @@ describe("exec()", () => {
             }
             `;
 			const spy = jest.fn();
-			stlExec(src, spy);
+			stlEvalMockPrint(src, spy);
 			expect(spy.mock.calls).not.toContain(5);
 		});
 
@@ -254,7 +254,7 @@ describe("exec()", () => {
             }
             `;
 			const spy = jest.fn();
-			stlExec(src, spy);
+			stlEvalMockPrint(src, spy);
 			expect(spy.mock.calls).not.toContainEqual(new StlNumber(5n));
 			expect(spy.mock.calls).toContainEqual([new StlNumber(6n)]);
 		});
@@ -280,7 +280,7 @@ describe("exec()", () => {
         `;
 		it("should loop until the condition is met", () => {
 			const spy = jest.fn();
-			stlExec(src, spy);
+			stlEvalMockPrint(src, spy);
 			expect(spy.mock.calls.length).toBe(10);
 		});
 	});
@@ -288,12 +288,14 @@ describe("exec()", () => {
 	describe("variables", () => {
 		it("should be able to access a variable", () => {
 			const src = "var a <- 14";
-			const scope: Scope = stlExec(src)[1];
-			expect(stlEval("a", scope)).toEqual(new StlNumber(14n));
+			const result = fullStlEval(src);
+			expect(stlEval("a", result.unsafeCoerce()[1])).toEqual(
+				new StlNumber(14n)
+			);
 		});
 
 		it("should be able to assign to a variable", () => {
-			const scope = stlExec("var a <- 14\na <- 15")[1];
+			const scope = fullStlEval("var a <- 14\na <- 15").unsafeCoerce()[1];
 			expect(stlEval("a", scope)).toEqual(new StlNumber(15n));
 		});
 
@@ -323,7 +325,7 @@ describe("exec()", () => {
 
 		it("should allow nonlocal shadowing", () => {
 			const spy = jest.fn();
-			stlExec(
+			stlEvalMockPrint(
 				` 
                 a = 4 
                 b = 6
@@ -362,19 +364,19 @@ describe("exec()", () => {
             }
             `;
 			it("should not throw on function definition", () => {
-				expect(() => stlExec(src, () => {})).not.toThrow();
+				expect(() => stlEvalMockPrint(src, () => {})).not.toThrow();
 			});
 
 			it("should not run the definition of a function", () => {
 				const spy = jest.fn();
-				stlExec(src, spy);
+				stlEvalMockPrint(src, spy);
 				expect(spy.mock.calls.length).toBe(0);
 			});
 
 			it("should be callable", () => {
 				const src2 = src + "a()";
 				const spy = jest.fn();
-				stlExec(src2, spy);
+				stlEvalMockPrint(src2, spy);
 				expect(spy.mock.calls).toEqual([[new StlNumber(5n)]]);
 			});
 
@@ -418,19 +420,19 @@ describe("exec()", () => {
            }
            `;
 			it("should not throw on function definition", () => {
-				expect(() => stlExec(src, () => {})).not.toThrow();
+				expect(() => stlEvalMockPrint(src, () => {})).not.toThrow();
 			});
 
 			it("should not run the definition of a function", () => {
 				const spy = jest.fn();
-				stlExec(src, spy);
+				stlEvalMockPrint(src, spy);
 				expect(spy.mock.calls).toEqual([]);
 			});
 
 			it("should be callable", () => {
 				const src2 = src + "a(5, 6)";
 				const spy = jest.fn();
-				stlExec(src2, spy);
+				stlEvalMockPrint(src2, spy);
 				expect(spy.mock.calls).toEqual([[new StlNumber(11n)]]);
 			});
 
@@ -637,7 +639,7 @@ describe("exec()", () => {
 
 		it("should be able to be used as an expression", () => {
 			const spy = jest.fn();
-			stlExec(
+			stlEvalMockPrint(
 				`
                 a = 4
                 b = a - 2

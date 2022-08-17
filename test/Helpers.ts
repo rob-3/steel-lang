@@ -3,7 +3,6 @@ import { expect } from "vitest";
 import Scope from "../src/Scope";
 import { UnboxedValue } from "../src/Value";
 import { stlEval as _stlEval } from "../src/Interpreter.js";
-import { Value } from "../src/Value.js";
 
 export const assertEqual = (
 	node1: { node?: Node; errors?: Error[] } | Error,
@@ -26,14 +25,13 @@ export const stlEval = (
 	});
 };
 
-export const stlExec = (
+export const stlEvalMockPrint = (
 	src: string,
-	printfn?: (a: UnboxedValue) => void
-): [Value | null, Scope] => {
+	printfn: (value: UnboxedValue) => void
+): [UnboxedValue | undefined, Scope] | Error[] => {
 	const val = _stlEval(src, { scope: new Scope({ printfn }) });
-	try {
-		return val.unsafeCoerce();
-	} catch (e) {
-		throw e;
-	}
+	return val.caseOf<[UnboxedValue | undefined, Scope] | Error[]>({
+		Right: ([val, scope]) => [val?.value, scope],
+		Left: (err) => err,
+	});
 };
