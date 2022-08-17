@@ -30,7 +30,7 @@ export const stlExec = (
 	src: string,
 	printfn?: (a: UnboxedValue) => void
 ): [Value | null, Scope] => {
-	const val = _stlEval(src, { scope: new Scope(null, printfn) });
+	const val = _stlEval(src, { scope: new Scope({ printfn }) });
 	try {
 		return val.unsafeCoerce();
 	} catch (e) {

@@ -18,7 +18,7 @@ describe("class Scope", () => {
 
 	it("should defer to higher parent scope", () => {
 		const parentScope = new Scope();
-		const childScope = new Scope(parentScope);
+		const childScope = new Scope({ parent: parentScope });
 		parentScope.setLocal("a", [new Box(new StlNumber(49n)), false]);
 		expect(childScope.get("a")?.value).toEqual(new StlNumber(49n));
 	});

@@ -16,12 +16,15 @@ import { toString } from "./Logger.js";
 export default class Scope {
 	// FIXME this should probably be two separate hashmaps
 	bindings: Map<string, [Value, boolean]>;
-	parent: Scope | null;
+	parent?: Scope;
 	printfn: (value: UnboxedValue) => void;
-	constructor(
-		parent: Scope | null = null,
-		printfn?: (value: UnboxedValue) => void
-	) {
+	constructor({
+		parent,
+		printfn,
+	}: {
+		parent?: Scope;
+		printfn?: (value: UnboxedValue) => void;
+	} = {}) {
 		this.bindings = new Map();
 		this.parent = parent;
 		printfn = printfn ?? parent?.printfn ?? ((x) => console.log(toString(x)));
@@ -60,7 +63,7 @@ export default class Scope {
 		const value = this.bindings.get(identifier);
 		if (value === undefined) {
 			if (this.parent !== null) {
-				return this.parent.getPair(identifier);
+				return this.parent?.getPair(identifier) ?? null;
 			} else {
 				return null;
 			}
@@ -77,7 +80,7 @@ export default class Scope {
 		if (this.bindings.has(identifier)) {
 			this.setLocal(identifier, [value, immutable]);
 		} else {
-			if (this.parent !== null && this.parent.has(identifier)) {
+			if (this.parent?.has(identifier)) {
 				this.parent.setLocal(identifier, [value, immutable]);
 			} else {
 				if (this.parent) {
@@ -118,7 +121,7 @@ export default class Scope {
 		if (this.has(key)) {
 			throw RuntimePanic(`Cannot redefine immutable variable ${key}.`);
 		} else {
-			const newScope = new LocalScope(this);
+			const newScope = new LocalScope({ parent: this });
 			newScope.setLocal(key, [evaluatedExpr, immutable]);
 			// Allow for recursive functions
 			if (evaluatedExpr.value instanceof StlFunction) {
@@ -142,7 +145,7 @@ class LocalScope extends Scope {
 	has(key: string): boolean {
 		if (this.bindings.has(key)) {
 			return true;
-		} else if (this.parent !== null && this.parent.has(key)) {
+		} else if (this.parent?.has(key)) {
 			return true;
 		} else {
 			return false;

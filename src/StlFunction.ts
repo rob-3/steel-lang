@@ -12,7 +12,7 @@ export class StlFunction {
 	}
 
 	call(callArgs: Value[]): Value | null {
-		const funScope = new Scope(this.scope);
+		const funScope = new Scope({ parent: this.scope });
 		for (let i = 0; i < this.funExpr.args.length; i++) {
 			// FIXME typecheck args
 			const { name, isImmutable } = this.funExpr.args[i];
