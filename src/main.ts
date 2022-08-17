@@ -1,14 +1,14 @@
 import { readFile } from "fs";
 import { writeFile } from "fs/promises";
 import { createInterface } from "readline";
-import { toString } from "./Logger.js";
+import { stlToString } from "./StlToString.js";
 import Scope from "./Scope.js";
 import { run, startRepl, compile } from "./steel.js";
 import { UnboxedValue } from "./Value.js";
 
 export function main(
 	stlPrint: (s: UnboxedValue) => void = (val: UnboxedValue) =>
-		console.log(toString(val))
+		console.log(stlToString(val))
 ) {
 	const rl = createInterface({
 		input: process.stdin,

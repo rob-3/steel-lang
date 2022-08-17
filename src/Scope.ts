@@ -4,7 +4,7 @@ import { Value, Box, UnboxedValue } from "./Value.js";
 import { FunctionExpr } from "./nodes/FunctionExpr.js";
 import { PrintStmt } from "./nodes/PrintStmt.js";
 import { VariableExpr } from "./nodes/VariableExpr.js";
-import { toString } from "./Logger.js";
+import { stlToString } from "./StlToString.js";
 
 /**
  * A Scope represents a lexical scope in the program. Each Scope has a set of
@@ -27,7 +27,8 @@ export default class Scope {
 	} = {}) {
 		this.bindings = new Map();
 		this.parent = parent;
-		printfn = printfn ?? parent?.printfn ?? ((x) => console.log(toString(x)));
+		printfn =
+			printfn ?? parent?.printfn ?? ((x) => console.log(stlToString(x)));
 		this.printfn = printfn;
 		// library print function
 		// FIXME null token lists
