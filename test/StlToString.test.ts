@@ -4,6 +4,7 @@ import { PrimaryExpr } from "../src/nodes/PrimaryExpr";
 import Scope from "../src/Scope";
 import { StlFunction } from "../src/StlFunction";
 import StlNumber from "../src/StlNumber";
+import StlObject from "../src/StlObject";
 import { stlToString } from "../src/StlToString.js";
 import { Box } from "../src/Value.js";
 
@@ -32,5 +33,20 @@ describe("stlToString()", () => {
 				)
 			)
 		).toEqual("[5, 5, 5]");
+	});
+
+	it("should stringify an object", () => {
+		expect(
+			stlToString(
+				new StlObject(
+					new Map(
+						Object.entries({
+							someProp: new Box(StlNumber.of(5)),
+							anotherProp: new Box(StlNumber.of(7)),
+						})
+					)
+				)
+			)
+		).toEqual("{ someProp: 5, anotherProp: 7 }");
 	});
 });
