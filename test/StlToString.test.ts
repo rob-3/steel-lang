@@ -49,4 +49,8 @@ describe("stlToString()", () => {
 			)
 		).toEqual("{ someProp: 5, anotherProp: 7 }");
 	});
+
+	it("should stringify an empty object", () => {
+		expect(stlToString(new StlObject(new Map()))).toEqual("{}");
+	});
 });
