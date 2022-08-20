@@ -8,6 +8,7 @@ export function stlToString(val: UnboxedValue): string {
 	} else if (val instanceof StlFunction) {
 		return "<function>";
 	} else if (val instanceof StlObject) {
+		if (val.properties.size === 0) return "{}";
 		return `{ ${[...val.properties.entries()]
 			.map(([key, value]) => `${key}: ${stlToString(value.value)}`)
 			.join(", ")} }`;
