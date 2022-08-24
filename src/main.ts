@@ -14,9 +14,9 @@ export function main(
 		input: process.stdin,
 		output: process.stdout,
 	});
-	startRepl(rl, stlPrint);
 	// If no filename, start REPL
 	if (process.argv.length === 2) {
+		startRepl(rl, stlPrint);
 	} else {
 		if (process.argv[2] === "-c") {
 			const filename = process.argv[3];
