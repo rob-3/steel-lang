@@ -3,7 +3,7 @@
 	"version": "1.0.0",
 	"main": "index.js",
 	"scripts": {
-		"start": "NODE_OPTIONS=--experimental-vm-modules node dist/src/main.js",
+		"start": "./bin/steel",
 		"test": "npx vitest run",
 		"test:watch": "npx vitest",
 		"build": "tsc"
