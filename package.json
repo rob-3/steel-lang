@@ -9,7 +9,7 @@
 		"build": "tsc"
 	},
 	"keywords": [],
-	"author": "",
+	"author": "Robert Boyd III",
 	"license": "MPL-2.0",
 	"description": "",
 	"type": "module",
