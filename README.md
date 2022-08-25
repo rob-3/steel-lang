@@ -1,8 +1,7 @@
 # Steel
 
-Steel is a programming language for teaching beginners best practices and
-functional programming patterns. Currently, it is a prototype; bugs and missing
-features are expected.
+Steel is an experimental compile-to-JavaScript programming language. Currently,
+it is a prototype; bugs and missing features are expected.
 
 ## Installation
 
@@ -12,20 +11,33 @@ To install Steel, run the following commands.
 git clone https://github.com/rob-3/steel-lang.git
 cd steel-lang
 npm install
+chmod +x ./bin/steel
+```
+
+Then, build thr project with:
+
+```bash
+npm run build
 ```
 
 ## Getting Started
 
-To use the REPL run:
+To start the REPL, use:
 
 ```bash
-npm start
+./bin/steel
 ```
 
-To run a file use:
+To run a file, use:
 
 ```bash
-npm start -- file.stl
+./bin/steel file.steel
+```
+
+To compile a file to JavaScript (very experimental), use:
+
+```bash
+./bin/steel -c file.steel
 ```
 
 ## License
