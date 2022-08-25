@@ -14,7 +14,7 @@ npm install
 chmod +x ./bin/steel
 ```
 
-Then, build thr project with:
+Then, build the project with:
 
 ```bash
 npm run build
