@@ -4,6 +4,7 @@ import Token from "../Token.js";
 import { Value } from "../Value.js";
 import { RuntimePanic } from "../Debug.js";
 import { x } from "code-red";
+import { makeLetStatements } from "./MakeLetStatements.js";
 
 export type WhileStmt = ExprBase & {
 	type: "WhileStmt";
@@ -37,11 +38,16 @@ export const WhileStmt = (
 			return [value, scope];
 		},
 		estree() {
+			const { node, identifierDeclarations } = this.body.estree();
+			const identifierDeclarationNode = makeLetStatements(
+				identifierDeclarations ?? []
+			);
 			return {
 				node: x`(() => {
 					let ret;
 					while (${this.condition.estree().node}) {
-						ret = ${this.body.estree().node}
+						${identifierDeclarationNode}
+						ret = ${node}
 					}
 					return ret;
 				})()`,
