@@ -4,6 +4,7 @@ import { Expr, ExprBase } from "../Expr.js";
 import Scope from "../Scope.js";
 import Token from "../Token.js";
 import { Value } from "../Value.js";
+import { wrapInClosureIfNecessary } from "./MakeLetStatements.js";
 
 export type IfStmt = ExprBase & {
 	type: "IfStmt";
@@ -40,11 +41,13 @@ export const IfStmt = (
 			}
 		},
 		estree() {
+			const ifNode = wrapInClosureIfNecessary(this.body.estree());
+			const elseNode = wrapInClosureIfNecessary(this.elseBody?.estree());
 			return {
 				node: x`
 				stlUnwrap(${this.condition.estree().node}) ? 
-					${this.body.estree().node} :
-					${this.elseBody?.estree().node ?? "null"}
+					${ifNode} :
+					${elseNode ?? "null"}
 				`,
 			};
 		},
