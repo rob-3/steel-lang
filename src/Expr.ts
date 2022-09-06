@@ -29,8 +29,13 @@ export type ExprBase = {
 	estree(): {
 		node?: Node;
 		errors?: Error[];
-		identifierDeclarations?: { identifier: string; immutable: boolean }[];
+		identifierDeclarations?: IdentifierDeclaration[];
 	};
+};
+
+export type IdentifierDeclaration = {
+	identifier: string;
+	immutable: boolean;
 };
 
 export type Expr =

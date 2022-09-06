@@ -1,6 +1,6 @@
 import { print } from "code-red";
 import { Either } from "purify-ts";
-import { Expr } from "./Expr.js";
+import { Expr, IdentifierDeclaration } from "./Expr.js";
 import { exprEval } from "./Interpreter.js";
 import parse from "./Parser.js";
 import Scope from "./Scope.js";
@@ -93,7 +93,7 @@ export function compile(src: string, filename: string) {
 			return err;
 		},
 		Right: (exprs) => {
-			const names: { identifier: string; immutable: boolean }[] = [];
+			const names: IdentifierDeclaration[] = [];
 			const exprStrings = exprs
 				.map((expr) => {
 					const jsCode = expr.estree();
