@@ -24,7 +24,7 @@ describe("WhileStmt codegen", () => {
 			node,
 			x`(() => {
 			let ret;
-			while (stlEqual(a, {stlValue: {top: 2n, bottom: 1n}})) {
+			while (stlEqual(a, {stlValue: {top: 2n, bottom: 1n}}).stlValue) {
 				ret = (a = {stlValue: {top: 3n, bottom: 1n}})
 			}
 			return ret;
@@ -45,7 +45,7 @@ describe("WhileStmt codegen", () => {
 			node,
 			x`(() => {
 			let ret;
-			while (stlEqual(a, {stlValue: {top: 2n, bottom: 1n}})) {
+			while (stlEqual(a, {stlValue: {top: 2n, bottom: 1n}}).stlValue) {
 				let hello;
 				ret = (hello = { stlValue: { top: 5n, bottom: 1n } });
 			}

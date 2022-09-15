@@ -45,7 +45,7 @@ export const WhileStmt = (
 			return {
 				node: x`(() => {
 					let ret;
-					while (${this.condition.estree().node}) {
+					while (${this.condition.estree().node}.stlValue) {
 						${identifierDeclarationNode}
 						ret = ${node}
 					}
