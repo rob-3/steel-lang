@@ -13,6 +13,18 @@ const stlSubtract = (a, b) => ({
 		bottom: a.stlValue.bottom,
 	},
 });
+const stlLess = (a, b) => ({
+	stlValue: a.stlValue.top * b.stlValue.bottom < b.stlValue.top * a.stlValue.bottom,
+});
+const stlLessEqual = (a, b) => ({
+	stlValue: a.stlValue.top * b.stlValue.bottom <= b.stlValue.top * a.stlValue.bottom,
+});
+const stlGreater = (a, b) => ({
+	stlValue: a.stlValue.top * b.stlValue.bottom > b.stlValue.top * a.stlValue.bottom,
+});
+const stlGreaterEqual = (a, b) => ({
+	stlValue: a.stlValue.top * b.stlValue.bottom >= b.stlValue.top * a.stlValue.bottom,
+});
 const print = (arg) => {
   const { stlValue } = arg;
   if (typeof arg === "function") {
